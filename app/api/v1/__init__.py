@@ -3,7 +3,7 @@ Api router - Merge all api routes.
 """
 
 from fastapi import APIRouter
-from app.api.v1.routes import events, particpants, speakers, user
+from api.v1.routes import events, particpants, speakers, user
 
 api_router = APIRouter()
 

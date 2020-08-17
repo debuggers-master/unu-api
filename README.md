@@ -58,5 +58,5 @@ docker-compose up --build
 Some awosem ressume documentation...
 
 ## Contributors
-[Emanuel Osorio](https://github.com/emanuelosva)
-[Mario barbosa](https://github.com/mariobarbosa777)
+- [Emanuel Osorio](https://github.com/emanuelosva)
+- [Mario barbosa](https://github.com/mariobarbosa777)

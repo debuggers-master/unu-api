@@ -37,5 +37,5 @@ class UserOut(UserBase):
     """
     _id: str = Field(...,
                      description="Unique Id identifier of a organization")
-    organizations: List[OrganizationOut]
-    collaborations: List[CollaborationOut]
+    organizations: Optional[List[OrganizationOut]] = []
+    collaborations: Optional[List[CollaborationOut]] = []

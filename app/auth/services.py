@@ -11,8 +11,8 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from config import settings  # pylint: disable-msg=E0611
-from db.users import get_user
-from schemas.users import UserOut
+from db.users import get_user, create_user
+from schemas.users import UserOut, UserIn
 
 # Auth constants
 SECRET = settings.SECRET_JWT
@@ -167,3 +167,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
     if user is None:
         raise credentials_exception
     return UserOut(**user)
+
+
+async def register_user(user: UserIn) -> str:
+    """
+    Create a new User
+    """
+    new_user = dict(user)
+    new_user.update({"password": hash_password(user.password)})
+    new_user.update({"organizations": []})
+    new_user.update({"collaborations": []})
+    inserted_id = await create_user(new_user)
+    if inserted_id is not None:
+        return UserOut(**new_user)
+    else:
+        return False

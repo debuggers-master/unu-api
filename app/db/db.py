@@ -80,14 +80,14 @@ class CRUD:
         """
         Create a new document in collection.
         """
-        created = self.coll.insert_one(document_data)
+        created = await self.coll.insert_one(document_data)
         return str(created.inserted_id)
 
     async def update(self, query: dict, document_data: dict) -> str:
         """
         Update an existing document.
         """
-        updated = self.coll.update_one(query, {"$set": document_data})
+        updated = await self.coll.update_one(query, {"$set": document_data})
         return str(updated.modified_count)
 
     async def add_to_set(self, query: dict, array_name: str, data: any) -> str:
@@ -95,7 +95,7 @@ class CRUD:
         Add a new item to a list within a document.
         """
         operation = {"$addToSet": {f"{array_name}": data}}
-        updated = self.coll.update_one(query, operation)
+        updated = await self.coll.update_one(query, operation)
         return str(updated.modified_count)
 
     async def delete(self, query: dict) -> None:

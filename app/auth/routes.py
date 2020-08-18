@@ -2,12 +2,16 @@
 Authorization endpoints.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-from schemas.users import UserOut
+from schemas.users import UserOut, UserIn
 from .services import (
-    authenticate_user, credentials_exception, create_access_token, Token)
+    authenticate_user,
+    credentials_exception,
+    create_access_token,
+    Token,
+    register_user)
 
 # Router instance
 auth_router = APIRouter()
@@ -22,7 +26,7 @@ class LoginRequest(BaseModel):
     password: str = Field(description="The user password")
 
 
-class LoginResponse(Token):
+class AuthResponse(Token):
     """
     Login Response schema.
     """
@@ -31,7 +35,7 @@ class LoginResponse(Token):
 
 # -------------------- Auth router ------------------------- #
 
-@auth_router.post('/login', response_model=LoginResponse)
+@auth_router.post("/login", response_model=AuthResponse)
 async def login_for_acces_token(login_data: LoginRequest):
     """
     Login route.
@@ -41,3 +45,15 @@ async def login_for_acces_token(login_data: LoginRequest):
         raise credentials_exception
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
+
+
+@auth_router.post("/signup", response_model=AuthResponse)
+async def signup(user: UserIn):
+    """
+    Register a new user and login the user
+    """
+    new_user = await register_user(user)
+    if not new_user:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    access_token = create_access_token(data={"sub": new_user.email})
+    return {"access_token": access_token, "token_type": "Bearer", "user": new_user}

@@ -102,5 +102,46 @@ class CRUD:
         """
         Delete a existing document
         """
-
         await self.coll.delete_one(query)
+
+    async def find(
+            self, query: dict,
+            only_one: bool = True,
+            filters: list = None,
+            excludes: list = None,
+    ) -> dict:
+        """
+        Retrieve the data that matches with the query and the filters.
+        """
+        query_filter = None
+        if filters is not None:
+            query_filter = self.generate_query_filter(filters)
+        if excludes is not None:
+            query_filter = self.generate_query_filter(excludes, excludes=True)
+
+        if only_one:
+            document = await self.coll.find_one(query, query_filter)
+            return jsonify(document)
+
+        cursor = await self.coll.find(query, query_filter)
+        items = []
+        for document in await cursor.to_list():
+            items.append(document)
+
+        return items
+
+    def generate_query_filter(
+            self, filter_list: list = None, excludes: bool = False) -> dict:
+        """
+        Generate a dict with the correct query filter
+        """
+
+        objet_filter = {}
+        if filter_list is not None:
+            for key in filter_list:
+                if excludes:
+                    objet_filter[key] = 0
+                else:
+                    objet_filter[key] = 1
+
+        return objet_filter

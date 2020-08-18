@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     CORS_ORIGIN: str
 
+    # AUTH
+    SECRET_JWT: str
+
     # MONGO DB
     DB_NAME: str
     DB_PASSWORD: str

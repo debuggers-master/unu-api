@@ -23,13 +23,21 @@ class UserBase(BaseModel):
                           example="Barbosa")
 
 
+class UserInDB(UserBase):
+    """
+    Base model for save user in DB
+    """
+    hashed_password: str = Field(...,
+                          description="Hash password of user")
+
 class UserIn(UserBase):
     """
     Base Model for register new user or login , this class extends UserBase
     """
     password: str = Field(...,
                           description="Password of user account")
-
+    passwordConfirm: str = Field(...,
+                                 description="Password of user account")
 
 class UserOut(UserBase):
     """

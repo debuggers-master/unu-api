@@ -37,3 +37,5 @@ async def login(user_login: UserIn):
     else: ## Wrong Password
         raise HTTPException(status_code=400, detail="Password does not match")
 
+
+# @router.get("/user/organizations")

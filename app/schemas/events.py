@@ -7,21 +7,19 @@ from pydantic import BaseModel, HttpUrl, Field # pylint: disable-msg=E0611
 
 class Templates(str, Enum):
     """
-        Template choice list
+    Template choice list
     """
     template1 = "template1"
     template2 = "template2"
 
-class EventIn(BaseModel):
+
+class EventBase(BaseModel):
     """
-    Base Model for create a event
+    Base Model for event
     """
     name: str = Field(...,
                       description="Name of event",
                       example="Python Week Code")
-    organization_id: str = Field(...,
-                                 description="Email of user",
-                                 example="name_last@organization.com")
     url: str = Field(...,
                      description="event url identifier",
                      example="cosas-de-inges/py-week")
@@ -29,6 +27,15 @@ class EventIn(BaseModel):
                            description="Date of Start of event",
                            example="28/08/2020")
     template: Templates
+
+class EventIn(EventBase):
+    """
+    Base Model for create a event
+    """
+    organization_id: str = Field(...,
+                                 description="Email of user",
+                                 example="name_last@organization.com")
+
 
 class Information(BaseModel):
     """

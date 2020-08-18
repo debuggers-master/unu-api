@@ -23,7 +23,7 @@ class UserBase(BaseModel):
 
 class UserIn(UserBase):
     """
-    Base Model for register new user, this class extends UserBase
+    Base Model for register new user or login , this class extends UserBase
     """
     password: str = Field(...,
                           description="Password of user account")

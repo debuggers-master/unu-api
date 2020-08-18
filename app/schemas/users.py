@@ -1,7 +1,7 @@
 """
 User Schema Models
 """
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, EmailStr, Field  # pylint: disable-msg=E0611
 
 from .organizations import OrganizationOut
@@ -37,5 +37,5 @@ class UserOut(UserBase):
     """
     _id: str = Field(...,
                      description="Unique Id identifier of a organization")
-    organizations = List[OrganizationOut]
-    collaborations = List[CollaborationOut]
+    organizations: List[OrganizationOut]
+    collaborations: List[CollaborationOut]

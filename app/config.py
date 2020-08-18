@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # MONGO DB
     DB_NAME: str
     DB_PASSWORD: str
-    DB_CLUSER: str
+    DB_CLUSTER: str
     DB_USERNAME: str
 
     # SEND_GRIND

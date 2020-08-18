@@ -2,7 +2,8 @@
 Register Schema Models
 """
 
-from pydantic import BaseModel, EmailStr, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, EmailStr, Field  # pylint: disable-msg=E0611
+
 
 class ResistersIn(BaseModel):
     """
@@ -12,6 +13,7 @@ class ResistersIn(BaseModel):
                           description="Unique Id identifier for organization")
     email: EmailStr = Field(...,
                             description="Email of new register")
+
 
 class RegisterOut(BaseModel):
     """

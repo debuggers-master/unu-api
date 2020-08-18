@@ -1,7 +1,7 @@
 """
 Organizations  Schema Models
 """
-from pydantic import EmailStr, BaseModel, Field # pylint: disable-msg=E0611
+from pydantic import EmailStr, BaseModel, Field  # pylint: disable-msg=E0611
 
 
 class CollaborationIn(BaseModel):
@@ -14,6 +14,7 @@ class CollaborationIn(BaseModel):
     name: str = Field(...,
                       description="Name of collaborator",
                       example="Valentina Collazos")
+
 
 class CollaborationOut(BaseModel):
     """

@@ -78,10 +78,7 @@ async def create_user(user_data: dict) -> str:
 
 
 async def update_user(
-        user_data: dict,
-        email: str = None,
-        user_id: str = None
-) -> str:
+        user_data: dict, email: str = None, user_id: str = None) -> str:
     """
     Update an existing user in collection.
 
@@ -106,10 +103,7 @@ async def update_user(
     return modified_count
 
 
-async def delete_user(
-        email: str = None,
-        user_id: str = None
-) -> bool:
+async def delete_user(email: str = None, user_id: str = None) -> bool:
     """
     Delete an existing user from collection.
 
@@ -132,10 +126,7 @@ async def delete_user(
 
 
 async def add_organization(
-        organization_data: dict,
-        email: str = None,
-        user_id: str = None,
-) -> str:
+        organization_data: dict, email: str = None, user_id: str = None) -> str:
     """
     Add a new organization to the organizations user list
 
@@ -162,9 +153,7 @@ async def add_organization(
 
 
 async def add_collaboration(
-        collaboration_data: dict,
-        email: str = None,
-        user_id: str = None,
+        collaboration_data: dict, email: str = None, user_id: str = None
 ) -> str:
     """
     Add a new organization to the collaborations user list

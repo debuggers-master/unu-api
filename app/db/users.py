@@ -3,10 +3,11 @@ DB users - Db functions about users
 """
 
 from bson.json_util import ObjectId
-from .db import get_collection, jsonify
+from .db import get_collection, jsonify, CRUD
 
 # Users collection
 db = get_collection('users')
+crud = CRUD(db)
 
 
 # ------------------- Useful functions ------------------ #
@@ -72,9 +73,8 @@ async def create_user(user_data: dict) -> str:
     inserted_id: str
         The user inserted id.
     """
-
-    user = await db.insert_one(user_data)
-    return str(user.inserted_id)
+    inserted_id = await crud.create(user_data)
+    return inserted_id
 
 
 async def update_user(
@@ -102,9 +102,8 @@ async def update_user(
     """
 
     query = create_query(email, user_id)
-    operation = {"$set": user_data}
-    updated_user = await db.update_one(query, operation)
-    return str(updated_user.modified_count)
+    modified_count = await crud.update(query, user_data)
+    return modified_count
 
 
 async def delete_user(
@@ -128,7 +127,7 @@ async def delete_user(
     """
 
     query = create_query(email, user_id)
-    await db.delete_one(query)
+    await crud.delete(query)
     return True
 
 
@@ -156,9 +155,10 @@ async def add_organization(
     """
 
     query = create_query(email, user_id)
-    operation = {"$addToSet": {"organizations": organization_data}}
-    updated_user = await db.update_one(query, operation)
-    return str(updated_user.modified_count)
+    modified_count = await crud.add_to_set(
+        query, "organizations", organization_data
+    )
+    return modified_count
 
 
 async def add_collaboration(
@@ -183,8 +183,8 @@ async def add_collaboration(
     modified_count: str
         The modified documents count (always str(1))
     """
-
     query = create_query(email, user_id)
-    operation = {"$addToSet": {"collaborations": collaboration_data}}
-    updated_user = await db.update_one(query, operation)
-    return str(updated_user.modified_count)
+    modified_count = await crud.add_to_set(
+        query, "collaborations", collaboration_data
+    )
+    return modified_count

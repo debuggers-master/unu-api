@@ -3,10 +3,11 @@ DB participants - Db functions about participants
 """
 
 from bson.json_util import ObjectId
-from .db import get_collection, jsonify
+from .db import get_collection, jsonify, CRUD
 
 # Users collection
 db = get_collection('participants')
+crud = CRUD(db)
 
 
 # -------------------- Participants methods -------------------- #
@@ -26,8 +27,7 @@ async def create_new_participants_document(event_id: str) -> str:
     """
 
     document = {"event_id": event_id, "participants": []}
-    created = await db.insert_one(document)
-    return str(created.inserted_id)
+    return await crud.create(document)
 
 
 async def add_participant(event_id: str, participant_data: dict) -> str:
@@ -48,9 +48,7 @@ async def add_participant(event_id: str, participant_data: dict) -> str:
     """
 
     query = {"event_id": ObjectId(event_id)}
-    operation = {"$addToSet": {"participants": participant_data}}
-    updated = db.update_one(query, operation)
-    return str(updated.modified_count)
+    return await crud.add_to_set(query, "participants", participant_data)
 
 
 async def get_participants(event_id: str) -> list:

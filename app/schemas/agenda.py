@@ -3,7 +3,7 @@ Events Schema Models
 """
 
 from typing import List
-from pydantic import BaseModel, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
 class Conference(BaseModel):
@@ -23,6 +23,7 @@ class Conference(BaseModel):
                              description="Name of the speaker",
                              example="Carlos Gonzales")
 
+
 class Day(BaseModel):
     """
     Base Model Day Events
@@ -31,6 +32,7 @@ class Day(BaseModel):
                            description=" A Text to show the day of the conference",
                            example="Sunday 30 of agust, 2020")
     conference: List[Conference]
+
 
 class Agenda(BaseModel):
     """

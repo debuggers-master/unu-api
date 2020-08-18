@@ -3,7 +3,8 @@ Events Schema Models
 """
 
 from enum import Enum
-from pydantic import BaseModel, HttpUrl, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, HttpUrl, Field  # pylint: disable-msg=E0611
+
 
 class Templates(str, Enum):
     """
@@ -13,7 +14,7 @@ class Templates(str, Enum):
     template2 = "template2"
 
 
-class EventBase(BaseModel):
+class EventIn(BaseModel):
     """
     Base Model for event
     """
@@ -27,14 +28,6 @@ class EventBase(BaseModel):
                            description="Date of Start of event",
                            example="28/08/2020")
     template: Templates
-
-class EventIn(EventBase):
-    """
-    Base Model for create a event
-    """
-    organization_id: str = Field(...,
-                                 description="Email of user",
-                                 example="name_last@organization.com")
 
 
 class Information(BaseModel):
@@ -50,6 +43,7 @@ class Information(BaseModel):
     localization: str = Field(...,
                               description="Localization of event",
                               example="Online")
+
 
 class Banner(BaseModel):
     """"

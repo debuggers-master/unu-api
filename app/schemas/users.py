@@ -2,10 +2,11 @@
 User Schema Models
 """
 from typing import List
-from pydantic import BaseModel, EmailStr, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, EmailStr, Field  # pylint: disable-msg=E0611
 
-from organizations import OrganizationOut
-from collaborations import CollaborationOut
+from .organizations import OrganizationOut
+from .collaborations import CollaborationOut
+
 
 class UserBase(BaseModel):
     """
@@ -20,6 +21,7 @@ class UserBase(BaseModel):
     lastName: str = Field(None,
                           description="Lastname of user",
                           example="Barbosa")
+
 
 class UserIn(UserBase):
     """

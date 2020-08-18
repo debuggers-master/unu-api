@@ -2,7 +2,8 @@
 Organizations  Schema Models
 """
 
-from pydantic import BaseModel, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
+
 
 class OrganizationIn(BaseModel):
     """
@@ -16,6 +17,7 @@ class OrganizationIn(BaseModel):
                      example="cosas-de-inges")
     user_id: str = Field(...,
                          description="Unique Id for organization")
+
 
 class OrganizationOut(OrganizationIn):
     """

@@ -13,10 +13,10 @@ class UserBase(BaseModel):
                             example="name_last@organization.com")
     firstName: str = Field(None,
                            description="Name of user",
-                           example="Mario Barbosa")
+                           example="Mario")
     lastName: str = Field(None,
                           description="Lastname of user",
-                          example="Mario Barbosa")
+                          example="Barbosa")
 
 class UserIn(UserBase):
     """

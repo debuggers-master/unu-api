@@ -3,7 +3,7 @@ DB participants - Db functions about participants
 """
 
 from bson.json_util import ObjectId
-from .db import get_collection, jsonify, CRUD
+from .db import get_collection, CRUD
 
 # Users collection
 db = get_collection('participants')

@@ -55,8 +55,8 @@ async def get_user(email: str = None, user_id: str = None) -> dict:
     """
 
     query = create_query(email, user_id)
-    user = await db.find_one(query)
-    return jsonify(user)
+    user = await crud.find(query)
+    return user
 
 
 async def create_user(user_data: dict) -> str:

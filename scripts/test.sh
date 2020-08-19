@@ -1,0 +1,1 @@
+COMMAND='bash -c "coverage run -m pytest && coverage report"' RESTART=no docker-compose up

@@ -10,9 +10,9 @@ services:
     depends_on:
       - redis
     env_file: ./app/.env
-    restart: on-failure
+    restart: $RESTART
     command:
-      - "/start-reload.sh"
+      - "$COMMAND"
 
   redis:
     container_name: redis

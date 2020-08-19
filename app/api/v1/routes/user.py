@@ -29,6 +29,7 @@ async def create_organization(organization: OrganizationIn):
 
     return OrganizationOut(**new_org)
 
+
 @router.post("/event/", status_code=201, response_model=EventOut)
 async def create_new_event(event: EventIn):
     """

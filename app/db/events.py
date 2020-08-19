@@ -54,7 +54,7 @@ async def create_event(event_data: dict) -> str:
         The inserted id of the created event
     """
 
-    inserted_id = crud.create(event_data)
+    inserted_id = await crud.create(event_data)
     return inserted_id
 
 
@@ -75,7 +75,7 @@ async def update_event(event_id: str, event_data: dict) -> str:
     """
     #"¿Modificar para que se borre con event_ID ?"
     query = {"_id": ObjectId(event_id)}
-    modified_count = crud.update(query, event_data)
+    modified_count = await crud.update(query, event_data)
     return modified_count
 
 
@@ -93,6 +93,6 @@ async def delete_event(event_id: str) -> bool:
     True
     """
 
-    query = {"_id": ObjectId(event_id)} #"¿Modificar para que se borre con event_ID ?"
-    crud.delete(query)
+    query = {"_id": ObjectId(event_id)}
+    await crud.delete(query)
     return True

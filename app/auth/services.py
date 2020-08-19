@@ -4,12 +4,12 @@ Authentication logic.
 
 from datetime import datetime, timedelta
 from typing import Optional
+from uuid import uuid4
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
-from uuid import uuid4
 
 from config import settings  # pylint: disable-msg=E0611
 from db.users import get_user, create_user

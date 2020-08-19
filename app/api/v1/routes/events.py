@@ -2,23 +2,24 @@
 Events Router - Operations about events
 """
 
-from fastapi import APIRouter
-from schemas.events import EventIn, EventBase # pylint: disable-msg=E0611
+from fastapi import APIRouter, HTTPException
+
+from schemas.events import InformationIn, InformationDB
+from db.events import update_event
+
+
 
 # Router instance
 router = APIRouter()
 
 
-@router.post("/event/",
-             status_code=201,
-             response_model=EventBase)
-async def event(new_event: EventIn):
+@router.post("information", status_code=204)
+async def create_information(info: InformationIn):
     """
-    EndPoint to create new event
+    Create a dict into events called information
+    with **Information** Model
     """
-    if True: ## User successful created
-        return UserOut
-    elif False: ## Email Already exists
-        raise HTTPException(status_code=409, detail="Email already register")
-    else: ## Wrong Password Confirm
-        raise HTTPException(status_code=400, detail="Password does not match")
+
+    modified = await update_event(event_id=info.event_id, event_data=InformationDB(**info.dict()))
+    if int(modified) < 1:
+        raise HTTPException(status_code=500, detail="Internal Server Error")

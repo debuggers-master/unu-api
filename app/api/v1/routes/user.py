@@ -1,41 +1,56 @@
 """
 User Router - Operations about users
 """
+from uuid import uuid4
+from fastapi import APIRouter, HTTPException, Depends
 
-from fastapi import APIRouter, HTTPException
-
-from schemas.users import UserIn, UserOut # pylint: disable-msg=E0611
+from schemas.organizations import OrganizationIn, OrganizationOut
+from schemas.events import EventIn, EventOut, EventDelete
+from db.users import add_organization
+from db.events import create_event, delete_event
+from auth.services import get_current_user
 
 # Router instance
 router = APIRouter()
 
-@router.post("/signin/",
-             status_code=201,
-             response_model=UserOut)
-async def signin(new_user: UserIn):
-    """
-    EndPoint to SignIn New user
-    """
-    if True: ## User successful created
-        return UserOut
-    elif False: ## Email Already exists
-        raise HTTPException(status_code=409, detail="Email already register")
-    else: ## Wrong Password Confirm
-        raise HTTPException(status_code=400, detail="Password does not match")
 
-@router.post("/login/",
-             status_code=201,
-             response_model=UserOut)
-async def login(user_login: UserIn):
+@router.post("/organizations/", status_code=200, response_model=OrganizationOut)
+async def create_organization(organization: OrganizationIn = Depends(get_current_user)):
     """
-    EndPoint to Login New user
+    Create new organization with **OrganizationIn** Model
     """
-    if True: ## User successful Login
-        return UserOut
-    elif False: ## Email does not register
-        raise HTTPException(status_code=409, detail="Email is not register")
-    else: ## Wrong Password
-        raise HTTPException(status_code=400, detail="Password does not match")
+    new_org = organization.dict()
+    new_org.update({"organization_id": str(uuid4())})
+    modified = await add_organization(organization_data=new_org, email=organization.ownerEmail)
+
+    if int(modified) < 1:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    return new_org
 
 
-# @router.get("/user/organizations")
+@router.post("/event/", status_code=200, response_model=EventOut)
+async def create_new_event(event: EventIn):
+    """
+    Create new event with **EventIn** Model
+    """
+    new_event = event.dict()
+    new_event.update({"event_id": str(uuid4())})
+
+    inserted_id = await create_event(event_data=event)
+    if inserted_id is not None:
+        return EventOut(**new_event)
+    raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.delete("/event/", status_code=204)
+async def delete_created_event(event: EventDelete):
+    """
+    Create new event with **Event** Model
+    """
+    delete_act = await delete_event(event_id=event.event_id)
+    print(delete_act)
+    if delete_act is True:
+        pass
+    else:
+        raise HTTPException(status_code=500, detail="Internal Server Error")

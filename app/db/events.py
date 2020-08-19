@@ -46,7 +46,7 @@ async def create_event(event_data: dict) -> str:
     Paramas:
     -------
     event_data: dict
-        The event data for update.
+        The event data for created.
 
     Return:
     ------
@@ -73,7 +73,7 @@ async def update_event(event_id: str, event_data: dict) -> str:
         The number of modified documents.
         (1 if updated, 0 if nothing happen)
     """
-
+    #"¿Modificar para que se borre con event_ID ?"
     query = {"_id": ObjectId(event_id)}
     modified_count = crud.update(query, event_data)
     return modified_count
@@ -81,7 +81,7 @@ async def update_event(event_id: str, event_data: dict) -> str:
 
 async def delete_event(event_id: str) -> bool:
     """
-    Update a existing event.
+    Delete a existing event.
 
     Paramas:
     -------
@@ -90,11 +90,9 @@ async def delete_event(event_id: str) -> bool:
 
     Return:
     ------
-    modified_counr: str
-        The number of modified documents.
-        (1 if updated, 0 if nothing happen)
+    True
     """
 
-    query = {"_id": ObjectId(event_id)}
+    query = {"_id": ObjectId(event_id)} #"¿Modificar para que se borre con event_ID ?"
     crud.delete(query)
     return True

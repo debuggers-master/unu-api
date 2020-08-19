@@ -25,10 +25,10 @@ class LoginRequest(BaseModel):
     """
     email: str = Field(...,
                        description="User email",
-                       example="emanuel@gmail.com")
+                       example="mariobarbosa777@hotmail.com")
     password: str = Field(...,
-                          description="The user password",
-                          example="the_awos0me_secr3t")
+                          description="user password",
+                          example="user123")
 
 
 class AuthResponse(Token):
@@ -40,7 +40,7 @@ class AuthResponse(Token):
 
 # -------------------- Auth router ------------------------- #
 
-@auth_router.post("/login", response_model=AuthResponse)
+@auth_router.post("/login", status_code=200, response_model=AuthResponse)
 async def login_for_acces_token(login_data: LoginRequest):
     """
     Verify the user credentials and return a jwt.
@@ -52,7 +52,7 @@ async def login_for_acces_token(login_data: LoginRequest):
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 
-@auth_router.post("/signup", response_model=AuthResponse)
+@auth_router.post("/signup", status_code=201, response_model=AuthResponse)
 async def signup(user: UserIn):
     """
     Register a new user and login the user.

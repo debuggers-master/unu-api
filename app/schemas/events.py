@@ -23,14 +23,29 @@ class EventIn(BaseModel):
                       example="Python Week Code")
     url: str = Field(...,
                      description="event url identifier",
-                     example="cosas-de-inges/py-week")
+                     example="py-week")
     startDate: str = Field(...,
                            description="Date of Start of event",
                            example="28/08/2020")
+    organization_id: str = Field(...,
+                                 description="Unique ID of organization",
+                                 example="0cdb372a-179e-46dd-abdb-a991fdfdaa00")
     template: Templates
 
+class EventOut(BaseModel):
+    """
+    Base Model returned when a new event is created
+    """
+    event_id: str = Field(...,
+                          description="Unique Id for organization")
 
-class Information(BaseModel):
+class EventDelete(EventOut):
+    """
+    Base Model for delete and event
+    """
+
+
+class InformationDB(BaseModel):
     """
     Base Model for aditional event settings
     """
@@ -44,6 +59,12 @@ class Information(BaseModel):
                               description="Localization of event",
                               example="Online")
 
+class InformationIn(InformationDB):
+    """
+    Base Model for aditional event settings
+    """
+    event_id: str = Field(...,
+                          description="Unique Id for organization")
 
 class Banner(BaseModel):
     """"

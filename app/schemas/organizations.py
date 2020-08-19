@@ -15,13 +15,13 @@ class OrganizationIn(BaseModel):
     url: str = Field(...,
                      description="organization url identifier",
                      example="cosas-de-inges")
-    user_id: str = Field(...,
-                         description="Unique Id for organization")
+    ownerEmail: str = Field(...,
+                            description="email registered by the user owner of organization",
+                            example="mariobarbosa777@hotmail.com")
 
-
-class OrganizationOut(OrganizationIn):
+class OrganizationOut(BaseModel):
     """
-    Base Model for organization dictionary  when user are just login
+    Base Model returned when a new organization is created
     """
     organization_id: str = Field(...,
                                  description="Unique Id for organization")

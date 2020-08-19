@@ -28,6 +28,7 @@ async def create_organization(organization: OrganizationIn):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     return OrganizationOut(**new_org)
 
+
 @router.post("/event/", status_code=201, response_model=EventOut)
 async def create_new_event(event: EventIn):
     """

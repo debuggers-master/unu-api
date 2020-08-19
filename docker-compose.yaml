@@ -11,8 +11,7 @@ services:
       - redis
     env_file: ./app/.env
     restart: $RESTART
-    command:
-      - "$COMMAND"
+    command: $COMMAND
 
   redis:
     container_name: redis

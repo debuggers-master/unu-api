@@ -2,7 +2,7 @@
 Authorization endpoints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from db.users import get_user

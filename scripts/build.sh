@@ -1,0 +1,1 @@
+COMMAND="/start-reload.sh" RESTART=on-failure docker-compose --build

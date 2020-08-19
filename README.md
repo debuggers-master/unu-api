@@ -31,27 +31,26 @@ After that fill all required env variables.
 This step is totally needed.
 
 #### Run the application
-If you want to initialize the uvicorn server run in the root directory:
+If you want to initialize the uvicorn server for development run in the root directory:
 
 ```bash
-docker-compose up
+source scripts/dev.sh
 ```
 
 This command initalize the server and reload on any change in the source code.
 
-If you want to run in backgroud run:
+If you want to run for production, exec:
 
 ```bash
-docker-compose up -d
-
-# Exec to see all logs
-docker-compose logs api
+source scripts/start.sh
 ```
 
-If you made any change in the Dockerfile or you added some new package to the requirements.txt file, you must run:
+If you made any change in the Dockerfile or you added some new package in the requirements.txt file, you must run:
 
 ```bash
-docker-compose up --build
+source scripts/build.sh
+# And then
+source scripts/dev.sh
 ```
 
 ## Api endpoints

@@ -1,0 +1,1 @@
+COMMAND="/start.sh" RESTART=on-failure docker-compose up

@@ -1,0 +1,1 @@
+COMMAND=pytest RESTART=no docker-compose up

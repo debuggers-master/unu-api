@@ -9,6 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
+from uuid import uuid4
 
 from config import settings  # pylint: disable-msg=E0611
 from db.users import get_user, create_user
@@ -163,7 +164,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
         raise credentials_exception
 
     user = await get_user(email=token_data.email)
-    print(user)
     if user is None:
         raise credentials_exception
     return UserOut(**user)
@@ -171,14 +171,24 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
 
 async def register_user(user: UserIn) -> str:
     """
-    Create a new User
+    Create a new user.
+
+    Params:
+    ------
+    user: UserIn
+        The principal user data.
+
+    Return:
+    user: UserOut
+        The complete user data.
     """
-    new_user = dict(user)
+
+    new_user = user.dict()
     new_user.update({"password": hash_password(user.password)})
     new_user.update({"organizations": []})
     new_user.update({"collaborations": []})
+    new_user.update({"user_id": str(uuid4())})
     inserted_id = await create_user(new_user)
     if inserted_id is not None:
         return UserOut(**new_user)
-    else:
-        return False
+    return False

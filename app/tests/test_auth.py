@@ -2,12 +2,6 @@
 Auth endpoints test
 """
 
-from fastapi.testclient import TestClient
-from app.main import app
-
-# Test client-server
-client = TestClient(app)
-
 # Expected constants
 LOGIN_RESPONSE = {
     "access_token": "",
@@ -38,7 +32,7 @@ LOGIN_RESPONSE = {
 
 # ------------------- Test functions --------------------- #
 
-def test_login_succes():
+def test_login_succes(client):
     """
     Test login endpoint,
     """
@@ -53,7 +47,7 @@ def test_login_succes():
     assert actuall == LOGIN_RESPONSE
 
 
-def test_login_bad_password():
+def test_login_bad_password(client):
     """
     Test login endpint when a bad password is sent.
     """
@@ -68,7 +62,7 @@ def test_login_bad_password():
     assert actuall == expected
 
 
-def test_login_bad_email():
+def test_login_bad_email(client):
     """
     Test login endpint when a bad password is sent.
     """
@@ -83,7 +77,7 @@ def test_login_bad_email():
     assert actuall == expected
 
 
-def test_signup_user_exists():
+def test_signup_user_exists(client):
     """
     Test login endpoint,
     """

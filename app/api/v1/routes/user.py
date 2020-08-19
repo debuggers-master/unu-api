@@ -2,7 +2,7 @@
 User Router - Operations about users
 """
 from uuid import uuid4
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 
 from schemas.organizations import OrganizationIn, OrganizationOut, OrganizationDB
 from schemas.events import EventIn, EventOut, EventDelete
@@ -26,7 +26,6 @@ async def create_organization(organization: OrganizationIn):
 
     if int(modified) < 1:
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
     return OrganizationOut(**new_org)
 
 @router.post("/event/", status_code=201, response_model=EventOut)
@@ -37,7 +36,7 @@ async def create_new_event(event: EventIn):
     new_event = event.dict()
     new_event.update({"event_id": str(uuid4())})
 
-    inserted_id = await create_event(event_data=event)
+    inserted_id = await create_event(event_data=new_event)
     if inserted_id is not None:
         return EventOut(**new_event)
     raise HTTPException(status_code=500, detail="Internal Server Error")

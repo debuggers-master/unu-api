@@ -1,7 +1,7 @@
 """
 DB events - Db functions about events
 """
-
+from typing import List
 from bson.json_util import ObjectId
 from .db import get_collection, CRUD
 
@@ -13,7 +13,7 @@ crud = CRUD(db)
 # -------------------- Events methods -------------------- #
 
 async def get_event(
-        event_id: str, filters: list = None, excludes: list = None) -> dict:
+        event_id: str, filters: List[str] = None, excludes: List[str] = None) -> dict:
     """
     Retrieve the complete information about one event.
 

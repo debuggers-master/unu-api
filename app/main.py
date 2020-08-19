@@ -3,7 +3,9 @@ Main app entry point.
 """
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+
 from api.v1 import api_router
+from auth.routes import auth_router
 from config import settings
 
 app = FastAPI(
@@ -24,3 +26,4 @@ if settings.CORS_ORIGIN:
 
 # Routers
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])

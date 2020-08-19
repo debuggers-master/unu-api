@@ -3,6 +3,7 @@ Db - Monglo Client instance and DB connection.
 """
 
 import json
+from typing import List
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
@@ -107,8 +108,8 @@ class CRUD:
     async def find(
             self, query: dict,
             only_one: bool = True,
-            filters: list = None,
-            excludes: list = None,
+            filters: List[str] = None,
+            excludes: List[str] = None,
     ) -> dict:
         """
         Retrieve the data that matches with the query and the filters.

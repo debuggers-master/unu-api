@@ -49,6 +49,7 @@ async def login_for_acces_token(login_data: LoginRequest):
     if not user:
         raise credentials_exception
     access_token = create_access_token(data={"sub": user.email})
+    print(user)
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 

@@ -10,11 +10,8 @@ from .collaborations import CollaborationOut
 
 class UserBase(BaseModel):
     """
-    Base Model for user
+    Base Model for user, and user update
     """
-    email: EmailStr = Field(...,
-                            description="Email of user",
-                            example="name_last@organization.com")
     firstName: str = Field(None,
                            description="Name of user",
                            example="Mario")
@@ -25,8 +22,11 @@ class UserBase(BaseModel):
 
 class UserIn(UserBase):
     """
-    Base Model for register new user or login , this class extends UserBase
+    Base Model for register new user , this class extends UserBase
     """
+    email: EmailStr = Field(...,
+                            description="Email of user",
+                            example="name_last@organization.com")
     password: str = Field(...,
                           description="Password of user account")
 
@@ -35,8 +35,7 @@ class UserOut(UserBase):
     """
     Base Model returned when user is login new, this class  extends UserBase
     """
-    _id: str = Field(...,
-                     description="Unique Id identifier of a organization")
-    user_id: str = Field(..., description="Unique uuid identifier")
+    userID: str = Field(...,
+                        description="Unique uuid identifier")
     organizations: Optional[List[OrganizationDB]] = []
     collaborations: Optional[List[CollaborationOut]] = []

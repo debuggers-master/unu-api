@@ -9,24 +9,15 @@ class SpeakerBase(BaseModel):
     """
     Base Model for speaker
     """
-    name: str = Field(...,
+    name: str = Field(None,
                       description="full name of speaker",
                       example="Marcos Cooler")
-
-
-class SpeakerIn(SpeakerBase):
-    """
-    Base Model to create speaker
-    """
-    event_id: str = Field(...,
-                          description="Unique Id identifier of a event",
-                          example="name_last@organization.com")
-    rol: str = Field(...,
-                     description="rol of speaker",
-                     example="Google Devs Expert")
     biography: str = Field(None,
                            description="Biography of speaker",
                            example="Software developer by error .....")
+    rol: str = Field(None,
+                     description="rol of speaker",
+                     example="Google Devs Expert")
     twitter: str = Field(None,
                          description="Twitter User ",
                          example="programer2020")
@@ -34,7 +25,18 @@ class SpeakerIn(SpeakerBase):
                           description="url of speaker image")
 
 
-class SpeakerOut(SpeakerBase):
+class SpeakerIn(SpeakerBase):
     """
     Base Model to create speaker
     """
+    eventId: str = Field(...,
+                         description="Unique Id of an event",
+                         example="string")
+
+
+class SpeakerOut():
+    """
+    Base Model return when a speaker is just created
+    """
+    speakerId: str = Field(...,
+                           description="Unique Id of a speaker")

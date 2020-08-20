@@ -1,0 +1,3 @@
+"""
+Participations schema Models
+"""

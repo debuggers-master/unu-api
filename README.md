@@ -55,7 +55,8 @@ source scripts/dev.sh
 
 ## Api endpoints
 
-BasePath: https://some_domai.com/api/v1
+Docs: http://35.239.16.11/docs
+BasePath: http://35.239.16.11.com/api/v1
 
 ### Operations about users
 

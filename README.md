@@ -9,7 +9,7 @@ Clone this repository:
 git clone git@github.com:debuggers-master/unu-api.git
 ```
 
-## Seutup worksapce
+## Setup workspace
 If you want to contribute to this API, first you can make some configurations
 to work correctly and according with our style code guide.
 

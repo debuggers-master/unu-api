@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
 
-from config import settings
+from config import settings  # pylint: disable-msg=E0611
 
 # Instance the motor-mongo client
 CLUSTER = settings.DB_CLUSTER
@@ -84,7 +84,7 @@ class CRUD:
         created = await self.coll.insert_one(document_data)
         return str(created.inserted_id)
 
-    async def update(self, query: dict, document_data: dict) -> str:
+    async def update(self, query: dict, document_data: dict) -> int:
         """
         Update an existing document.
         """
@@ -107,11 +107,12 @@ class CRUD:
         updated = await self.coll.update_one(query, operation)
         return int(updated.modified_count)
 
-    async def delete(self, query: dict) -> None:
+    async def delete(self, query: dict) -> int:
         """
         Delete a existing document.
         """
-        await self.coll.delete_one(query)
+        deleted = await self.coll.delete_one(query)
+        return int(deleted.deleted_count)
 
     async def delete_many(self, query: dict) -> None:
         """

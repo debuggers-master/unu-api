@@ -89,6 +89,7 @@ BasePath: https://some_domai.com/api/v1
 - path: `/users`
 - method: `PUT`
 - body
+  - userId: str
   - user_data: obj - The data for update
 
 - response (200):
@@ -108,8 +109,8 @@ BasePath: https://some_domai.com/api/v1
 - method: `POST`
 - body
   - name: str
-  - url: str
-  - ownerId: str
+  - description: str
+  - userId: str
 
 - response (201):
   - detail: {"organizationId": str}
@@ -118,7 +119,7 @@ BasePath: https://some_domai.com/api/v1
 - path: `/users/organization`
 - method: `PUT`
 - body
-  - ownerId: str
+  - userId: str
   - organizationId: str
   - organization_data: obj - The info for update
 

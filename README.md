@@ -108,7 +108,6 @@ BasePath: https://some_domai.com/api/v1
 - method: `POST`
 - body
   - name: str
-  - url: str
   - ownerId: str
 
 - response (201):

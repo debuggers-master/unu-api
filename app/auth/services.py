@@ -12,7 +12,9 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from config import settings  # pylint: disable-msg=E0611
-from db.users import get_user, create_user
+from api.v1.services.users import UserService
+#from db.users import get_user, create_user
+
 from schemas.users import UserOut, UserIn
 
 # Auth constants
@@ -29,6 +31,9 @@ credentials_exception = HTTPException(
 # Auth instances
 pwd_context = CryptContext(schemes=["bcrypt"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+#User service to DB fuctions
+UserMethos = UserService()
 
 
 # ---------------- Token Schemas ------------------- #
@@ -104,7 +109,7 @@ async def authenticate_user(email: str, password: str) -> UserOut:
         The user class. If not authenticated, returns False.
     """
 
-    user = await get_user(email=email)
+    user = await UserMethos.get_user(email=email)
     if not user:
         return False
     if not verify_password(password, user.get("password")):
@@ -163,7 +168,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
     except JWTError:
         raise credentials_exception
 
-    user = await get_user(email=token_data.email)
+    user = await UserMethos.get_user(email=token_data.email)
     if user is None:
         raise credentials_exception
     return UserOut(**user)
@@ -187,8 +192,9 @@ async def register_user(user: UserIn) -> str:
     new_user.update({"password": hash_password(user.password)})
     new_user.update({"organizations": []})
     new_user.update({"collaborations": []})
-    new_user.update({"user_id": str(uuid4())})
-    inserted_id = await create_user(new_user)
+    new_user.update({"userId": str(uuid4())})
+
+    inserted_id = await UserMethos.create_user(new_user)
     if inserted_id is not None:
         return UserOut(**new_user)
     return False

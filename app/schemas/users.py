@@ -35,8 +35,6 @@ class UserOut(UserBase):
     """
     Base Model returned when user is login new, this class  extends UserBase
     """
-    _id: str = Field(...,
-                     description="Unique Id identifier of a organization")
-    user_id: str = Field(..., description="Unique uuid identifier")
+    userId: str = Field(None, description="Unique uuid identifier")
     organizations: Optional[List[OrganizationDB]] = []
     collaborations: Optional[List[CollaborationOut]] = []

@@ -1,57 +1,51 @@
 """
 User Router - Operations about users
 """
-from uuid import uuid4
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 
-from schemas.organizations import OrganizationIn, OrganizationOut, OrganizationDB
-from schemas.events import EventIn, EventOut, EventDelete
-from db.users import add_organization
-from db.events import create_event, delete_event
-from auth.services import get_current_user
+
+from schemas.organizations import OrganizationIn, OrganizationOut
+from schemas.events import EventIn, EventOut
+from api.v1.services.organization import OrganizationController
 
 # Router instance
 router = APIRouter()
 
 
-@router.post("/organizations/", status_code=201, response_model=OrganizationOut)
+#Organizations service to DB fuctions
+OrgMethos = OrganizationController()
+
+@router.post("/organizations/",
+             status_code=201,
+             response_model=OrganizationOut)
 async def create_organization(organization: OrganizationIn):
     """
     Create new organization with **OrganizationIn** Model
     """
-    new_org = OrganizationDB(**organization.dict())
-    new_org.organization_id = str(uuid4())
-    new_org = new_org.dict()
-    modified = await add_organization(organization_data=new_org, email=organization.ownerEmail)
-
-    if int(modified) < 1:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
-
-    return OrganizationOut(**new_org)
+    org = await OrgMethos.add_organization(user_id=organization.userIdOwner,
+                                           organization_data=organization.dict())
+    org_out = OrganizationOut(**organization.dict(), **org)
+    if org_out.organizationId is None:
+        raise HTTPException(status_code=409, **org)
+    return org_out
 
 
-@router.post("/event/", status_code=201, response_model=EventOut)
-async def create_new_event(event: EventIn):
+@router.get("organizations/",
+            status_code=200, 
+            response_model=OrganizationOut)
+async def get_organizations(user_id: OrganizationIn):
     """
-    Create new event with **EventIn** Model
+    Get all list of organizations from a user
     """
-    new_event = event.dict()
-    new_event.update({"event_id": str(uuid4())})
-
-    inserted_id = await create_event(event_data=event)
-    if inserted_id is not None:
-        return EventOut(**new_event)
-    raise HTTPException(status_code=500, detail="Internal Server Error")
+    pass
 
 
-@router.delete("/event/", status_code=204)
-async def delete_created_event(event: EventDelete):
+
+@router.get("event/",
+            status_code=200, 
+            response_model=EventOut)
+async def create_event(event: EventIn):
     """
-    Create new event with **Event** Model
+    Get all list of organizations from a user
     """
-    delete_act = await delete_event(event_id=event.event_id)
-    print(delete_act)
-    if delete_act is True:
-        pass
-    else:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    pass

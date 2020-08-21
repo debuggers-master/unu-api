@@ -2,7 +2,6 @@
 Bussiness logic about user operations.
 """
 
-from uuid import uuid4
 from db.db import get_collection, CRUD
 
 # COLLECTIONS
@@ -39,7 +38,7 @@ class UserService:
             return None
 
         return inserted_id
-    
+
     async def get_user(self, email: str) -> dict:
         """
         Return the user that matches with email
@@ -86,4 +85,3 @@ class UserService:
         """
         query = {"userId": user_id}
         await self.crud.delete(query)
-

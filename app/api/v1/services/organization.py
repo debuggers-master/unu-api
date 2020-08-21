@@ -80,7 +80,7 @@ class OrganizationController:
                 query={"userId": user_id},
                 array_name="organizations",
                 data={"organizationId": organization_id,
-                    "name": organization_data.get("name")})
+                      "name": organization_data.get("name")})
             if not modified_count:
                 return {"detail": "Error UserId is not valid"}
 

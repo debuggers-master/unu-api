@@ -2,8 +2,10 @@
 Organizations  Schema Models
 """
 
+from typing import List, Optional
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
+from .events import EventOut
 
 class OrganizationBase(BaseModel):
     """
@@ -31,3 +33,5 @@ class OrganizationOut(OrganizationBase):
     """
     organizationId: str = Field(None,
                                 description="Unique Id for organization")
+    events: Optional[List[EventOut]] = []
+

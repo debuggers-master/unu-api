@@ -67,11 +67,12 @@ class OrganizationController:
         if org_exists is None:
             organization_id = str(uuid4())
             organization_data.update({"organizationId": organization_id})
-
             # Create the url name
             organization_name = organization_data.get("name")
             organization_name = organization_name.replace(" ", "-").lower()
             organization_data.update({"organizatonName": organization_name})
+            # Create void List of events
+            organization_data.update({"events":[]})
 
             # Create a new organization
 

@@ -2,6 +2,7 @@
 Unu API - Application settings.
 """
 
+from typing import List
 from secrets import token_urlsafe
 from pydantic import BaseSettings
 
@@ -19,12 +20,11 @@ class Settings(BaseSettings):
 
     # APP
     APP_NAME: str = "Unu - API"
-    SECRET_KEY: str = token_urlsafe(32)
     API_V1_STR: str = "/api/v1"
     CORS_ORIGIN: str
 
     # AUTH
-    SECRET_JWT: str
+    SECRET_JWT: token_urlsafe(32)
 
     # MONGO DB
     DB_NAME: str
@@ -37,6 +37,9 @@ class Settings(BaseSettings):
 
     # STORAGE
     GCP_STORAGE_KEY: str
+    GOOGLE_STORAGE_BUCKET: str
+    ALLOWED_EXTENSIONS: List[str]
+    GOOGLE_APPLICATION_CREDENTIALS: str
 
 
 settings = Settings()

@@ -15,7 +15,7 @@ from .services import (
     register_user)
 
 # Router instance
-auth_router = APIRouter()
+auth_router = APIRouter() 
 
 
 # Login Request
@@ -49,7 +49,7 @@ async def login_for_acces_token(login_data: LoginRequest):
     if not user:
         raise credentials_exception
     access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "Bearer", "user": user}
+    return {"   ": access_token, "tokenType": "Bearer", "user": user}
 
 
 @auth_router.post("/signup", status_code=201, response_model=AuthResponse)
@@ -69,4 +69,4 @@ async def signup(user: UserIn):
     if not new_user:
         raise HTTPException(status_code=500, detail="Internal Server Error")
     access_token = create_access_token(data={"sub": new_user.email})
-    return {"access_token": access_token, "token_type": "Bearer", "user": new_user}
+    return {"accessToken": access_token, "tokenType": "Bearer", "user": new_user}

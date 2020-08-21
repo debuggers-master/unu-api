@@ -12,29 +12,22 @@ class OrganizationBase(BaseModel):
     name: str = Field(...,
                       description="name of organization",
                       example="Cosas de ingenieros")
-    url: str = Field(...,
-                     description="organization url identifier",
-                     example="cosas-de-inges")
+    description: str = Field(None,
+                             description="description of organization",
+                             example="Comunidad para ingenieros")
+
 
 class OrganizationIn(OrganizationBase):
     """
     Base Model for creates new organization
     """
-    ownerEmail: str = Field(...,
-                            description="email registered by the user owner of organization",
-                            example="mariobarbosa777@hotmail.com")
+    userIdOwner: str = Field(...,
+                             description="The user Id of owner of organization",)
 
-class OrganizationDB(OrganizationBase):
-    """
-    Base Model upload to DB when organization
-    is created  and give back when user is logged
-    """
-    organization_id: str = Field(None,
-                                 description="Unique Id for organization")
 
-class OrganizationOut(BaseModel):
+class OrganizationOut(OrganizationBase):
     """
     Base Model returned when a new organization is  just created
     """
-    organization_id: str = Field(...,
-                                 description="Unique Id for organization")
+    organizationId: str = Field(None,
+                                description="Unique Id for organization")

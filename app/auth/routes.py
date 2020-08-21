@@ -43,7 +43,9 @@ class AuthResponse(Token):
 
 # -------------------- Auth router ------------------------- #
 
-@auth_router.post("/login", status_code=200, response_model=AuthResponse)
+@auth_router.post("/login",
+                  status_code=200,
+                  response_model=AuthResponse)
 async def login_for_acces_token(login_data: LoginRequest):
     """
     Verify the user credentials and return a jwt.
@@ -55,7 +57,9 @@ async def login_for_acces_token(login_data: LoginRequest):
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 
-@auth_router.post("/signup", status_code=201, response_model=AuthResponse)
+@auth_router.post("/signup",
+                  status_code=201,
+                  response_model=AuthResponse)
 async def signup(user: UserIn):
     """
     Register a new user and login the user.
@@ -71,6 +75,6 @@ async def signup(user: UserIn):
     new_user = await register_user(user)
     print(new_user)
     if not new_user:
-        raise HTTPException(status_code=500, detail="AAAA Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     access_token = create_access_token(data={"sub": new_user.email})
     return {"access_token": access_token, "token_type": "Bearer", "user": new_user}

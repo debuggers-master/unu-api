@@ -9,7 +9,7 @@ Clone this repository:
 git clone git@github.com:debuggers-master/unu-api.git
 ```
 
-## Seutup worksapce
+## Setup workspace
 If you want to contribute to this API, first you can make some configurations
 to work correctly and according with our style code guide.
 
@@ -120,6 +120,7 @@ BasePath: http://35.239.16.11.com/api/v1
 - path: `/organizations`
 - method: `POST`
 - body
+
   - userId: str
   - organizationData
 

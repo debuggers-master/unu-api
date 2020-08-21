@@ -4,7 +4,7 @@ User Schema Models
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr, Field  # pylint: disable-msg=E0611
 
-from .organizations import OrganizationDB
+from .organizations import OrganizationOut
 from .collaborations import CollaborationOut
 
 
@@ -35,8 +35,6 @@ class UserOut(UserBase):
     """
     Base Model returned when user is login new, this class  extends UserBase
     """
-    _id: str = Field(...,
-                     description="Unique Id identifier of a organization")
-    user_id: str = Field(..., description="Unique uuid identifier")
-    organizations: Optional[List[OrganizationDB]] = []
+    userId: str = Field(None, description="Unique uuid identifier")
+    organizations: Optional[List[OrganizationOut]] = []
     collaborations: Optional[List[CollaborationOut]] = []

@@ -2,7 +2,6 @@
 Bussiness logic about user operations.
 """
 
-from uuid import uuid4
 from db.db import get_collection, CRUD
 
 # COLLECTIONS
@@ -20,6 +19,42 @@ class UserService:
 
     def __init__(self):
         self.crud = CRUD(users_collection)
+
+    async def create_user(self, user_data: dict) -> dict:
+        """
+        Creare a new user.
+
+        Params:
+        ------
+        user_data: dict - The user info.
+
+        Return:
+        ------
+        user_id: dict - The user uuid created.
+        """
+
+        inserted_id = await self.crud.create(user_data)
+        if not inserted_id:
+            return None
+
+        return inserted_id
+
+    async def get_user(self, email: str) -> dict:
+        """
+        Return the user that matches with email
+
+        Params:
+        ------
+        email: str - The user email
+
+        Return:
+        ------
+        user: list - The event user
+        """
+        query = {"email": email}
+        user = await self.crud.find(query)
+        return user
+
 
     async def update_user(self, user_id: str, user_data: dict) -> dict:
         """

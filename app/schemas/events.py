@@ -27,16 +27,16 @@ class EventIn(BaseModel):
     startDate: str = Field(...,
                            description="Date of Start of event",
                            example="28/08/2020")
-    organization_id: str = Field(...,
+    organizationId: str = Field(...,
                                  description="Unique ID of organization",
                                  example="0cdb372a-179e-46dd-abdb-a991fdfdaa00")
     template: Templates
 
-class EventOut(BaseModel):
+class EventOut(EventIn):
     """
     Base Model returned when a new event is created
     """
-    event_id: str = Field(...,
+    eventId: str = Field(None,
                           description="Unique Id for organization")
 
 class EventDelete(EventOut):

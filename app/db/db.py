@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
 
-from config import settings
+from config import settings  # pylint: disable-msg=E0611
 
 # Instance the motor-mongo client
 CLUSTER = settings.DB_CLUSTER
@@ -84,26 +84,41 @@ class CRUD:
         created = await self.coll.insert_one(document_data)
         return str(created.inserted_id)
 
-    async def update(self, query: dict, document_data: dict) -> str:
+    async def update(self, query: dict, document_data: dict) -> int:
         """
         Update an existing document.
         """
         updated = await self.coll.update_one(query, {"$set": document_data})
-        return str(updated.modified_count)
+        return int(updated.modified_count)
 
-    async def add_to_set(self, query: dict, array_name: str, data: any) -> str:
+    async def add_to_set(self, query: dict, array_name: str, data: any) -> int:
         """
         Add a new item to a list within a document.
         """
         operation = {"$addToSet": {f"{array_name}": data}}
         updated = await self.coll.update_one(query, operation)
-        return str(updated.modified_count)
+        return int(updated.modified_count)
 
-    async def delete(self, query: dict) -> None:
+    async def pull_array(self, query: dict, array_name: str, condition: dict) -> int:
         """
-        Delete a existing document
+        Remove a item from a list that matches the condition.
         """
-        await self.coll.delete_one(query)
+        operation = {"$pull": {f"{array_name}": condition}}
+        updated = await self.coll.update_one(query, operation)
+        return int(updated.modified_count)
+
+    async def delete(self, query: dict) -> int:
+        """
+        Delete a existing document.
+        """
+        deleted = await self.coll.delete_one(query)
+        return int(deleted.deleted_count)
+
+    async def delete_many(self, query: dict) -> None:
+        """
+        Delete many documents.
+        """
+        await self.coll.delete_many(query)
 
     async def find(
             self, query: dict,

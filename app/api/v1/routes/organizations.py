@@ -33,7 +33,7 @@ async def update_organization(organization: OrganizationUpdate):
     """
     Create new organization with **OrganizationIn** Model
     """
-    org = await OrgMethos.update_organization(user_id=organization.userIdOwner,
+    await OrgMethos.update_organization(user_id=organization.userIdOwner,
                                               organization_id=organization.organizationId,
                                               organization_data=organization.dict())
 

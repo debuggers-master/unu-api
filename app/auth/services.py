@@ -12,13 +12,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from config import settings  # pylint: disable-msg=E0611
-<<<<<<< HEAD
-from services.users import get_user
-=======
 from api.v1.services.users import UserService
-#from db.users import get_user, create_user
-
->>>>>>> 2806347c41b9bfcf72ffba2820a2eb6c03721b6c
 from schemas.users import UserOut, UserIn
 
 # Auth constants

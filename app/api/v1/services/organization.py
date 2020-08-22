@@ -111,19 +111,26 @@ class OrganizationController:
         ------
         organizationId: str - The organization uuid unique identifier.
         """
+
+        for k,v  in list(organization_data.items()):
+            if v is None:
+                del organization_data[k]
+
         # Update in the collection
         query_orga = {"organizationId": organization_id}
         modified_count = await self.crud.update(query_orga, organization_data)
         if not modified_count:
-            return False
+             return False
 
-        # Update in the user list
-        query = {"userId": user_id,
-                 "organizations.organizationId": organization_id}
-        data = {"organizations.$": {"organizationId": organization_id,
-                                    "name": organization_data.get("name")}}
-        modified_count = await self.users.update(query, data)
-        return {"modifiedCount": modified_count}
+
+        if  organization_data.get("name") is not None:
+            # Update in the user list
+            query = {"userId": user_id,
+                    "organizations.organizationId": organization_id}
+            data = {"organizations.$": {"organizationId": organization_id,
+                                        "name": organization_data.get("name")}}
+            modified_count = await self.users.update(query, data)
+            return {"modifiedCount": modified_count}
 
     async def delete_organization(self, user_id: str, organization_id: str) -> None:
         """

@@ -13,8 +13,6 @@ from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from config import settings  # pylint: disable-msg=E0611
 from api.v1.services.users import UserService
-#from db.users import get_user, create_user
-
 from schemas.users import UserOut, UserIn
 
 # Auth constants

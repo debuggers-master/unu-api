@@ -17,11 +17,11 @@ OrgMethos = OrganizationController()
 @router.get("",
             status_code=200,
             response_model=OrganizationOut)
-async def get_organization(organization_id:str):
+async def get_organization(organizationId:str):
     """
-    Get a organization information using **organizationId**
+    Get a organization using organizationId
     """
-    org_info = await OrgMethos.get_organization(organization_id=organization_id)
+    org_info = await OrgMethos.get_organization(organization_id=organizationId)
 
     return OrganizationOut(**org_info)
 
@@ -31,7 +31,7 @@ async def get_organization(organization_id:str):
             )
 async def update_organization(organization: OrganizationUpdate):
     """
-    Create new organization with **OrganizationIn** Model
+    Edit a Organization name and/or description
     """
     org = await OrgMethos.update_organization(user_id=organization.userIdOwner,
                                               organization_id=organization.organizationId,

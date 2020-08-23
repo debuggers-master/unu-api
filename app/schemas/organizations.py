@@ -5,7 +5,7 @@ Organizations  Schema Models
 from typing import List, Optional
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-from .events import EventOut
+from schemas.events.events import EventOut
 
 class OrganizationBase(BaseModel):
     """

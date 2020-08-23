@@ -47,7 +47,7 @@ class CreateEvent:
 
     async def add_collaborator(self, event_id: str, collaborator_data: dict) -> dict:
         """
-        Add new speaker to the event.
+        Add new collaborator to the event.
 
         Params:
         ------
@@ -56,7 +56,7 @@ class CreateEvent:
 
         Return:
         ------
-        speaker_id: The uuid of the created collaborator.
+        collaboratorId: The uuid of the created collaborator.
         """
         collaborator_id = _uuid()
         collaborator_data.update({"userId": collaborator_id})

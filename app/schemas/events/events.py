@@ -36,8 +36,8 @@ class EventOut(BaseModel):
     """
     Base Model returned when a new event is created
     """
-    eventId: str = Field(None,
-                          description="Unique Id for organization")
+    eventId: str = Field(...,
+                          description="Unique Id of a event")
 
 class EventDelete(EventOut):
     """
@@ -63,8 +63,8 @@ class InformationIn(InformationDB):
     """
     Base Model for aditional event settings
     """
-    event_id: str = Field(...,
-                          description="Unique Id for organization")
+    eventId: str = Field(...,
+                          description="Unique Id of a event")
 
 class Banner(BaseModel):
     """"

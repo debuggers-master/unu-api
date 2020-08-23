@@ -32,7 +32,7 @@ class CreateEvent:
         """
         event_id = _uuid()
         event_data.update({"eventId": event_id})
-        event_data.update({"colaborators": []})
+        event_data.update({"collaborators": []})
         event_data.update({"speakers": []})
         event_data.update({"agenda": []})
         event_data.update({"associates": []})
@@ -59,11 +59,11 @@ class CreateEvent:
         collaboratorId: The uuid of the created collaborator.
         """
         collaborator_id = _uuid()
-        collaborator_data.update({"userId": collaborator_id})
+        collaborator_data.update({"collaboratorId": collaborator_id})
 
-        ######################
-        ##Logic for register##
-        ######################
+        ##########################
+        ##Logic for collaborator##
+        #########################
 
         query = _make_query(event_id)
         modified_count = await self.crud.add_to_set(query, "collaborators", collaborator_data)

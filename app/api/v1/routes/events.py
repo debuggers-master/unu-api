@@ -7,10 +7,14 @@ from fastapi import APIRouter, HTTPException
 from schemas.events.events import EventIn, EventOut
 from schemas.events.events import InformationIn, InformationDB
 from api.v1.services.events.create import CreateEvent
+from api.v1.services.events.delete import DeleteEvent
+
+from schemas.events.collaborators import CollaboratorIn, CollaboratorOut, CollaboratorDelete
 
 # Router instance
 router = APIRouter()
-CreateMethods  = CreateEvent()
+CreateMethods = CreateEvent()
+DeleteMethods = DeleteEvent() 
 
 @router.get("",
             status_code=200,
@@ -26,7 +30,7 @@ async def get_event(get_event: EventIn):
             response_model=EventOut)
 async def update_event(update_event: EventIn):
     """
-    Get create a new event
+    Update a create event
     """
 
 
@@ -45,8 +49,7 @@ async def create_event(new_event: EventIn):
     return  eventId
 
 @router.delete("",
-            status_code=200,
-            response_model=EventOut)
+               status_code=200)
 async def delete_event(event: EventIn):
     """
     Get create a new event 
@@ -59,11 +62,33 @@ async def delete_event(event: EventIn):
 
 @router.post("/collaborator/",
             status_code=200,
-            response_model=EventOut)
-async def add_collaborator(collaborator: EventIn):
+            response_model=CollaboratorOut)
+async def add_collaborator(new_collaborator: CollaboratorIn):
     """
     Add a collaborator to a event
     using eventId
     """
+    collaborator_id = await CreateMethods.add_collaborator(event_id=new_collaborator.eventId,
+                                                          collaborator_data=new_collaborator.collaboratorInfo.dict())
+    if collaborator_id is  False:
+        raise HTTPException(status_code=500,
+                            detail="Error Adding Collaborator, Maybe EventId is Wrong")
+
+    return collaborator_id
+
+@router.delete("/collaborator/",
+            status_code=204)
+async def delete_collaborator(collaborator: CollaboratorDelete):
+    """
+    Add a collaborator to a event
+    using eventId
+    """
+
+    deleted = await DeleteMethods.collaborators(event_id=collaborator.eventId,
+                                                collaborator_id=collaborator.collaboratorId)
+
+    print(deleted)
+
+
 
 # CreateMethods

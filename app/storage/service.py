@@ -5,6 +5,7 @@ Storage files functions.
 from uuid import uuid4
 from datetime import datetime
 import os
+import base64
 
 from fastapi import status, HTTPException, UploadFile
 import six
@@ -35,16 +36,16 @@ def _unique_filename(filename: str) -> str:
     return "{0}-{1}-{2}.{3}".format(basename, date, str(uuid4()), extension)
 
 
-async def upload_file(file: UploadFile) -> str:
+async def upload_file(file_base64: str = "", file: UploadFile = None) -> str:
     """
     Uploads a file to a given Cloud Storage bucket and returns the public url
     to the new object.
 
     Params:
     ------
-    file_stream: file - The file binary data.
-    filename: str - The image name.
-    content_type: str
+    file_base64: str - The file to upload encoded in base 64.
+    file: UploadFile - The file to upload
+    * You only pass one option.
 
     Return:
     ------
@@ -52,9 +53,16 @@ async def upload_file(file: UploadFile) -> str:
         If some error occurs. Return False.
     """
 
-    filename = file.filename
-    content_type = file.content_type
-    file_stream = file.file
+    if file_base64:
+        metadata: list = file_base64.split(";")
+        content_type: str = metadata[0][5:]
+        file_data: bytes = base64.b64decode(metadata[1][7:])
+        ext: str = content_type.split("/")[1]
+        filename = f"avatar-unu.{ext}"
+    else:
+        filename = file.filename
+        content_type = file.content_type
+        file_stream = file.file
 
     _check_extension(filename)
 
@@ -67,7 +75,11 @@ async def upload_file(file: UploadFile) -> str:
         # If the bucket is missing cause credential exception
         return False
 
-    blob.upload_from_file(file_stream, content_type=content_type)
+    if file_base64:
+        blob.upload_from_string(file_data, content_type=content_type)
+    else:
+        blob.upload_from_file(file_stream, content_type=content_type)
+
     url = blob.public_url
     if isinstance(url, six.binary_type):
         url = url.decode('utf-8')

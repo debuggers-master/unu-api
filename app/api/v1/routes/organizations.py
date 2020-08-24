@@ -21,7 +21,8 @@ async def get_organization(organizationId:str):
     """
     Get a organization using organizationId
     """
-    org_info = await OrgMethos.get_organization(organization_id=organizationId)
+    org_info = await OrgMethos.get_organization(
+        organization_id=organizationId)
 
     return OrganizationOut(**org_info)
 
@@ -33,9 +34,10 @@ async def update_organization(organization: OrganizationUpdate):
     """
     Edit a Organization name and/or description
     """
-    org = await OrgMethos.update_organization(user_id=organization.userIdOwner,
-                                              organization_id=organization.organizationId,
-                                              organization_data=organization.dict())
+    await OrgMethos.update_organization(
+        user_id=organization.userIdOwner,
+        organization_id=organization.organizationId,
+        organization_data=organization.dict())
 
 
 @router.post("",
@@ -45,8 +47,9 @@ async def create_organization(organization: OrganizationIn):
     """
     Create new organization with **OrganizationIn** Model
     """
-    org = await OrgMethos.add_organization(user_id=organization.userIdOwner,
-                                           organization_data=organization.dict())
+    org = await OrgMethos.add_organization(
+        user_id=organization.userIdOwner,
+        organization_data=organization.dict())
     org_out = OrganizationOut(**organization.dict(), **org)
     if org_out.organizationId is None:
         raise HTTPException(status_code=409, **org)
@@ -59,5 +62,6 @@ async def delete_organization(organization: OrganizationDelete):
     """
     Delete a organization  with **OrganizationDelete** Model
     """
-    await OrgMethos.delete_organization(user_id=organization.userIdOwner,
-                                        organization_id=organization.organizationId)
+    await OrgMethos.delete_organization(
+        user_id=organization.userIdOwner,
+        organization_id=organization.organizationId)

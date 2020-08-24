@@ -112,9 +112,9 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
-        for k,v  in list(organization_data.items()):
-            if v is None:
-                del organization_data[k]
+        for key,value  in list(organization_data.items()):
+            if value is None:
+                del organization_data[key]
 
         # Update in the collection
         query_orga = {"organizationId": organization_id}

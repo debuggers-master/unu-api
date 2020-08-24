@@ -95,23 +95,23 @@ class CreateEvent:
     # Create agenda (Falta) #
     #########################
 
-    async def add_associates(self, event_id: str, associated_data: dict) -> dict:
+    async def add_associates(self, event_id: str, associate_data: dict) -> dict:
         """
         Add a new associated to event.
 
         Params:
         ------
         event_id: str - The event uuid.
-        associated_data: dict - The new associated data.
+        associate_data: dict - The new associated data.
 
         Return:
         ------
-        associated_id: str - The uuid of the created associated.
+        associate_id: str - The uuid of the created associated.
         """
-        associated_id = _uuid()
-        associated_data.update({"associatedId": associated_id})
+        associate_id = _uuid()
+        associate_data.update({"associateId": associate_id})
         query = _make_query(event_id)
-        modified_count = await self.crud.add_to_set(query, "associates", associated_data)
+        modified_count = await self.crud.add_to_set(query, "associates", associate_data)
         if not modified_count:
             return False
-        return {"associatedId": associated_id}
+        return {"associateId": associate_id}

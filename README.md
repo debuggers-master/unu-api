@@ -80,55 +80,72 @@ source scripts/dev.sh
 ```
 
 - response (201):
-  - acces_token: str
-  - type_token: str
-  - user: obj - User data
+```
+{  
+  acces_token: str
+  type_token: str
+  user: obj // User data
+}
+```
 
 **Login an user**:
 - path: `/auth/login`
 - method: `POST`
-- body: {
-  email: `str`,
-  password: `str`,
+- body:
+```
+{
+  email: str,
+  password: str,
 }
+```
 
 - response (200):
-  - access_token: `str`
-  - type_token: `str`
-  - user: obj - User data
+```
+{  
+  acces_token: str
+  type_token: str
+  user: obj // User data
+}
+```
 
 **Update user info**:
 - path: `/users`
 - method: `PUT`
-- body: {
-  userId: `str`
+- body:
+```
+{
+  userId: str
   userData: {
-    firstName: `str`,
-    lastName: `str`,
-    email: `str`,
+    firstName: str,
+    lastName: str,
+    email: str,
   }
 }
+```
 
 - response (200):
-  - {"modifiedCount": int}
+  - ``{modifiedCount:}``
 
 **Delete user**:
 - path: `/users`
 - method: `DELETE`
-- body
-  - userId: `str`
+- query:
+  - userId: str
 
 - response (204):
-  - empty
+  - `empty`
 
 ### Operations about organizations
 
 **Retrieve organization info**
 - path: `/organizations`
 - method: `GET`
-- body: {
-  organizationId: `str`
+- body:
+```
+{
+  organizationId: str
 }
+```
 
 - response (200):
   - organization data
@@ -136,40 +153,49 @@ source scripts/dev.sh
 **Create a new organization**:
 - path: `/organizations`
 - method: `POST`
-- body: {
-  userId: `str`,
+- body:
+```
+{
+  userId: str,
   organizationData: {
-    name: `str`
+    name: str
   }
 }
+```
 
 - response (201):
-  - {"organizationId": `str`}
+  - `{"organizationId": str}`
 
 **Update a organization**:
 - path: `/users/organization`
 - method: `PUT`
-- body: {
-  userId: `str`
-  organizationId: `str`
+- body: 
+```
+{
+  userId: str
+  organizationId: str
   organizationData: {
-      name: `str`
+      name: str
   }
 }
+```
 
 - response (200):
-  - {"modifiedCount": "1"}
+  - `{modifiedCount:}`
 
 **Delete a organization**:
 - path: `/users/organization`
 - method: `DELETE`
-- body: {
-  userId: `str`,
-  organizationId: `str`,
+- body:
+```
+{
+  userId: str,
+  organizationId: str,
 }
+```
 
 - response (204):
-  - empty
+  - `empty`
 
 ### Operations about events
 
@@ -179,9 +205,9 @@ source scripts/dev.sh
 - path: `/events`
 - method: `GET`
 - query
-  - eventId: `str`
-  - filters: List[`str`] (optional)
-  - excludes: List[`str`] (optional)
+  - eventId: str
+  - filters: List[str] (optional)
+  - excludes: List[str] (optional)
 
 - response (200):
   - eventData: obj - The event info
@@ -193,12 +219,15 @@ source scripts/dev.sh
 - path: `/events/from-url`
 - method: `GET`
 - query
-  - filters: List[`str`] (optional)
-  - excludes: List[`str`] (optional)
-- body: {
-  organizationName: `str`
-  eventUrl: `str`
+  - filters: List[str] (optional)
+  - excludes: List[str] (optional)
+- body:
+```
+{
+  organizationName: str
+  eventUrl: str
 }
+```
 
 - response (200):
   - eventData: obj - The event info
@@ -211,239 +240,288 @@ source scripts/dev.sh
 - method: `GET`
 
 - response (200):
-  - publishedEvent: List[
+  - publishedEvents:
+  ```
+  List[
     {
-      "eventId": `str`,
-      "name": `str`,
-      "startDate": `str`,
-      "shortDescription": `str`
-      "organization": `str`,
+      "eventId": str,
+      "name": str,
+      "startDate": str,
+      "shortDescription": str
+      "organization": str,
     },
     ...
   ]
+  ```
 
 **Return the number of registered participants**:
 - path: `/events/count-participants`
 - method: `GET`
 - query
-  - eventId: `str`
+  - eventId: str
 
 - response (200):
-  - {"particpants": int }: int - The total regitrated particpants
+  - `{"particpants": int }` - int -> The total regitrated particpants
 
 ---------------------------------------------------------------------------
 
 **Create a new event**:
 - path: `/events`
 - method: `POST`
-- body: {
-  name: `str`,
-  template: `str`,
-  url: `str`,,
-  startDate: `str`, - date
-  organization: `str`,
+- body:
+```
+{
+  name: str,
+  template: str,
+  url: str,,
+  startDate: str, - date
+  organization: str,
 }
+```
 
 - response (201):
-  - detail: {"eventId": `str`}
+  - `{"eventId": str}`
 
 **Update event info**:
 (Complete all event info)
 - path: `/events`
 - method: `UPDATE`
-- body:{
-  eventId: `str`
+- body:
+```
+{
+  eventId: str
   eventData: {
-    name: `str`,
-    shortDescription: `str`,
-    description: `str`,
-    imageHeader: `str`, - ecoded base64 image
-    imageEvent: `str`, - ecoded base64 image
-    localTime: `str` - eg. "GMT-5"
+    name: str,
+    shortDescription: str,
+    description: str,
+    imageHeader: str, - ecoded base64 image
+    imageEvent: str, - ecoded base64 image
+    localTime: str - eg. "GMT-5"
   }
 }
+```
+
+- response (200):
+  - `{"modifiedCount": int}`
 
 **Delete a event**:
 (Complete all event info)
 - path: `/events`
 - method: `DELETE`
 - query:
-  - eventId: `str`
+  - eventId: str
+
+- response (204):
+  - `empty`
 
 ---------------------------------------------------------------------------
 
 **Add a collaborator to event**:
 - path: `/events/collaborators`
 - method: `POST`
-- body: {
-  eventId: `str`,
+- body:
+```
+{
+  eventId: str,
   collaboratorData: {
-    firstName: `str`,
-    lastName: `str`,
-    email: `str`,
-    password: `str`,
+    firstName: str,
+    lastName: str,
+    email: str,
+    password: str,
   }
 }
+```
 
 - response (201):
-  - {"collaboratorId": `str`}
+  - `{"collaboratorId": str}`
 
 **Add a existing collaborator to event**:
 - path: `/events/collaborators`
 - method: `POST`
-- body: {
-  email: `str`,
-}
+- body: `{email: str}`
 
 **Remove a collaborators from a event**:
 - path: `/events/collaborators`
 - method: `DELETE`
-- body: {
-  eventId: `str`,
-  email: `str`,
+- body: 
+```
+{
+  eventId: str,
+  email: str,
 }
+```
 
 - response (204):
-  - empty
+  - `empty`
 
 ---------------------------------------------------------------------------
 
 **Add a new associated**:
 - path: `/events/associates`
 - method: `POST`
-- body: {
-  eventId: `str`
+- body:
+```
+{
+  eventId: str
   associatedData: {
-    name: `str`,
-    url: `str`,
-    logo: `str`, - ecoded base64 image
+    name: str,
+    url: str,
+    logo: str, - ecoded base64 image
   }
 }
+```
 - response (200):
-  - {"associatedId": `str`}
+  - `{"associatedId": str}`
 
 **Update event associates info**:
 - path: `/events/associates`
 - method: `PUT`
-- body: {
-  eventId: `str`,
-  associatedId: `str`,
+- body:
+```
+{
+  eventId: str,
+  associatedId: str,
   associatedData: {
-    name: `str`,
-    url: `str`,
-    logo: `str`, - ecoded base64 image
+    name: str,
+    url: str,
+    logo: str, - ecoded base64 image
   }
 }
+```
 
 - response (200):
-  - {"modifiedCount": int}
+  - `{modifiedCount: int}`
 
 **Delete a associated**:
 - path: `/events/associates`
 - method: `DELETE`
-- body: {
-  eventId: `str`,
-  associatedId: `str`,
+- body:
+```
+{
+  eventId: str,
+  associatedId: str,
 }
+```
+
+- response (204):
+  - `empty`
 
 ---------------------------------------------------------------------------
 
 **Add event day**:
 - path: `/events/day`
 - method: `POST`
-- body: {
-  eventId: `str`,
+- body:
+```
+{
+  eventId: str,
   dayData: {
-    date: `str`, - time
+    date: str, - time
   }
 }
+```
 
 - response (201):
-  - {"dayId": `str`}
+  - {"dayId": str}
 
 **Update a event day**:
 - path: `/events/day`
 - method: `PUT`
-- body: {
-  eventId: `str`,
-  dayId: `str`,
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
   dayData: {
-    date: `str`, - time
+    date: str, - time
   }
 }
+```
 
 - response (200):
-  - detail: {"modifiedCount": int}
+  - `{modifiedCount: int}`
 
 **Delete a event day**:
 - path: `/events/day`
 - method: `DELETE`
-- body: {
-  eventId: `str`,
-  dayId: `str`,
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
 }
+```
 
 - response (204):
-  - empty
+  - `empty`
 
 ---------------------------------------------------------------------------
 
 **Add a conference**:
 - path: `/events/conference`
 - method: `POST`
-- body: {
-  eventId: `str`
-  dayId: `str`
+- body:
+```
+{
+  eventId: str
+  dayId: str
   conferenceData: {
-    name: `str`,
-    description: `str`,
-    startHour: `str`, - date
-    endHour: `str` -  date
-    speakerName: `str`,
-    speakerBio: `str`,
-    twitter: `str`,
-    rol: `str`,
-    photo: `str`,
+    name: str,
+    description: str,
+    startHour: str, - date
+    endHour: str -  date
+    speakerName: str,
+    speakerBio: str,
+    twitter: str,
+    rol: str,
+    photo: str,
   }
 }
+```
 
 - response (201):
-  - detail: {"conferenceId": int}
+  - `{"conferenceId": int}`
 
 **Update a conference info**:
 - path: `/events/conference`
 - method: `PUT`
-- body: {
-  eventId: `str`,
-  dayId: `str`,
-  conferenceId: `str`
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
+  conferenceId: str
   conferenceData: {
-    name: `str`,
-    description: `str`,
-    startHour: `str`, - date
-    endHour: `str` -  date
-    speakerName: `str`,
-    speakerBio: `str`,
-    twitter: `str`,
-    rol: `str`,
-    photo: `str`,
+    name: str,
+    description: str,
+    startHour: str, - date
+    endHour: str -  date
+    speakerName: str,
+    speakerBio: str,
+    twitter: str,
+    rol: str,
+    photo: str,
   }
 }
+```
 
 - response (200):
-  - detail: {"modifiedCount": int}
+  - `{modifiedCount: int}`
 
 **Remove a conference**:
 - path: `/events/conference`
 - method: `DELETE`
-- body: {
-  eventId: `str`,
-  dayId: `str`,
-  conferenceId: `str`,
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
+  conferenceId: str,
 }
+```
 
 - response (204):
-  - empty
+  - `empty`
 
 ---------------------------------------------------------------------------
 
@@ -451,10 +529,14 @@ source scripts/dev.sh
 - path: `/events/change-status`
 - method: `PUT`
 - body:
-  - eventId: `str`
-  - actualStatus: bool - The actual status
+```
+{
+  eventId: str
+  actualStatus: Boolean // The actual status
+}
+```
 - response (200):
-  - {"actualStatus": bool} - True if public, flase if private
+  - `{"actualStatus": bool}` - True if public, flase if private
 
 ---------------------------------------------------------------------------
 
@@ -465,31 +547,31 @@ source scripts/dev.sh
 ```js
 user: {
   _id: `ObjectId`,
-  userId: `str`,
-  email: `str`,
-  firstName: `str`,
-  lastName: `str`,
-  password: `str`,
+  userId: str,
+  email: str,
+  firstName: str,
+  lastName: str,
+  password: str,
   organizations: [
     {
-      organizationId: `str`,
-      name: `str`,
+      organizationId: str,
+      name: str,
     }
   ],
   myEvents: [
     {
-      eventId: `str`,
-      organization: `str`,
-      name: `str`,
-      shortDescription: `str`,
+      eventId: str,
+      organization: str,
+      name: str,
+      shortDescription: str,
     }
   ],
   collaborations: [
     {
-      eventId: `str`,
-      organization: `str`,
-      name: `str`,
-      shortDescription: `str`,
+      eventId: str,
+      organization: str,
+      name: str,
+      shortDescription: str,
     }
   ]
 }
@@ -500,13 +582,13 @@ user: {
 ```js
 organization: {
   _id: `ObjectId`,
-  organizationId: `str`,
-  name: `str`,
-  organizationUrl: `str`,
+  organizationId: str,
+  name: str,
+  organizationUrl: str,
   events: [
     {
-      eventId: `str`,
-      name: `str`,
+      eventId: str,
+      name: str,
     }
   ]
 }
@@ -517,60 +599,60 @@ organization: {
 ```js
 event: {
   _id: `ObjectId`,
-  eventId: `str`,
-  organizationId: `str`,
-  organizationUrl: `str`, //Generated automatly
-  name: `str`,
-  url: `str`,
-  startDate: `str`, // Date
-  template: `str`,
-  organization: `str`,
-  localization: `str`, // eg. GTM-5
-  shortDescription: `str`,
-  description: `str`,
-  imageHeader: `str`, - ecoded base64 image
-  imageEvent: `str`, - ecoded base64 image
-  localTime: `str` - eg. "GMT-5"
+  eventId: str,
+  organizationId: str,
+  organizationUrl: str, //Generated automatly
+  name: str,
+  url: str,
+  startDate: str, // Date
+  template: str,
+  organization: str,
+  localization: str, // eg. GTM-5
+  shortDescription: str,
+  description: str,
+  imageHeader: str, - ecoded base64 image
+  imageEvent: str, - ecoded base64 image
+  localTime: str - eg. "GMT-5"
   speakers: [
     {
-      speakerId: `str`,
-      speakerName: `str`,
-      speakerBio: `str`,
-      twitter: `str`,
-      rol: `str`,
-      photo: `str`,
+      speakerId: str,
+      speakerName: str,
+      speakerBio: str,
+      twitter: str,
+      rol: str,
+      photo: str,
     }
   ],
   agenda: [
     {
-      dayId: `str`,
-      date: `str`, // Date
+      dayId: str,
+      date: str, // Date
       conferences: [
         {
-          conferenceId: `str`,
-          name: `str`,
-          description: `str`,
-          startHour: `str`, - date
-          endHour: `str` -  date
-          speakerName: `str`,
-          rol: `str`,
-          photo: `str`,
+          conferenceId: str,
+          name: str,
+          description: str,
+          startHour: str, - date
+          endHour: str -  date
+          speakerName: str,
+          rol: str,
+          photo: str,
         }
       ]
     }
   ],
   associates: [
     {
-      name: `str`,
-      url: `str`,
-      logo: `str`, //url
+      name: str,
+      url: str,
+      logo: str, //url
     }
   ],
   collaborators: [
     {
-      userId: `str`,
-      name: `str`,
-      email: `str`,
+      userId: str,
+      name: str,
+      email: str,
     }
   ],
   publicationStatus: Boolean // True if is accesible to all public
@@ -582,8 +664,8 @@ event: {
 
 ```js
 participants: {
-  eventId: `str`,
-  emails: List[`str`],
+  eventId: str,
+  emails: List[str],
 }
 ```
 

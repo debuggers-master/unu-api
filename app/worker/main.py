@@ -10,7 +10,12 @@ from rq import Queue, Connection, Retry, Worker
 from config import settings  # pylint: disable-msg=E0611
 
 
-def create_job(function: callable, time_delta: timedelta = None, date_time: datetime = None) -> str:
+def create_job(
+        function: callable,
+        date_time: datetime,
+        utc_hours: int = 0,
+        **kwargs,
+) -> str:
     """
     Add a new Job to Queue.
 
@@ -18,7 +23,7 @@ def create_job(function: callable, time_delta: timedelta = None, date_time: date
     ------
     function: callable - The job function
     date_time: datetime - The specific time when the job must be executed
-    time_delta: timedelta - The time to excecute the job
+    utc_hours: int - Eg: -5 or +2 The specific GTM.
 
     Return:
     ------
@@ -28,22 +33,19 @@ def create_job(function: callable, time_delta: timedelta = None, date_time: date
     with Connection(redis.from_url(settings.REDIS_URL)):
         redis_queue = Queue("email")
 
-        if date_time:
-            job = redis_queue.enqueue_at(
-                date_time,
-                function,
-                retry=Retry(max=3, interval=[10, 30, 60])
-            )
-        elif time_delta:
-            job = redis_queue.enqueue_in(
-                time_delta,
-                function,
-                retry=Retry(max=3, interval=[10, 30, 60])
-            )
-        else:
-            raise AttributeError("Some time specification id needed")
+        # Fix the correct time to execute.
+        utc_to_place_time = datetime.utcnow() + timedelta(hours=utc_hours)
+        seconds = date_time - utc_to_place_time
+        minutes = seconds.seconds / 60
 
-    return str(job.get_id())
+        job = redis_queue.enqueue_in(
+            time_delta=timedelta(minutes=minutes),
+            func=function,
+            kwargs=kwargs,
+            retry=Retry(max=3, interval=[10, 30, 60])
+        )
+
+        return job.get_id()
 
 
 def __run_worker():

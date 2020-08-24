@@ -108,7 +108,7 @@ async def update_collaborator(collaborator: CollaboratorUpdate):
 ##ASSOCIATES API CRUD##
 #######################
 @router.post("/associate/",
-             status_code=200,
+             status_code=201,
              response_model=AssociateOut)
 async def add_associate(new_associate: AssociateIn):
     """

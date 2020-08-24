@@ -69,16 +69,19 @@ source scripts/dev.sh
 **Register an user**:
 - path: `/auth/signup`
 - method: `POST`
-- body: {
-  email: `str`,
-  password: `str`,
-  firstName: `str`,
-  lastName: `str`,
+- body: 
+```
+{
+  email: str,
+  password: str,
+  firstName: str,
+  lastName: str,
 }
+```
 
 - response (201):
-  - acces_token: `str`
-  - type_token: `str`
+  - acces_token: str
+  - type_token: str
   - user: obj - User data
 
 **Login an user**:

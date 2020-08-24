@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     CORS_ORIGIN: str
 
     # AUTH
-    SECRET_JWT: token_urlsafe(32)
+    SECRET_JWT: str = token_urlsafe(32)
 
     # MONGO DB
     DB_NAME: str

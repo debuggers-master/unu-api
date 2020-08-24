@@ -56,8 +56,10 @@ source scripts/dev.sh
 ## Api endpoints
 
 #### Complete documentation
+
 > Swagger: http://35.239.16.11/docs
-> OpemApi: http://35.239.16.11/redoc
+
+> OpenApi: http://35.239.16.11/redoc
 
 #### Url
 **API-url**: http://35.239.16.11.com/api/v1

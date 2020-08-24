@@ -3,6 +3,7 @@ services:
   api:
     container_name: api
     build: .
+    image: unu_api
     ports:
       - 3000:80
     volumes:
@@ -13,9 +14,28 @@ services:
     restart: $RESTART
     command: "/start-reload.sh"
 
+  worker:
+    container_name: worker
+    image: unu_api
+    command: python3 worker/main.py
+    volumes:
+      - ./app:/app
+    depends_on:
+      - redis
+
   redis:
     container_name: redis
     image: redis:alpine
     ports:
       - 6379:6379
     restart: always
+
+  dashboard:
+    build: ./app/worker
+    image: dashboard
+    container_name: dashboard
+    ports:
+      - 9181:9181
+    command: rq-dashboard -H redis
+    depends_on:
+      - redis

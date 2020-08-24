@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     CORS_ORIGIN: str
 
     # AUTH
-    SECRET_JWT: token_urlsafe(32)
+    SECRET_JWT: str = token_urlsafe(32)
 
     # MONGO DB
     DB_NAME: str
@@ -34,6 +34,10 @@ class Settings(BaseSettings):
 
     # SEND_GRIND
     SENDGRID_API_KEY: str
+
+    # REDIS_WORKER
+    REDIS_URL: str
+    QUEUES: List[str]
 
     # STORAGE
     GCP_STORAGE_KEY: str

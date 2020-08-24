@@ -55,63 +55,97 @@ source scripts/dev.sh
 
 ## Api endpoints
 
-Docs: http://35.239.16.11/docs
-BasePath: http://35.239.16.11.com/api/v1
+#### Complete documentation
+
+> Swagger: http://35.239.16.11/docs
+
+> OpenApi: http://35.239.16.11/redoc
+
+#### Url
+**base_path**: http://35.239.16.11.com/api/v1
 
 ### Operations about users
 
 **Register an user**:
 - path: `/auth/signup`
 - method: `POST`
-- body
-  - email: str
-  - password: str
-  - firstName: str
-  - lastName: str
+- body:
+```
+{
+  email: str,
+  password: str,
+  firstName: str,
+  lastName: str,
+}
+```
 
 - response (201):
-  - acces_token: str
-  - type_token: str
-  - user: obj - User data
+```
+{  
+  acces_token: str
+  type_token: str
+  user: obj // User data
+}
+```
 
 **Login an user**:
 - path: `/auth/login`
 - method: `POST`
-- body
-  - email: str
-  - password: str
+- body:
+```
+{
+  email: str,
+  password: str,
+}
+```
 
 - response (200):
-  - access_token: str
-  - type_token: str
-  - user: obj - User data
+```
+{  
+  acces_token: str
+  type_token: str
+  user: obj // User data
+}
+```
 
 **Update user info**:
 - path: `/users`
 - method: `PUT`
-- body
-  - userId: str
-  - userData: obj - The data for update
+- body:
+```
+{
+  userId: str
+  userData: {
+    firstName: str,
+    lastName: str,
+    email: str,
+  }
+}
+```
 
 - response (200):
-  - detail: {"modified_count": "1"}
+  - `{modifiedCount: int}`
 
 **Delete user**:
 - path: `/users`
 - method: `DELETE`
-- body
+- query:
   - userId: str
 
 - response (204):
-  - empty
+  - `empty`
 
 ### Operations about organizations
 
 **Retrieve organization info**
 - path: `/organizations`
 - method: `GET`
-- body
-  - organizationId: str
+- body:
+```
+{
+  organizationId: str
+}
+```
 
 - response (200):
   - organization data
@@ -119,36 +153,53 @@ BasePath: http://35.239.16.11.com/api/v1
 **Create a new organization**:
 - path: `/organizations`
 - method: `POST`
-- body
-
-  - userId: str
-  - organizationData
+- body:
+```
+{
+  userId: str,
+  organizationData: {
+    organizationName: str
+  }
+}
+```
 
 - response (201):
-  - detail: {"organizationId": str}
+  - `{"organizationId": str}`
 
 **Update a organization**:
 - path: `/users/organization`
 - method: `PUT`
-- body
-  - userId: str
-  - organizationId: str
-  - organizationData: obj - The info for update
+- body: 
+```
+{
+  userId: str
+  organizationData: {
+    organizationId: str
+    organizationName: str
+  }
+}
+```
 
 - response (200):
-  - detail: {"modifiedCount": "1"}
+  - `{modifiedCount: int}`
 
 **Delete a organization**:
 - path: `/users/organization`
-- method: `POST`
-- body
-  - userId: str
-  - organizationId: str
+- method: `DELETE`
+- body:
+```
+{
+  userId: str,
+  organizationId: str,
+}
+```
 
 - response (204):
-  - empty
+  - `empty`
 
 ### Operations about events
+
+---------------------------------------------------------------------------
 
 **Retrieve event info**:
 - path: `/events`
@@ -171,8 +222,12 @@ BasePath: http://35.239.16.11.com/api/v1
   - filters: List[str] (optional)
   - excludes: List[str] (optional)
 - body:
-  - organizationName: str
-  - eventUrl: str
+```
+{
+  organizationName: str
+  url: str
+}
+```
 
 - response (200):
   - eventData: obj - The event info
@@ -185,8 +240,19 @@ BasePath: http://35.239.16.11.com/api/v1
 - method: `GET`
 
 - response (200):
-  - publishedEvent: List[event]
-  event = {"eventId": str, "name": str, "startDate": str, "organizationName": str}
+  - publishedEvents:
+  ```
+  List[
+    {
+      "eventId": str,
+      "name": str,
+      "startDate": str,
+      "shortDescription": str
+      "organization": str,
+    },
+    ...
+  ]
+  ```
 
 **Return the number of registered participants**:
 - path: `/events/count-participants`
@@ -195,239 +261,412 @@ BasePath: http://35.239.16.11.com/api/v1
   - eventId: str
 
 - response (200):
-  - {"particpants": int }: int - The total regitrated particpants
+  - `{"particpants": int }` - int -> The total regitrated particpants
+
+---------------------------------------------------------------------------
 
 **Create a new event**:
 - path: `/events`
 - method: `POST`
-- body: (eventData)
-  - url: str
-  - name: str
-  - startDate: str
-  - template: str
-  - shortDescription: str
-  - description: str
-  - banner: image
-  - organizationName: str
+- body:
+```
+{
+  name: str,
+  template: str,
+  url: str,
+  startDate: str, - date
+  organization: str,
+}
+```
 
 - response (201):
-  - detail: {"eventId": str}
+  - `{"eventId": str}`
 
-**Add a collaborators to event**:
+**Update event info**:
+(Complete all event info)
+- path: `/events`
+- method: `UPDATE`
+- body:
+```
+{
+  eventId: str
+  eventData: {
+    name: str,
+    shortDescription: str,
+    description: str,
+    imageHeader: str, - ecoded base64 image
+    imageEvent: str, - ecoded base64 image
+    localTime: str - eg. "UTC-5"
+  }
+}
+```
+
+- response (200):
+  - `{"modifiedCount": int}`
+
+**Delete all event**:
+- path: `/events`
+- method: `DELETE`
+- query:
+  - eventId: str
+
+- response (204):
+  - `empty`
+
+---------------------------------------------------------------------------
+
+**Add a collaborator to event**:
 - path: `/events/collaborators`
 - method: `POST`
 - body:
-  - eventId: str
-  - collaboratorData: obj
-- response (201):
-  - {"collaboratorId": str}
+```
+{
+  eventId: str,
+  collaboratorData: {
+    firstName: str,
+    lastName: str,
+    email: str,
+    password: str,
+  }
+}
+```
 
-**Add a new speaker**:
-- path: `/events/speakers`
-- method: `POST`
-- body:
-  - eventId: str
-  - speakerData: obj
 - response (201):
-  - {"speakerId": str}
+  - `{"collaboratorId": str}`
+
+**Add a existing collaborator to event**:
+- path: `/events/collaborators?existing=True`
+- method: `POST`
+- body: {
+    eventId: str,
+    email: str,
+}
+
+**Remove a collaborators from a event**:
+- path: `/events/collaborators`
+- method: `DELETE`
+- body: 
+```
+{
+  eventId: str,
+  email: str,
+}
+```
+
+- response (204):
+  - `empty`
+
+---------------------------------------------------------------------------
 
 **Add a new associated**:
 - path: `/events/associates`
 - method: `POST`
 - body:
-  - eventId: str
-  - associatedData: obj
-- response (200):
-  - {"associatedId": str}
-
------------------------------------
-**Add event day**:
-- path: `/events/day`
-- method: `POST`
-- body:
-  - eventId: str
-  - dayId: str
-  - new_data: obj - The new data
-- response (200):
-  - detail: {"modified_count": int}
-
-**Add a conference**:
-- path: `/events/conference`
-- method: `POST`
-- body:
-  - eventId: str
-  - dayId: str
-  - conferenceId: str
-  - new_data: obj - The new data
-- response (200):
-  - detail: {"modified_count": int}
----------------------------------------------
-
-**Update event principal info**:
-- path: `/events`
-- method: `PUT`
-- body:
-  - eventId: str
-  - newData: obj - The new data
-- response (200):
-  - {"modified_count": int}
-
-**Update event collaborators info**:
-- path: `/events/collaborators`
-- method: `PUT`
-- body:
-  - eventId: str
-  - collaboratorEmail: str
-  - newData: obj - The new data
-- response (200):
-  - {"modified_count": int}
-
-**Update event speakers info**:
-- path: `/events/speakers`
-- method: `PUT`
-- body:
-  - eventId: str
-  - speakerId: str
-  - newData: obj - The new data
-- response (200):
-  - {"modified_count": int}
+```
+{
+  eventId: str
+  associatedData: {
+    name: str,
+    url: str,
+    logo: str, - ecoded base64 image
+  }
+}
+```
+- response (201):
+  - `{"associatedId": str}`
 
 **Update event associates info**:
 - path: `/events/associates`
 - method: `PUT`
 - body:
-  - eventId: str
-  - associatedId: str
-  - newData: obj - The new data
+```
+{
+  eventId: str,
+  associatedData: {
+    associatedId: str,
+    name: str,
+    url: str,
+    logo: str, - ecoded base64 image
+  }
+}
+```
+
 - response (200):
-  - {"modified_count": int}
+  - `{modifiedCount: int}`
+
+**Delete a associated**:
+- path: `/events/associates`
+- method: `DELETE`
+- body:
+```
+{
+  eventId: str,
+  associatedId: str,
+}
+```
+
+- response (204):
+  - `empty`
+
+---------------------------------------------------------------------------
+
+**Add event day**:
+- path: `/events/day`
+- method: `POST`
+- body:
+```
+{
+  eventId: str,
+  dayData: {
+    date: str, - time
+  }
+}
+```
+
+- response (201):
+  - {"dayId": str}
+
+**Update a event day**:
+- path: `/events/day`
+- method: `PUT`
+- body:
+```
+{
+  eventId: str,
+  dayData: {
+    dayId: str,
+    date: str, - time
+  }
+}
+```
+
+- response (200):
+  - `{modifiedCount: int}`
+
+**Delete a event day**:
+- path: `/events/day`
+- method: `DELETE`
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
+}
+```
+
+- response (204):
+  - `empty`
+
+---------------------------------------------------------------------------
+
+**Add a conference**:
+- path: `/events/conference`
+- method: `POST`
+- body:
+```
+{
+  eventId: str
+  dayId: str
+  conferenceData: {
+    name: str,
+    description: str,
+    startHour: str, - date
+    endHour: str -  date
+    speakerName: str,
+    speakerBio: str,
+    twitter: str,
+    rol: str,
+    speakerPhoto: str, - ecoded base64 image
+  }
+}
+```
+
+- response (201):
+  - `{"conferenceId": int}`
+
+**Update a conference info**:
+- path: `/events/conference`
+- method: `PUT`
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
+  conferenceData: {
+    conferenceId: str
+    name: str,
+    description: str,
+    startHour: str, - date
+    endHour: str -  date
+    speakerName: str,
+    speakerBio: str,
+    twitter: str,
+    rol: str,
+    speakerPhoto: str,
+  }
+}
+```
+
+- response (200):
+  - `{modifiedCount: int}`
+
+**Remove a conference**:
+- path: `/events/conference`
+- method: `DELETE`
+- body:
+```
+{
+  eventId: str,
+  dayId: str,
+  conferenceId: str,
+}
+```
+
+- response (204):
+  - `empty`
+
+---------------------------------------------------------------------------
 
 **Update event publication status**:
 - path: `/events/change-status`
 - method: `PUT`
 - body:
-  - eventId: str
-  - actualStatus: bool - The actual status
+```
+{
+  eventId: str
+  actualStatus: Boolean // The actual status
+}
+```
 - response (200):
-  - {"actualStatus": bool} - True if public, flase if private
+  - `{"actualStatus": bool}` - True if public, flase if private
 
------------------------------------
-**Update event day info**:
-- path: `/events/day`
-- method: `PUT`
-- body:
-  - eventId: str
-  - dayId: str
-  - new_data: obj - The new data
-- response (200):
-  - detail: {"modified_count": int}
+---------------------------------------------------------------------------
 
-**Update event conference info**:
-- path: `/events/conference`
-- method: `PUT`
-- body:
-  - eventId: str
-  - dayId: str
-  - conferenceId: str
-  - new_data: obj - The new data
-- response (200):
-  - detail: {"modified_count": int}
----------------------------------------------
+### Models
 
-**Delete event**:
-- path: `/events/`
-- method: `DELETE`
-- query:
-  - event_field: (Enun)
-    - all - Delete all event
-    - agenda - Delete all agenda
-    - day - Delete a specific day
-    - conference - Delete a especific conference
-    - speakers - Delete a specific speaker
-    - collaborator - Delete a specific collaborator
-    - associates- Delete a specific assoicate
-
-- body:
-  - eventId: str
-  - <fieldId>: str
-    - if all -> None
-    - if agenda -> None *
-    - if day -> dayId: str *
-    - if conference -> conferenceId: str *
-    - if speakers -> speakerId: str
-    - if collaborator -> collaboratorId: str
-    - if associates -> associatedId: str
-
--reponse: (204)
-  - empty
-
-
-**Principal models**
+**User**
 
 ```js
-userData: {
-  email: str
-  firstName: str
-  lastName: str
+user: {
+  _id: `ObjectId`,
+  userId: str,
+  email: str,
+  firstName: str,
+  lastName: str,
+  password: str,
+  organizations: [
+    {
+      organizationId: str,
+      organizationName: str,
+    }
+  ],
+  myEvents: [
+    {
+      eventId: str,
+      organizationName: str,
+      name: str,
+      shortDescription: str,
+    }
+  ],
+  collaborations: [
+    {
+      eventId: str,
+      organizationName: str,
+      name: str,
+      shortDescription: str,
+    }
+  ]
 }
 ```
 
+**Organization**
+
 ```js
-organizationData: {
-  name: str
-  description: str
+organization: {
+  _id: `ObjectId`,
+  organizationId: str,
+  organizationName: str,
+  organizationUrl: str,
+  events: [
+    {
+      eventId: str,
+      name: str,
+    }
+  ]
 }
 ```
 
+**Event**
+
 ```js
-eventData: {
+event: {
+  _id: `ObjectId`,
   eventId: str,
   organizationId: str,
-  organizationName: str, //Generated automatly
-  url: str,
+  organizationUrl: str, //Generated automatly
+  organizationName: str,
   name: str,
-  startDate: Date,
+  url: str,
+  startDate: str, // Date
   template: str,
-  localization: str,
-  banner: image,
-  decription: str,
-  shortDescription: str,
-  collaborators: [],
-  speakers: [],
-  agenda: [],
-  associates: [],
-  publicationStatus: bool
+  shortDescription: str,
+  description: str,
+  imageHeader: str, - ecoded base64 image
+  imageEvent: str, - ecoded base64 image
+  localTime: str - eg. "UTC-5"
+  speakers: [
+    {
+      speakerId: str,
+      speakerName: str,
+      speakerBio: str,
+      twitter: str,
+      rol: str,
+      speakerPhoto: str,
+    }
+  ],
+  agenda: [
+    {
+      dayId: str,
+      date: str, // Date
+      conferences: [
+        {
+          conferenceId: str,
+          name: str,
+          description: str,
+          startHour: str, - date
+          endHour: str -  date
+          speakerName: str,
+          rol: str,
+          speakerPhoto: str,
+        }
+      ]
+    }
+  ],
+  associates: [
+    {
+      name: str,
+      url: str,
+      logo: str, //url
+    }
+  ],
+  collaborators: [
+    {
+      userId: str,
+      name: str,
+      email: str,
+    }
+  ],
+  publicationStatus: Boolean // True if is accesible to all public
 }
 
 ```
 
-```js
-collaboratorData: {
-  collaboratorId: str, // Generated automatly
-  firstName: str,
-  lastName: str,
-  email: str,
-  password: str,
-}
-```
+**Participants**
 
 ```js
-speakerData: {
-    speakerId: str, // Generated automatly
-    name: str,
-    biography: str,
-    twitter: url,
-    photo: image,
-  }
-```
-
-```js
-associatedData: {
-  speakerId: str, // Generated automatly
-  name: str,
-  url:url,
-  logo: image,
-  tag: str,
+participants: {
+  eventId: str,
+  emails: List[str],
 }
 ```
 

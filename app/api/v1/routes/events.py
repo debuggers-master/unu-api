@@ -167,16 +167,16 @@ async def add_speaker(new_speaker:SpeakerIn):
 
     ##base64img= new_associate.logo
 
-    #######################
+    ##############################
     ## URL created  Image Logic ##
-    #######################
+    ##############################
 
-    associate = new_associate.asociateInfo.dict()
-    associate.update({"url_logo": "url_logo"})
+    speaker = new_speaker.spekerInfo.dict()
+    speaker.update({"url_photo": "url_photo"})
 
-    associate_id = await CreateMethods.add_associates(
-                                event_id=new_associate.eventId,
-                                associate_data=associate)
+    speaker_id = await CreateMethods.add_speaker(
+                            event_id=new_speaker.eventId,
+                            speaker_data=new_speaker.spekerInfo)
 
     # No se de donde toma el associateId :O
     return AssociateOut(**associate)

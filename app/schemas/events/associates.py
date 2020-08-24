@@ -34,29 +34,26 @@ class AssociateIn(EventOut):
     """
     asociateInfo: AsociateInfo
     logo: str = Field(None,
-                      description="Image of associate in base64",
-                      example="")
+                      description="Image of associate in base64")
 
 
 class AssociateOut(BaseModel):
     """
-    Base Model returned when a new collaborator is just added
+    Base Model returned when a new associate is just added
     """
     associateId: str = Field(...,
                              description="Unique Associate uuid identifier")
     url_logo: str = Field(None,
-                          description="Unique Associate uuid identifier")
+                          description="url of associate logo")
 
 class AssociateDelete(EventOut,AssociateOut):
     """
     Base Model to delele a associate
     """
 
+
 class AsociateUpdate(AssociateDelete):
     """
     Base Model to Update a associate
     """
-    ######################
-    ## DELETE IMG LOGIC ##
-    ######################
     asociateInfo: Optional[AsociateInfo]

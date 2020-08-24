@@ -62,14 +62,14 @@ source scripts/dev.sh
 > OpenApi: http://35.239.16.11/redoc
 
 #### Url
-**API-url**: http://35.239.16.11.com/api/v1
+**base_path**: http://35.239.16.11.com/api/v1
 
 ### Operations about users
 
 **Register an user**:
 - path: `/auth/signup`
 - method: `POST`
-- body: 
+- body:
 ```
 {
   email: str,
@@ -124,7 +124,7 @@ source scripts/dev.sh
 ```
 
 - response (200):
-  - ``{modifiedCount:}``
+  - `{modifiedCount: int}`
 
 **Delete user**:
 - path: `/users`
@@ -158,7 +158,7 @@ source scripts/dev.sh
 {
   userId: str,
   organizationData: {
-    name: str
+    organizationName: str
   }
 }
 ```
@@ -173,15 +173,15 @@ source scripts/dev.sh
 ```
 {
   userId: str
-  organizationId: str
   organizationData: {
-      name: str
+    organizationId: str
+    organizationName: str
   }
 }
 ```
 
 - response (200):
-  - `{modifiedCount:}`
+  - `{modifiedCount: int}`
 
 **Delete a organization**:
 - path: `/users/organization`
@@ -225,7 +225,7 @@ source scripts/dev.sh
 ```
 {
   organizationName: str
-  eventUrl: str
+  url: str
 }
 ```
 
@@ -273,7 +273,7 @@ source scripts/dev.sh
 {
   name: str,
   template: str,
-  url: str,,
+  url: str,
   startDate: str, - date
   organization: str,
 }
@@ -296,7 +296,7 @@ source scripts/dev.sh
     description: str,
     imageHeader: str, - ecoded base64 image
     imageEvent: str, - ecoded base64 image
-    localTime: str - eg. "GMT-5"
+    localTime: str - eg. "UTC-5"
   }
 }
 ```
@@ -304,8 +304,7 @@ source scripts/dev.sh
 - response (200):
   - `{"modifiedCount": int}`
 
-**Delete a event**:
-(Complete all event info)
+**Delete all event**:
 - path: `/events`
 - method: `DELETE`
 - query:
@@ -336,9 +335,12 @@ source scripts/dev.sh
   - `{"collaboratorId": str}`
 
 **Add a existing collaborator to event**:
-- path: `/events/collaborators`
+- path: `/events/collaborators?existing=True`
 - method: `POST`
-- body: `{email: str}`
+- body: {
+    eventId: str,
+    email: str,
+}
 
 **Remove a collaborators from a event**:
 - path: `/events/collaborators`
@@ -370,7 +372,7 @@ source scripts/dev.sh
   }
 }
 ```
-- response (200):
+- response (201):
   - `{"associatedId": str}`
 
 **Update event associates info**:
@@ -380,8 +382,8 @@ source scripts/dev.sh
 ```
 {
   eventId: str,
-  associatedId: str,
   associatedData: {
+    associatedId: str,
     name: str,
     url: str,
     logo: str, - ecoded base64 image
@@ -431,8 +433,8 @@ source scripts/dev.sh
 ```
 {
   eventId: str,
-  dayId: str,
   dayData: {
+    dayId: str,
     date: str, - time
   }
 }
@@ -474,7 +476,7 @@ source scripts/dev.sh
     speakerBio: str,
     twitter: str,
     rol: str,
-    photo: str,
+    speakerPhoto: str, - ecoded base64 image
   }
 }
 ```
@@ -490,8 +492,8 @@ source scripts/dev.sh
 {
   eventId: str,
   dayId: str,
-  conferenceId: str
   conferenceData: {
+    conferenceId: str
     name: str,
     description: str,
     startHour: str, - date
@@ -500,7 +502,7 @@ source scripts/dev.sh
     speakerBio: str,
     twitter: str,
     rol: str,
-    photo: str,
+    speakerPhoto: str,
   }
 }
 ```
@@ -555,13 +557,13 @@ user: {
   organizations: [
     {
       organizationId: str,
-      name: str,
+      organizationName: str,
     }
   ],
   myEvents: [
     {
       eventId: str,
-      organization: str,
+      organizationName: str,
       name: str,
       shortDescription: str,
     }
@@ -569,7 +571,7 @@ user: {
   collaborations: [
     {
       eventId: str,
-      organization: str,
+      organizationName: str,
       name: str,
       shortDescription: str,
     }
@@ -583,7 +585,7 @@ user: {
 organization: {
   _id: `ObjectId`,
   organizationId: str,
-  name: str,
+  organizationName: str,
   organizationUrl: str,
   events: [
     {
@@ -602,17 +604,16 @@ event: {
   eventId: str,
   organizationId: str,
   organizationUrl: str, //Generated automatly
+  organizationName: str,
   name: str,
   url: str,
   startDate: str, // Date
   template: str,
-  organization: str,
-  localization: str, // eg. GTM-5
   shortDescription: str,
   description: str,
   imageHeader: str, - ecoded base64 image
   imageEvent: str, - ecoded base64 image
-  localTime: str - eg. "GMT-5"
+  localTime: str - eg. "UTC-5"
   speakers: [
     {
       speakerId: str,
@@ -620,7 +621,7 @@ event: {
       speakerBio: str,
       twitter: str,
       rol: str,
-      photo: str,
+      speakerPhoto: str,
     }
   ],
   agenda: [
@@ -636,7 +637,7 @@ event: {
           endHour: str -  date
           speakerName: str,
           rol: str,
-          photo: str,
+          speakerPhoto: str,
         }
       ]
     }

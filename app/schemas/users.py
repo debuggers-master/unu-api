@@ -87,3 +87,10 @@ class UserOut(UserId, UserIn):
     organizations: Optional[List[OrganizationOut]] = []
     myEvents: Optional[List[EventUserBaseDB]] = []
     collaborations: Optional[List[CollaboratorDB]] = []
+
+
+class UserUpdate(UserId):
+    """
+    Base Model to Update user info
+    """
+    userData: UserBase

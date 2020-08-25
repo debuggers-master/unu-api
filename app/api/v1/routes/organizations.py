@@ -3,12 +3,13 @@ Organizations Router - Operations about organizations
 """
 
 from fastapi import APIRouter, HTTPException
-
+from schemas.general import ModifiedCount
 from schemas.organizations import (OrganizationIn,
                                    OrganizationOut,
                                    OrganizationDelete,
                                    OrganizationUpdate)
 from api.v1.services.organization import OrganizationController # pylint: disable-msg=E0611
+
 
 # Router instance
 router = APIRouter()
@@ -33,7 +34,8 @@ async def create_organization(organization: OrganizationIn):
     return org_out
 
 @router.put("",
-             status_code=200)
+            status_code=200,
+            response_model=ModifiedCount)
 async def update_organization(organization: OrganizationUpdate):
     """
     Update  organization

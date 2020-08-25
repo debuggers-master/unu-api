@@ -2,7 +2,6 @@
 Organizations  Schema Models
 """
 
-from typing import List, Optional, Union
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
@@ -53,6 +52,9 @@ class OrganizationOut(OrganizationId, OrganizationBase):
     """
 
 class OrganizationUpdate(UserId):
+    """
+    Base Model to organization Update
+    """
     organizationData: OrganizationOut
 
 class OrganizationDelete(OrganizationId, UserId):

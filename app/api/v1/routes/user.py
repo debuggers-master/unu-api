@@ -41,4 +41,3 @@ async def deleteuser(userId:str):
 
     # add Delete Events associated with user
     # add Delete Organizations associated with user
-

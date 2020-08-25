@@ -105,3 +105,18 @@ class GetEvent:
         """
         count = await participants_collection.find_one({"eventId": event_id})
         return {"participants": len(count.get("emails"))}
+
+    async def get_particpants(self, event_id: str) -> int:
+        """
+        Return the list of inscribed participants.
+
+        Params:
+        ------
+        event_id: str - The unique event uuid
+
+        Return:
+        ------
+        participants: int - The list of particpants
+        """
+        participnats = await participants_collection.find_one({"eventId": event_id})
+        return participnats.get("emails")

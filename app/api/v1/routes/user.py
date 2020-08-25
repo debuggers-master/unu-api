@@ -1,11 +1,12 @@
 """
 User Router - Operations about users
 """
-from fastapi import APIRouter, HTTPException  # pylint: disable-msg=E0611
+from fastapi import APIRouter, HTTPException, Depends  # pylint: disable-msg=E0611
 
 from schemas.general import ModifiedCount
-from schemas.users import UserUpdate
+from schemas.users import UserUpdate, UserOut
 from api.v1.services.users import UserService  # pylint: disable-msg=E0611
+from auth.services import get_current_user
 
 
 # Router instance
@@ -17,7 +18,8 @@ UserMethos = UserService()
 @router.put("",
             status_code=200,
             response_model=ModifiedCount)
-async def update_user(user: UserUpdate):
+async def update_user(user: UserUpdate,
+                      current_user: UserOut = Depends(get_current_user)):
     """
     Update an User
     """
@@ -35,7 +37,8 @@ async def update_user(user: UserUpdate):
 
 @router.delete("",
                status_code=204)
-async def deleteuser(userId: str):
+async def delete_user(userId: str,
+                      current_user: UserOut = Depends(get_current_user)):
     """
     Delete an User
     """

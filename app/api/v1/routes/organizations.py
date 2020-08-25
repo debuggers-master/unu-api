@@ -2,9 +2,11 @@
 Organizations Router - Operations about organizations
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from api.v1.services.organization import OrganizationController  # pylint: disable-msg=E0611
+from auth.services import get_current_user
 from schemas.general import ModifiedCount
+from schemas.users import UserOut
 from schemas.organizations import (
     OrganizationIn, OrganizationOut,
     OrganizationDelete, OrganizationUpdate, OrganizationGet)
@@ -19,7 +21,8 @@ OrgMethos = OrganizationController()
 @router.post("",
              status_code=201,
              response_model=OrganizationOut)
-async def create_organization(organization: OrganizationIn):
+async def create_organization(organization: OrganizationIn,
+                              current_user: UserOut = Depends(get_current_user)):
     """
     Create new organization with **OrganizationIn** Model
     """
@@ -36,7 +39,8 @@ async def create_organization(organization: OrganizationIn):
 @router.put("",
             status_code=200,
             response_model=ModifiedCount)
-async def update_organization(organization: OrganizationUpdate):
+async def update_organization(organization: OrganizationUpdate,
+                              current_user: UserOut = Depends(get_current_user)):
     """
     Update  organization
     """
@@ -50,7 +54,8 @@ async def update_organization(organization: OrganizationUpdate):
 
 @router.delete("",
                status_code=204)
-async def delete_organization(organization: OrganizationDelete):
+async def delete_organization(organization: OrganizationDelete,
+                              current_user: UserOut = Depends(get_current_user)):
     """
     Delete and organization
     """
@@ -62,7 +67,8 @@ async def delete_organization(organization: OrganizationDelete):
 @router.get("",
             status_code=200,
             response_model=OrganizationGet)
-async def get_organization(organizationId: str):
+async def get_organization(organizationId: str,
+                           current_user: UserOut = Depends(get_current_user)):
     """
     Get an organization
     """

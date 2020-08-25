@@ -30,7 +30,7 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, new_data)
         return self.check_modified(modified_count)
 
-    async def collaborators(self, event_id: str, collaborator_email: str, new_data: dict) -> dict:
+    async def collaborators(self, event_id: str, collaborator_id: str, new_data: dict) -> dict:
         """
         Update one collaborator info.
 
@@ -44,8 +44,13 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
+        for key,value  in list(new_data.items()):
+            if value is None:
+                del new_data[key]
+
+        # Update in the collection
         query = {"eventId": event_id,
-                 "collaborators.email": collaborator_email}
+                 "collaborators.collaboratorId": collaborator_id}
         data = {"collaborators.$": new_data}
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)

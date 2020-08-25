@@ -2,56 +2,72 @@
 Organizations  Schema Models
 """
 
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-from .events import EventOut
+
+class Events(BaseModel):
+    """
+    Base Model for request or return eventId
+    """
+    eventId: str = Field(...,
+                         description="UUID of a event")
+    name: str = Field(...,
+                    description="Name of event",
+                    example="Python Week Code")
+
+
+class UserId(BaseModel):
+    """
+    Base Model for request or return organizationId
+    """
+    userId: str = Field(...,
+                        description="UUID of a user")
+
+
+class OrganizationId(BaseModel):
+    """
+    Base Model for request or return organizationId
+    """
+    organizationId: str = Field(...,
+                                description="UUID of a organization")
+
 
 class OrganizationBase(BaseModel):
     """
     Base Model for organization
     """
-    name: str = Field(...,
+    organizationName: str = Field(...,
                       description="name of organization",
                       example="Cosas de ingenieros")
-    description: str = Field(None,
-                             description="description of organization",
-                             example="Comunidad para ingenieros")
 
-
-class OrganizationIn(OrganizationBase):
+class OrganizationIn(UserId):
     """
     Base Model for creates new organization
     """
-    userIdOwner: str = Field(...,
-                             description="The user Id of owner of organization",)
+    organizationData : OrganizationBase
 
-
-class OrganizationOut(OrganizationBase):
+class OrganizationOut(OrganizationId, OrganizationBase):
     """
     Base Model returned when a new organization is  just created
     """
-    organizationId: str = Field(None,
-                                description="Unique Id for organization")
-    events: Optional[List[EventOut]] = []
 
+class OrganizationUpdate(UserId):
+    """
+    Base Model to organization Update
+    """
+    organizationData: OrganizationOut
 
-class OrganizationDelete(BaseModel):
+class OrganizationDelete(OrganizationId, UserId):
     """
     Base Model for delete and organization
     """
-    organizationId: str = Field(...,
-                                description="Unique Id for organization")
-    userIdOwner: str = Field(...,
-                             description="The user Id of owner of organization",)
 
-class OrganizationUpdate(OrganizationDelete):
+
+class OrganizationGet(OrganizationId, OrganizationBase):
     """
-    Base Model for update  and organization
+    Base model returned from DB
     """
-    name: str = Field(None,
-                      description="name of organization",
-                      example="Cosas de ingenieros")
-    description: str = Field(None,
-                             description="description of organization",
-                             example="Comunidad para ingenieros")
+    organizationUrl: str = Field(None,
+                                 description="Organization url formed by the name")
+    events: List[Events]

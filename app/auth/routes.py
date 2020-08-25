@@ -4,8 +4,7 @@ Authorization endpoints.
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
-
-from api.v1.services.users import UserService
+from api.v1.services.users import UserService # pylint: disable-msg=E0611
 from schemas.users import UserOut, UserIn
 from .services import (
     authenticate_user,

@@ -189,6 +189,7 @@ async def register_user(user: UserIn) -> str:
     new_user = user.dict()
     new_user.update({"password": hash_password(user.password)})
     new_user.update({"organizations": []})
+    new_user.update({"myEvents": []})
     new_user.update({"collaborations": []})
     new_user.update({"userId": str(uuid4())})
 

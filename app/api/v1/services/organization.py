@@ -122,7 +122,7 @@ class OrganizationController:
         query_orga = {"organizationId": organization_id}
         modified_count = await self.crud.update(query_orga, organization_data)
         if not modified_count:
-             return False
+            return False
 
         # Update in the user list
         query = {"userId": user_id,

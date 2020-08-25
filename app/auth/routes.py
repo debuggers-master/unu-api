@@ -4,7 +4,7 @@ Authorization endpoints.
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
-from api.v1.services.users import UserService # pylint: disable-msg=E0611
+from api.v1.services.users import UserService  # pylint: disable-msg=E0611
 from schemas.users import UserOut, UserIn
 from .services import (
     authenticate_user,
@@ -16,7 +16,7 @@ from .services import (
 # Router instance
 auth_router = APIRouter()
 
-#User service to DB fuctions
+# User service to DB fuctions
 UserMethos = UserService()
 
 
@@ -53,6 +53,7 @@ async def login_for_acces_token(login_data: LoginRequest):
     if not user:
         raise credentials_exception
     access_token = create_access_token(data={"sub": user.email})
+    user.password = ""
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 
@@ -72,7 +73,6 @@ async def signup(user: UserIn):
 
     # Only make register if the user is new.
     new_user = await register_user(user)
-    print(new_user)
     if not new_user:
         raise HTTPException(status_code=500, detail="Internal Server Error")
     access_token = create_access_token(data={"sub": new_user.email})

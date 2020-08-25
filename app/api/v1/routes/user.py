@@ -30,3 +30,15 @@ async def update_user(user: UserUpdate):
             detail="The email is already used by another user")
 
     return modified_count
+
+@router.delete("",
+               status_code=204)
+async def deleteuser(query:str):
+    """
+    Delete an User
+    """
+    await UserMethos.delete_user(user_id=query)
+
+    # add Delete Events associated with user
+    # add Delete Organizations associated with user
+

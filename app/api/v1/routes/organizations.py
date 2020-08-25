@@ -7,7 +7,8 @@ from schemas.general import ModifiedCount
 from schemas.organizations import (OrganizationIn,
                                    OrganizationOut,
                                    OrganizationDelete,
-                                   OrganizationUpdate)
+                                   OrganizationUpdate,
+                                   OrganizationGet)
 from api.v1.services.organization import OrganizationController # pylint: disable-msg=E0611
 
 
@@ -56,3 +57,17 @@ async def delete_organization(organization: OrganizationDelete):
     await OrgMethos.delete_organization(
         user_id=organization.userId,
         organization_id=organization.organizationId)
+
+@router.get("",
+            status_code=200,
+            response_model=OrganizationGet)
+async def get_organization(query:str):
+    """
+    Get an organization
+    """
+    organization = await OrgMethos.get_organization(
+                    organization_id=query)
+
+    if organization is not None:
+        return OrganizationGet(**organization)
+    raise HTTPException(status_code=200, detail="Not organizationId Found")

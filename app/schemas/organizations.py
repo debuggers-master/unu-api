@@ -2,6 +2,7 @@
 Organizations  Schema Models
 """
 
+from typing import List
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
@@ -61,3 +62,12 @@ class OrganizationDelete(OrganizationId, UserId):
     """
     Base Model for delete and organization
     """
+
+
+class OrganizationGet(OrganizationId, OrganizationBase):
+    """
+    Base model returned from DB
+    """
+    organizationUrl: str = Field(None,
+                                 description="Organization url formed by the name")
+    events: List[Events]

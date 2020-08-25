@@ -61,8 +61,15 @@ source scripts/dev.sh
 
 > OpenApi: http://35.239.16.11/redoc
 
-#### Url
+### Url
 **base_path**: http://35.239.16.11.com/api/v1
+
+### Authorization
+All routes excpet `auth/login` & `auth/signup` require the Authorization header.
+
+```
+headers: {Authorization: `Bearer {acces_token}`}
+```
 
 ### Operations about users
 

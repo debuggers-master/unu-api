@@ -84,7 +84,6 @@ class UserOut(UserId, UserIn):
     """
     Base Model returned when user is login new,
     """
-    Hola : str
     organizations: Optional[List[OrganizationOut]] = []
     myEvents: Optional[List[EventUserBaseDB]] = []
     collaborations: Optional[List[CollaboratorDB]] = []

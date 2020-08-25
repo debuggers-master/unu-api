@@ -6,9 +6,9 @@ from fastapi import APIRouter, HTTPException
 
 # from schemas.events.event import EventIn, EventOut
 # from schemas.events.event import InformationIn, InformationDB
-# from api.v1.services.events.create import CreateEvent
-# from api.v1.services.events.delete import DeleteEvent
-# from api.v1.services.events.update import UpdateEvent
+from api.v1.services.events.create import CreateEvent
+from api.v1.services.events.delete import DeleteEvent
+from api.v1.services.events.update import UpdateEvent
 
 # from schemas.events.collaborators import CollaboratorIn, CollaboratorOut, CollaboratorDelete, CollaboratorUpdate
 # from schemas.events.associates import AssociateIn, AssociateOut, AssociateDelete, AsociateUpdate
@@ -16,9 +16,25 @@ from fastapi import APIRouter, HTTPException
 
 # Router instance
 router = APIRouter()
-# CreateMethods = CreateEvent()
-# DeleteMethods = DeleteEvent()
-# UpdateMethods = UpdateEvent()
+CreateMethods = CreateEvent()
+DeleteMethods = DeleteEvent()
+UpdateMethods = UpdateEvent()
+
+
+# @router.post("",
+#             status_code=200,
+#             response_model=EventOut)
+# async def create_event(new_event: EventIn):
+#     """
+#     Create a new event
+#     """
+    
+
+#     eventId = await CreateMethods.create_event(event_data=new_event.dict())
+
+#     return  eventId
+
+
 
 # @router.get("",
 #             status_code=200,
@@ -39,18 +55,7 @@ router = APIRouter()
 
 
 
-# @router.post("",
-#             status_code=200,
-#             response_model=EventOut)
-# async def create_event(new_event: EventIn):
-#     """
-#     Create a new event
-#     """
-    
 
-#     eventId = await CreateMethods.create_event(event_data=new_event.dict())
-
-#     return  eventId
 
 # @router.delete("",
 #                status_code=200)

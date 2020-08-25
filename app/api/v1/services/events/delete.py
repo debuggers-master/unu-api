@@ -62,12 +62,11 @@ class DeleteEvent:
         """
 
         query = _make_query(event_id)
-        modified_count = await  self.crud.pull_array(
-            query= query,
+        modified_count = await self.crud.pull_array(
+            query=query,
             array_name="collaborators",
             condition={"collaboratorId": collaborator_id})
         return self.check_deleted(modified_count)
-
 
     async def associates(self, event_id: str, associate_id: str) -> dict:
         """
@@ -83,13 +82,11 @@ class DeleteEvent:
         {deleted: bool} - True if deleted, False if nothig happens.
         """
         query = _make_query(event_id)
-        modified_count =  await self.crud.pull_array(
+        modified_count = await self.crud.pull_array(
             query=query,
             array_name="associates",
             condition={"associateId": associate_id})
         return self.check_deleted(modified_count)
-
-
 
     def check_deleted(self, count: int) -> dict:
         """

@@ -55,7 +55,6 @@ class UserService:
         user = await self.crud.find(query)
         return user
 
-
     async def update_user(self, user_id: str, user_data: dict) -> dict:
         """
         Update the user info.
@@ -75,7 +74,7 @@ class UserService:
         print(existing_user)
 
         if existing_user:
-            if existing_user.get("userId") ==  user_id:
+            if existing_user.get("userId") == user_id:
                 query = {"userId": user_id}
                 modified_count = await self.crud.update(query, user_data)
                 return {"modifiedCount": modified_count}

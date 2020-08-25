@@ -28,12 +28,11 @@ UpdateMethods = UpdateEvent()
 #     """
 #     Create a new event
 #     """
-    
+
 
 #     eventId = await CreateMethods.create_event(event_data=new_event.dict())
 
 #     return  eventId
-
 
 
 # @router.get("",
@@ -54,14 +53,11 @@ UpdateMethods = UpdateEvent()
 #     """
 
 
-
-
-
 # @router.delete("",
 #                status_code=200)
 # async def delete_event(event: EventIn):
 #     """
-#     Get create a new event 
+#     Get create a new event
 #     """
 
 

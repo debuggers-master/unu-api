@@ -44,7 +44,7 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
-        for key,value  in list(new_data.items()):
+        for key, value in list(new_data.items()):
             if value is None:
                 del new_data[key]
 

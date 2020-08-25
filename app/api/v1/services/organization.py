@@ -63,7 +63,7 @@ class OrganizationController:
         query = {"name": organization_data.get("name")}
         org_exists = await self.crud.find(query)
 
-        #Check is organization name is unique
+        # Check is organization name is unique
         if org_exists is None:
             organization_id = str(uuid4())
             organization_data.update({"organizationId": organization_id})
@@ -72,7 +72,7 @@ class OrganizationController:
             organization_url = organization_url.replace(" ", "-").lower()
             organization_data.update({"organizationUrl": organization_url})
             # Create void List of events
-            organization_data.update({"events":[]})
+            organization_data.update({"events": []})
 
             # Create a new organization
 
@@ -88,13 +88,11 @@ class OrganizationController:
             # Create a organization document in organizations collections
             inserted_id = await self.crud.create(organization_data)
             if not inserted_id:
-                #Se debe borrar el documento de usuario si este error se presenta
+                # Se debe borrar el documento de usuario si este error se presenta
                 return {"detail": "Error on insert organization document"}
             return {"organizationId": organization_id}
 
         return {"detail": "This Organizations already exists"}
-
-
 
     async def update_organization(
             self, user_id: str, organization_id: str, organization_data: dict) -> dict:
@@ -117,7 +115,6 @@ class OrganizationController:
         organization_url = organization_url.replace(" ", "-").lower()
         organization_data.update({"organizationUrl": organization_url})
 
-
         # Update in the collection
         query_orga = {"organizationId": organization_id}
         modified_count = await self.crud.update(query_orga, organization_data)
@@ -126,7 +123,7 @@ class OrganizationController:
 
         # Update in the user list
         query = {"userId": user_id,
-                "organizations.organizationId": organization_id}
+                 "organizations.organizationId": organization_id}
         data = {"organizations.$": {"organizationId": organization_id,
                                     "organizationName": organization_data.get("organizationName")}}
         modified_count = await self.users.update(query, data)

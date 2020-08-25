@@ -60,7 +60,7 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
-        query = {"name": organization_data.get("name")}
+        query = {"organizationName": organization_data.get("organizationName")}
         org_exists = await self.crud.find(query)
 
         # Check is organization name is unique

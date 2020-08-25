@@ -140,12 +140,8 @@ source scripts/dev.sh
 **Retrieve organization info**
 - path: `/organizations`
 - method: `GET`
-- body:
-```
-{
-  organizationId: str
-}
-```
+- query:
+  - organizationId: str
 
 - response (200):
   - organization data
@@ -219,15 +215,10 @@ source scripts/dev.sh
 - path: `/events/from-url`
 - method: `GET`
 - query
+  - organizationName: str,
+  - url: str, (The event url)
   - filters: List[str] (optional)
   - excludes: List[str] (optional)
-- body:
-```
-{
-  organizationName: str
-  url: str
-}
-```
 
 - response (200):
   - eventData: obj - The event info

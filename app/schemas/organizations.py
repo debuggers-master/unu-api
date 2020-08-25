@@ -13,8 +13,8 @@ class Events(BaseModel):
     eventId: str = Field(...,
                          description="UUID of a event")
     name: str = Field(...,
-                    description="Name of event",
-                    example="Python Week Code")
+                      description="Name of event",
+                      example="Python Week Code")
 
 
 class UserId(BaseModel):
@@ -29,7 +29,7 @@ class OrganizationId(BaseModel):
     """
     Base Model for request or return organizationId
     """
-    organizationId: str = Field(...,
+    organizationId: str = Field(None,
                                 description="UUID of a organization")
 
 
@@ -38,25 +38,29 @@ class OrganizationBase(BaseModel):
     Base Model for organization
     """
     organizationName: str = Field(...,
-                      description="name of organization",
-                      example="Cosas de ingenieros")
+                                  description="name of organization",
+                                  example="Cosas de ingenieros")
+
 
 class OrganizationIn(UserId):
     """
     Base Model for creates new organization
     """
-    organizationData : OrganizationBase
+    organizationData: OrganizationBase
+
 
 class OrganizationOut(OrganizationId, OrganizationBase):
     """
     Base Model returned when a new organization is  just created
     """
 
+
 class OrganizationUpdate(UserId):
     """
     Base Model to organization Update
     """
     organizationData: OrganizationOut
+
 
 class OrganizationDelete(OrganizationId, UserId):
     """

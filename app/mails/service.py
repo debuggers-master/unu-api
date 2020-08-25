@@ -3,6 +3,7 @@ Functions to manage the SendGrid Sender.
 """
 from typing import List
 from datetime import datetime
+from fastapi import UploadFile
 
 from mails.templates.welcome import welcome_template
 from mails.templates.event_close import event_close_template
@@ -38,6 +39,7 @@ def send_special_email(
         message: str,
         subjet: str,
         to_list: List[str],
+        image: UploadFile = None,
         send_at: datetime = None
 ) -> None:
     """

@@ -61,12 +61,12 @@ async def delete_organization(organization: OrganizationDelete):
 @router.get("",
             status_code=200,
             response_model=OrganizationGet)
-async def get_organization(query:str):
+async def get_organization(organizationId:str):
     """
     Get an organization
     """
     organization = await OrgMethos.get_organization(
-                    organization_id=query)
+                    organization_id=organizationId)
 
     if organization is not None:
         return OrganizationGet(**organization)

@@ -33,11 +33,11 @@ async def update_user(user: UserUpdate):
 
 @router.delete("",
                status_code=204)
-async def deleteuser(query:str):
+async def deleteuser(userId:str):
     """
     Delete an User
     """
-    await UserMethos.delete_user(user_id=query)
+    await UserMethos.delete_user(user_id=userId)
 
     # add Delete Events associated with user
     # add Delete Organizations associated with user

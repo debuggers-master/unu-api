@@ -2,17 +2,15 @@
 Associates schema Models
 """
 from typing import Optional
-from enum import Enum
 from pydantic import BaseModel, Field
 
-from schemas.events.events  import EventOut
 
-class Tag(str, Enum):
+class EventId(BaseModel):
     """
-    Template choice list
+    Base Model for request or return eventId
     """
-    sponsor = "sponsor"
-    community = "community"
+    eventId: str = Field(...,
+                         description="UUID of a event")
 
 
 class AsociateInfo(BaseModel):
@@ -22,38 +20,31 @@ class AsociateInfo(BaseModel):
     name: str = Field(None,
                       description="Name of Associate",
                       example="Platzi")
-    website: str = Field(None,
+    url: str = Field(None,
                          description="Web page of associate",
                          example="platzi.com")
-    tag: Optional[Tag]
 
 
-class AssociateIn(EventOut):
+class AsociateImg(BaseModel):
     """
-    Base Model to add Associate
+    Base Model to get str base64 for Asociate logo
     """
-    asociateInfo: AsociateInfo
     logo: str = Field(None,
-                      description="Image of associate in base64")
+                      description="encoded base64 image")
 
 
-class AssociateOut(BaseModel):
+class AsociateIn(AsociateInfo, AsociateImg):
     """
-    Base Model returned when a new associate is just added
-    """
-    associateId: str = Field(...,
-                             description="Unique Associate uuid identifier")
-    url_logo: str = Field(None,
-                          description="url of associate logo")
-
-class AssociateDelete(EventOut,AssociateOut):
-    """
-    Base Model to delele a associate
+    Base Model to add a new Asociate
     """
 
 
-class AsociateUpdate(AssociateDelete):
+class AsociateDB(AsociateInfo):
     """
-    Base Model to Update a associate
+    Base Model to add speaker
     """
-    asociateInfo: Optional[AsociateInfo]
+    urlAsociateLogo : str = Field(None,
+                                  description="url of speakerPhoto updloaded to the storage")
+    associatedId: str = Field(...,
+                              description="UUID of a speaker")
+    

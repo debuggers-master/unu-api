@@ -5,7 +5,23 @@ Organizations  Schema Models
 from typing import List, Optional
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-from schemas.events.events import EventOut
+class Events(BaseModel):
+    """
+    Base Model for request or return eventId
+    """
+    eventId: str = Field(...,
+                         description="UUID of a event")
+    name: str = Field(...,
+                    description="Name of event",
+                    example="Python Week Code")
+
+
+class OrganizationId(BaseModel):
+    """
+    Base Model for request or return organizationId
+    """
+    organizationId: str = Field(...,
+                                description="UUID of a event")
 
 class OrganizationBase(BaseModel):
     """
@@ -14,10 +30,6 @@ class OrganizationBase(BaseModel):
     name: str = Field(...,
                       description="name of organization",
                       example="Cosas de ingenieros")
-    description: str = Field(None,
-                             description="description of organization",
-                             example="Comunidad para ingenieros")
-
 
 class OrganizationIn(OrganizationBase):
     """
@@ -33,7 +45,7 @@ class OrganizationOut(OrganizationBase):
     """
     organizationId: str = Field(None,
                                 description="Unique Id for organization")
-    events: Optional[List[EventOut]] = []
+    events: Optional[List[Events]] = []
 
 
 class OrganizationDelete(BaseModel):
@@ -49,9 +61,6 @@ class OrganizationUpdate(OrganizationDelete):
     """
     Base Model for update  and organization
     """
-    name: str = Field(None,
+    name: str = Field(...,
                       description="name of organization",
                       example="Cosas de ingenieros")
-    description: str = Field(None,
-                             description="description of organization",
-                             example="Comunidad para ingenieros")

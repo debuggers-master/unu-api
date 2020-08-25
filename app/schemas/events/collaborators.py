@@ -4,14 +4,34 @@ Collaboratos Schema Models
 from pydantic import BaseModel, Field, EmailStr
 
 from schemas.users import UserBase
-from schemas.events.events  import EventOut
 
 
-class CollaboratorIn(EventOut):
+class EventId(BaseModel):
+    """
+    Base Model for request or return eventId
+    """
+    eventId: str = Field(...,
+                         description="UUID of a event")
+
+
+class CollaboratorInfo(BaseModel):
+    """
+    User Base to Collaborator Information
+    """
+    email: EmailStr = Field(...,
+                            description="Email of user",
+                            example="name_last@organization.com")
+    name: str = Field(None,
+                      description="Name of collaborator",
+                      example="Mario Barbosa")
+
+
+class CollaboratorDB(CollaboratorInfo):
     """
     Base Model to add Collaborators
     """
-    collaboratorInfo: UserBase
+    collaboratorId: str = Field(None,
+                                description="Unique collaborator uuid identifier")
 
 
 class CollaboratorOut(BaseModel):
@@ -22,7 +42,7 @@ class CollaboratorOut(BaseModel):
                                 description="Unique collaborator uuid identifier")
 
 
-class CollaboratorDelete(EventOut,CollaboratorOut):
+class CollaboratorDelete(EventId,CollaboratorOut):
     """
     Base Model to delele a collaborator
     """
@@ -48,4 +68,3 @@ class CollaboratorUpdate(CollaboratorDelete):
     Base Model to update a collaborator
     """
     collaboratorData: CollaboratorData
-

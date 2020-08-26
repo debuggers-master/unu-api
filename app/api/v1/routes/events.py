@@ -15,6 +15,7 @@ from auth.services import get_current_user
 
 from schemas.users import UserOut
 from schemas.events.event import NewEvent, EventOut, EventIn
+from schemas.events.collaborators import NewCollaborator
 
 # Router instance
 router = APIRouter()
@@ -48,9 +49,18 @@ class UpdateResponse(BaseModel):
     modifiedCount: int
 
 
+class CollaboratorResponse(BaseModel):
+    """
+    Response class.
+    """
+    collaboratorId: str
+
+
 # Exceptions
 server_error = HTTPException(status_code=500, detail="Internal server error")
 not_found = HTTPException(status_code=404, detail="Not found")
+conflict_request = HTTPException(
+    status_code=409, detail="The user already exists")
 
 
 ###########################################
@@ -159,20 +169,24 @@ async def delete_event(
 ##     Events/Collaborators API CRUD     ##
 ###########################################
 
-# @router.post("/collaborator/",
-#              status_code=200,
-#             response_model=CollaboratorOut)
-# async def add_collaborator(new_collaborator: CollaboratorIn):
-#     """
-#     Add a collaborator to a event
-#     using eventId
-#     """
-#     collaborator_id = await CreateMethods.add_collaborator(event_id=new_collaborator.eventId,
-#                                                           collaborator_data=new_collaborator.collaboratorInfo.dict())
-#     if collaborator_id is  False:
-#         raise HTTPException(status_code=500,
-#                             detail="Error Adding Collaborator, Maybe EventId is Wrong")
-#     return collaborator_id
+@router.post("/collaborators",
+             status_code=200,
+             response_model=CollaboratorResponse)
+async def add_collaborator(info: NewCollaborator):
+    """
+    Add a collaborator to a event
+    using eventId
+    """
+    result = await CreateMethods.add_collaborator(
+        event_id=info.eventId,
+        collaborator_data=info.collaboratorData)
+    if result == 404:
+        raise not_found
+    if result == 409:
+        raise conflict_request
+    return result
+
+
 # @router.delete("/collaborator/",
 #                status_code=204)
 # async def delete_collaborator(collaborator: CollaboratorDelete):

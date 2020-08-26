@@ -2,13 +2,16 @@
 Bussines Logic for create events elemets.
 """
 
-from db.db import get_collection
+from db.db import get_collection, CRUD
+from schemas.users import EventUserBaseDB
 from .utils import _uuid, _make_query, events_crud
 
 
 # COLLECTIONS
 PARTICIPANTS_COLLECTION_NAME = "participants"
 participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
+PARTICIPANTS_COLLECTION_NAME = "users"
+users_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
 
 
 class CreateEvent:
@@ -18,8 +21,9 @@ class CreateEvent:
 
     def __init__(self):
         self.crud = events_crud
+        self.users = CRUD(users_collection)
 
-    async def create_event(self, event_data: dict) -> dict:
+    async def create_event(self, event_data: dict, user_email: str) -> dict:
         """
         Creare a new event.
 
@@ -60,6 +64,11 @@ class CreateEvent:
 
         await participants_collection.insert_one(
             {"eventId": event_id, "emails": []})
+
+        event_in_user = EventUserBaseDB(**event_data)
+        await self.users.add_to_set(
+            {"email": user_email}, "myEvents", event_in_user.dict())
+
         return {"eventId": event_id}
 
     async def add_collaborator(

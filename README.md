@@ -162,7 +162,7 @@ headers: {Authorization: `Bearer {acces_token}`}
   userId: str,
   organizationData: {
     organizationName: str,
-    logoOrganization: str,
+    organizationLogo: str,
   }
 }
 ```
@@ -180,7 +180,7 @@ headers: {Authorization: `Bearer {acces_token}`}
   organizationData: {
     organizationId: str
     organizationName: str,
-    logoOrganization: str,
+    organizationLogo: str,
   }
 }
 ```
@@ -588,6 +588,7 @@ organization: {
   organizationId: str,
   organizationName: str,
   organizationUrl: str,
+  organizationLogo: str,
   events: [
     {
       eventId: str,
@@ -610,6 +611,7 @@ event: {
   url: str,
   startDate: str, // Date
   template: str,
+  titleHeader: str,
   shortDescription: str,
   description: str,
   imageHeader: str, - ecoded base64 image

@@ -14,7 +14,7 @@ from auth.services import get_current_user
 
 from schemas.users import UserOut
 from schemas.events.event import NewEvent, EventOut, EventIn
-from schemas.events.collaborators import NewCollaborator
+from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 
 # Router instance
 router = APIRouter()
@@ -195,16 +195,20 @@ async def add_collaborator(
     return result
 
 
-# @router.delete("/collaborator/",
-#                status_code=204)
-# async def delete_collaborator(collaborator: CollaboratorDelete):
-#     """
-#     Delete  a collaborator into  a event
-#     using eventId and collaboratorId
-#     """
-#     await DeleteMethods.collaborators(
-#         event_id=collaborator.eventId,
-#         collaborator_id=collaborator.collaboratorId)
+@router.delete("/collaborators",
+               status_code=204)
+async def delete_collaborator(body: CollaboratorOnDelete):
+    """
+    Delete  a collaborator.
+    """
+    deleted = await DeleteMethods.collaborators(
+        event_id=body.eventId, collaborator_email=body.email)
+
+    if not deleted:
+        raise not_found
+    return
+
+
 # @router.put("/collaborator/",
 #             status_code=204)
 # async def update_collaborator(collaborator: CollaboratorUpdate):

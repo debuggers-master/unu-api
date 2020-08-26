@@ -3,6 +3,7 @@ Bussines Logic for create events elemets.
 """
 
 from db.db import get_collection, CRUD
+from storage.service import upload_file
 from schemas.users import EventUserBaseDB
 from schemas.events.event import EventInUser
 from schemas.events.collaborators import CollaboratorInfo
@@ -170,24 +171,42 @@ class CreateEvent:
     # Create agenda (Falta) #
     #########################
 
-    async def add_associates(self, event_id: str, associate_data: dict) -> dict:
+    async def add_associates(self, event_id: str, associated_data) -> dict:
         """
         Add a new associated to event.
 
         Params:
         ------
         event_id: str - The event uuid.
-        associate_data: dict - The new associated data.
+        associated_data: dict - The new associated data.
 
         Return:
         ------
         associate_id: str - The uuid of the created associated.
         """
-        associate_id = _uuid()
-        associate_data.update({"associateId": associate_id})
+        associated_id = _uuid()
+        associated_data.update({"associatedId": associated_id})
+
+        # Image processing
+        logo_url = await self.upsert_image(associated_data.get("logo"))
+        associated_data.update({"logo": logo_url})
+
         query = _make_query(event_id)
         modified_count = await self.crud.add_to_set(
-            query, "associates", associate_data)
+            query, "associates", associated_data)
+
         if not modified_count:
             return False
-        return {"associateId": associate_id}
+        return {"associatedId": associated_id}
+
+    async def upsert_image(self, image: str) -> str:
+        """
+        Update the url for image if it is new.
+        """
+        prefix = image.split(":")[0]
+        if prefix == "data":
+            new_image_url = await upload_file(file_base64=image)
+            return new_image_url
+        if prefix in ("http", ""):
+            return image
+        return image

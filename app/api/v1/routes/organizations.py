@@ -5,7 +5,7 @@ Organizations Router - Operations about organizations
 from fastapi import APIRouter, HTTPException, Depends
 from api.v1.services.organization import OrganizationController  # pylint: disable-msg=E0611
 from auth.services import get_current_user
-from schemas.general import ModifiedCount
+from schemas.general import ModifiedCountUrls
 from schemas.users import UserOut
 from schemas.organizations import (
     OrganizationIn, OrganizationOut,
@@ -30,7 +30,11 @@ async def create_organization(organization: OrganizationIn,
         user_id=organization.userId,
         organization_data=organization.organizationData.dict())
 
-    org_out = OrganizationOut(**organization.organizationData.dict(), **org)
+    org_in = organization.organizationData.dict()
+    
+    org_in.pop("organizationLogo",None)
+
+    org_out = OrganizationOut(**org_in,**org)
     if org_out.organizationId is None:
         raise HTTPException(status_code=409, **org)
     return org_out
@@ -38,17 +42,22 @@ async def create_organization(organization: OrganizationIn,
 
 @router.put("",
             status_code=200,
-            response_model=ModifiedCount)
+            response_model=ModifiedCountUrls)
 async def update_organization(organization: OrganizationUpdate,
                               current_user: UserOut = Depends(get_current_user)):
     """
     Update  organization
     """
-
     modified_count = await OrgMethos.update_organization(
         user_id=organization.userId,
         organization_id=organization.organizationData.organizationId,
         organization_data=organization.organizationData.dict())
+
+    if modified_count is False:
+        raise HTTPException(
+            status_code=409,
+            detail="The organization name is already used")
+
     return modified_count
 
 

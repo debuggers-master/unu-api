@@ -2,7 +2,6 @@
 Mails Router - Operations about send mails
 """
 
-from typing import Optional
 from pydantic import BaseModel, Field
 from fastapi import (
     APIRouter, Depends, Form, UploadFile, HTTPException, BackgroundTasks)
@@ -42,16 +41,27 @@ async def send_email_to_participants(
     """
     Send a message to participants with the content that the organiztors specify.
     """
-    event = await events_service.get_event(eventId, filters=["name", "eventId"])
+    event = await events_service.get_event(
+        eventId, filters=["name", "eventId", "organizationUrl", "url"])
     if not event:
         raise not_found_event
 
     event_name = event.get("name")
+    organization_url = event.get("organizationUrl")
+    url = event.get("url")
+    event_url = f"{organization_url}/{url}"
+
     to_list = await events_service.get_particpants(eventId)
 
+    content_type = None
     if image:
-        image = await image.read()
+        image: bytes = await image.read()
+        content_type: str = image.content_type
+
+    # No blocking the treath with background proccess.
     background_task.add_task(
-        send_welcome_email, "Emanuel", ["emanuelosva@gmail.com"])
-    #event_name, message, subject, to_list, image=image
+        send_special_email,
+        event_name, message, subject, to_list, event_url,
+        image=image, content_type=content_type)
+
     return MailResponse()

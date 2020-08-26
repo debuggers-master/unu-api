@@ -41,7 +41,9 @@ def send_special_email(
         message: str,
         subjet: str,
         to_list: List[str],
+        event_url: str,
         image: bytes = None,
+        content_type: str = None,
 ) -> None:
     """
     Send a special email.
@@ -55,13 +57,15 @@ def send_special_email(
     send_at: datetime - Optional date to send the mail.
     """
     if image:
-        image = str(base64.b64encode(image))
+        image = base64.b64encode(image)
 
-    content = special_message_template(event_name, message, image=image)
+    content = special_message_template(event_name, message, event_url)
     email = sender.create_email(
         to_list=to_list,
         subject=subjet,
         html_content=content,
+        image=image,
+        content_type=content_type,
     )
     sender.send_email(email_to_send=email)
 

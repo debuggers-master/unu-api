@@ -2,6 +2,7 @@
 Bussines Logic for update events elemets.
 """
 
+from storage.service import upload_file
 from .utils import _make_query, events_crud
 
 
@@ -26,11 +27,18 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
+        # Update image only if are new files
+        image_header = await self.update_image(new_data["imageHeader"])
+        image_event = await self.update_image(new_data["imageEvent"])
+        new_data.update({"imageHeader": image_header})
+        new_data.update({"imageEvent": image_event})
+
         query = _make_query(event_id)
         modified_count = await self.crud.update(query, new_data)
         return self.check_modified(modified_count)
 
-    async def collaborators(self, event_id: str, collaborator_id: str, new_data: dict) -> dict:
+    async def collaborators(
+            self, event_id: str, collaborator_id: str, new_data: dict) -> dict:
         """
         Update one collaborator info.
 
@@ -55,7 +63,8 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
-    async def speakers(self, event_id: str, speaker_id: str, new_data: dict) -> dict:
+    async def speakers(
+            self, event_id: str, speaker_id: str, new_data: dict) -> dict:
         """
         Update the speakers data.
 
@@ -74,7 +83,8 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
-    async def associates(self, event_id: str, associated_id: str, new_data: dict) -> dict:
+    async def associates(
+            self, event_id: str, associated_id: str, new_data: dict) -> dict:
         """
         Update one associated info.
 
@@ -98,7 +108,8 @@ class UpdateEvent:
     ## Agenda (Falta)##
     ###################
 
-    async def chnage_status(self, event_id: str, actual_status: bool) -> dict:
+    async def chnage_status(
+            self, event_id: str, actual_status: bool) -> dict:
         """
         Change the actual a publication status.
 
@@ -119,5 +130,17 @@ class UpdateEvent:
         Check if the modified_count is grather than 0
         """
         if not modified_count:
-            return False
+            return {"modifiedCount": 0}
         return {"modifiedCount": modified_count}
+
+    async def update_image(self, image: str) -> str:
+        """
+        Update the url for image if it is new.
+        """
+        prefix = image.split(":")[0]
+        if prefix == "data":
+            new_image_url = await upload_file(file_base64=image)
+            return new_image_url
+        if prefix in ("http", ""):
+            return image
+        return image

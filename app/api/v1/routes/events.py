@@ -143,11 +143,13 @@ async def update_event(update_info: EventIn):
 
 
 @router.delete("/", status_code=204)
-async def delete_event(eventId: str = Query(...)):
+async def delete_event(
+        eventId: str = Query(...),
+        current_user: UserOut = Depends(get_current_user)):
     """
     Delete a existing event
     """
-    deleted = await DeleteMethods.all(event_id=eventId)
+    deleted = await DeleteMethods.all(eventId, current_user.email)
     if not deleted:
         raise not_found
     return

@@ -13,6 +13,7 @@ from api.v1.services.events.get import GetEvent
 from auth.services import get_current_user
 
 from schemas.users import UserOut
+from schemas.events.associates import AssociatedIn
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 
@@ -53,6 +54,13 @@ class CollaboratorResponse(BaseModel):
     Response class.
     """
     collaboratorId: str
+
+
+class AssociatedResponse(BaseModel):
+    """
+    Response class.
+    """
+    associatedId: str
 
 
 # Exceptions
@@ -209,39 +217,29 @@ async def delete_collaborator(body: CollaboratorOnDelete):
     return
 
 
-# @router.put("/collaborator/",
-#             status_code=204)
-# async def update_collaborator(collaborator: CollaboratorUpdate):
-#     """
-#     Update a collaborator into  a event
-#     using eventId and collaboratorId
-#     """
-#     await UpdateMethods.collaborators(
-#         event_id=collaborator.eventId,
-#         collaborator_id=collaborator.collaboratorId,
-#         new_data=collaborator.collaboratorData.dict())
-# #######################
-# ##ASSOCIATES API CRUD##
-# #######################
-# @router.post("/associate/",
-#              status_code=201,
-#              response_model=AssociateOut)
-# async def add_associate(new_associate: AssociateIn):
-#     """
-#     Add an associate to a event
-#     using eventId
-#     """
-#     ##base64img= new_associate.logo
-#     #######################
-#     ## URL created  Image Logic ##
-#     #######################
-#     associate = new_associate.asociateInfo.dict()
-#     associate.update({"url_logo": "url_logo"})
-#     associate_id = await CreateMethods.add_associates(
-#                                 event_id=new_associate.eventId,
-#                                 associate_data=associate)
-#     # No se de donde toma el associateId :O
-#     return AssociateOut(**associate)
+###########################################
+##      Events/Associateds API CRUD      ##
+###########################################
+
+
+@router.post("/associates",
+             status_code=201,
+             response_model=AssociatedResponse)
+async def add_associate(body: AssociatedIn):
+    """
+    Add an associate to a event
+    using eventId
+    """
+
+    associated_id = await CreateMethods.add_associates(
+        event_id=body.eventId,
+        associated_data=body.associatedData.dict())
+
+    if not associated_id:
+        raise not_found
+    return associated_id
+
+
 # @router.delete("/associate/",
 #                status_code=204)
 # async def delete_associate(associate: AssociateDelete):

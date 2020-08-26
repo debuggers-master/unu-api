@@ -33,9 +33,16 @@ class OrganizationId(BaseModel):
                                 description="UUID of a organization")
 
 
-class OrganizationBase(BaseModel):
+class OrganizationImg(BaseModel):
     """
-    Base Model for organization
+    BaseModel for organizationLogo
+    """
+    organizationLogo: str = Field(None,
+                                  description="b64 encoded image as input, URL image as out")
+
+class OrganizationBase(OrganizationImg):
+    """
+    Base Model for organization Base
     """
     organizationName: str = Field(...,
                                   description="name of organization",
@@ -49,17 +56,22 @@ class OrganizationIn(UserId):
     organizationData: OrganizationBase
 
 
-class OrganizationOut(OrganizationId, OrganizationBase):
+class OrganizationOut(OrganizationId, OrganizationImg):
     """
     Base Model returned when a new organization is  just created
     """
 
 
+class OrganizationBaseUpdate(OrganizationBase, OrganizationId):
+    """
+    Base Model to update a Organization
+    """
+
 class OrganizationUpdate(UserId):
     """
     Base Model to organization Update
     """
-    organizationData: OrganizationOut
+    organizationData: OrganizationBaseUpdate
 
 
 class OrganizationDelete(OrganizationId, UserId):

@@ -13,3 +13,11 @@ class ModifiedCount(BaseModel):
     modifiedCount: str = Field(...,
                                description="Modified values in update",
                                example="1")
+
+class ModifiedCountUrls(ModifiedCount):
+    """
+    Base Model for modifiedCount
+    used in updates methods with img
+    """
+    url: dict = Field(None,
+                      description="Modified values in update")

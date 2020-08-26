@@ -11,6 +11,9 @@ from api.v1.services.events.delete import DeleteEvent
 from api.v1.services.events.update import UpdateEvent
 from api.v1.services.events.get import GetEvent
 
+from auth.services import get_current_user
+
+from schemas.users import UserOut
 from schemas.events.event import NewEvent, EventOut, EventIn
 
 # Router instance
@@ -50,14 +53,20 @@ server_error = HTTPException(status_code=500, detail="Internal server error")
 not_found = HTTPException(status_code=404, detail="Not found")
 
 
+###########################################
+##            Events API CRUD            ##
+###########################################
+
 @router.post("/",
              status_code=201,
              response_model=EventResponse)
-async def create_event(new_event: NewEvent):
+async def create_event(
+        new_event: NewEvent, curret_user: UserOut = Depends(get_current_user)):
     """
     Create a new event
     """
-    event_id = await CreateMethods.create_event(new_event.dict())
+    event_id = await CreateMethods.create_event(
+        new_event.dict(), curret_user.email)
     if not event_id:
         raise server_error
     return event_id
@@ -138,14 +147,16 @@ async def delete_event(eventId: str = Query(...)):
     """
     Delete a existing event
     """
-    deleted = DeleteMethods.all(event_id=eventId)
-    if not deleted.get("deleted"):
+    deleted = await DeleteMethods.all(event_id=eventId)
+    if not deleted:
         raise not_found
     return
 
-# ##########################
-# ##Collaborators API CRUD##
-# ##########################
+
+###########################################
+##     Events/Collaborators API CRUD     ##
+###########################################
+
 # @router.post("/collaborator/",
 #              status_code=200,
 #             response_model=CollaboratorOut)

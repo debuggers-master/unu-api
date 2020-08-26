@@ -42,7 +42,7 @@ class CollaboratorOut(BaseModel):
                                 description="Unique collaborator uuid identifier")
 
 
-class CollaboratorDelete(EventId,CollaboratorOut):
+class CollaboratorDelete(EventId, CollaboratorOut):
     """
     Base Model to delele a collaborator
     """

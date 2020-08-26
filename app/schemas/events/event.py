@@ -3,7 +3,7 @@ Events Schema Models
 """
 from typing import Optional, List
 from enum import Enum
-from pydantic import BaseModel, Field # pylint: disable-msg=E0611
+from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 from schemas.events.speakers import SpeakerDB
 from schemas.events.agenda import Day
@@ -17,6 +17,7 @@ class EventId(BaseModel):
     """
     eventId: str = Field(...,
                          description="UUID of a event")
+
 
 class Templates(str, Enum):
     """
@@ -32,11 +33,11 @@ class EventUserBase(BaseModel):
     of event in users document
     """
     name: str = Field(...,
-                    description="Name of event",
-                    example="Python Week Code")
+                      description="Name of event",
+                      example="Python Week Code")
     organizationName: str = Field(...,
-                                description="Name of organization",
-                                example="Cosas de ingenieros")
+                                  description="Name of organization",
+                                  example="Cosas de ingenieros")
     shortDescription: str = Field(None,
                                   description="a short description of the event",
                                   example="Eveneto para programar en python")
@@ -54,7 +55,7 @@ class EventBase(EventUserBase):
     imageHeader: str = Field(None,
                              description="encoded base64 image")
     imageEvent: str = Field(None,
-                             description="encoded base64 image")
+                            description="encoded base64 image")
     localTime: str = Field(None,
                            description="UTC of event localization",
                            example="UTC -5")

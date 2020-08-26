@@ -21,8 +21,8 @@ class AsociateInfo(BaseModel):
                       description="Name of Associate",
                       example="Platzi")
     url: str = Field(None,
-                         description="Web page of associate",
-                         example="platzi.com")
+                     description="Web page of associate",
+                     example="platzi.com")
 
 
 class AsociateImg(BaseModel):
@@ -43,8 +43,7 @@ class AsociateDB(AsociateInfo):
     """
     Base Model to add speaker
     """
-    urlAsociateLogo : str = Field(None,
-                                  description="url of speakerPhoto updloaded to the storage")
+    urlAsociateLogo: str = Field(None,
+                                 description="url of speakerPhoto updloaded to the storage")
     associatedId: str = Field(...,
                               description="UUID of a speaker")
-    

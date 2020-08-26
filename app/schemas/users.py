@@ -14,20 +14,22 @@ class EventId(BaseModel):
     eventId: str = Field(...,
                          description="UUID of a event")
 
+
 class EventUserBase(BaseModel):
     """
     Base Model to form Information
     of event in users document
     """
     name: str = Field(...,
-                    description="Name of event",
-                    example="Python Week Code")
+                      description="Name of event",
+                      example="Python Week Code")
     organizationName: str = Field(...,
-                                description="Name of organization",
-                                example="Cosas de ingenieros")
+                                  description="Name of organization",
+                                  example="Cosas de ingenieros")
     shortDescription: str = Field(None,
                                   description="a short description of the event",
                                   example="Eveneto para programar en python")
+
 
 class EventUserBaseDB(EventUserBase, EventId):
     """
@@ -36,13 +38,13 @@ class EventUserBaseDB(EventUserBase, EventId):
     """
 
 
-
 class UserId(BaseModel):
     """
     Base Model for request or return userId
     """
     userId: str = Field(...,
-                         description="UUID of a user")
+                        description="UUID of a user")
+
 
 class CollaboratorDB(UserId):
     """
@@ -54,7 +56,6 @@ class CollaboratorDB(UserId):
     name: str = Field(None,
                       description="Name of collaborator",
                       example="Mario Barbosa")
-
 
 
 class UserBase(BaseModel):
@@ -80,7 +81,7 @@ class UserIn(UserBase):
                           description="Password of user account")
 
 
-class UserOut(UserId, UserIn):
+class UserOut(UserId, UserBase):
     """
     Base Model returned when user is login new,
     """

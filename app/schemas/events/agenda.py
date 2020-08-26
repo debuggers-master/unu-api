@@ -8,14 +8,13 @@ from typing import Optional, List
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
-
 class ConferenceInfo(BaseModel):
     """
     Base Model info  conferences
     """
     name: str = Field(None,
-                       description="name of the conference or speech",
-                       example=" The Event App Show")
+                      description="name of the conference or speech",
+                      example=" The Event App Show")
     description: str = Field(None,
                              description="Text description of event",
                              example="El equipo nos mostrara")

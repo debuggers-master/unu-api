@@ -3,7 +3,7 @@ Api router - Merge all api routes.
 """
 
 from fastapi import APIRouter
-from api.v1.routes import events, particpants, user, organizations
+from api.v1.routes import events, particpants, user, organizations, mails
 
 api_router = APIRouter()
 
@@ -22,3 +22,7 @@ api_router.include_router(user.router,
 api_router.include_router(organizations.router,
                           prefix="/organizations",
                           tags=["Organizations"])
+
+api_router.include_router(mails.router,
+                          prefix="/mails",
+                          tags=["Mails"])

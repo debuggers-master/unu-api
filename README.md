@@ -161,7 +161,8 @@ headers: {Authorization: `Bearer {acces_token}`}
 {
   userId: str,
   organizationData: {
-    organizationName: str
+    organizationName: str,
+    organizationLogo: str,
   }
 }
 ```
@@ -178,7 +179,8 @@ headers: {Authorization: `Bearer {acces_token}`}
   userId: str
   organizationData: {
     organizationId: str
-    organizationName: str
+    organizationName: str,
+    organizationLogo: str,
   }
 }
 ```
@@ -273,7 +275,7 @@ headers: {Authorization: `Bearer {acces_token}`}
   template: str,
   url: str,
   startDate: str, - date
-  organization: str,
+  organizationName: str,
 }
 ```
 
@@ -292,6 +294,7 @@ headers: {Authorization: `Bearer {acces_token}`}
     name: str,
     shortDescription: str,
     description: str,
+    titleHeader: str,
     imageHeader: str, - ecoded base64 image
     imageEvent: str, - ecoded base64 image
     localTime: str - eg. "UTC-5"
@@ -585,6 +588,7 @@ organization: {
   organizationId: str,
   organizationName: str,
   organizationUrl: str,
+  organizationLogo: str,
   events: [
     {
       eventId: str,
@@ -607,6 +611,7 @@ event: {
   url: str,
   startDate: str, // Date
   template: str,
+  titleHeader: str,
   shortDescription: str,
   description: str,
   imageHeader: str, - ecoded base64 image

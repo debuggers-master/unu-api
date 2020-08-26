@@ -5,7 +5,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
-
 from api.v1.services.events.create import CreateEvent
 from api.v1.services.events.delete import DeleteEvent
 from api.v1.services.events.update import UpdateEvent
@@ -172,18 +171,27 @@ async def delete_event(
 @router.post("/collaborators",
              status_code=200,
              response_model=CollaboratorResponse)
-async def add_collaborator(info: NewCollaborator):
+async def add_collaborator(
+        info: NewCollaborator,
+        existing: Optional[bool] = Query(False)):
     """
     Add a collaborator to a event
     using eventId
     """
-    result = await CreateMethods.add_collaborator(
-        event_id=info.eventId,
-        collaborator_data=info.collaboratorData)
+    if existing:
+        result = await CreateMethods.add_existing_collaborator(
+            event_id=info.eventId, email=info.email)
+    else:
+        result = await CreateMethods.add_collaborator(
+            event_id=info.eventId,
+            collaborator_data=info.collaboratorData)
+
     if result == 404:
         raise not_found
     if result == 409:
         raise conflict_request
+    if result == 412:
+        raise HTTPException(status_code=412, detail="The user must be created")
     return result
 
 

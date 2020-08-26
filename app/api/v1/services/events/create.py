@@ -4,6 +4,7 @@ Bussines Logic for create events elemets.
 
 from db.db import get_collection, CRUD
 from schemas.users import EventUserBaseDB
+from schemas.events.event import EventInUser
 from schemas.events.collaborators import CollaboratorInfo
 from .utils import _uuid, _make_query, events_crud
 from auth.services import register_user
@@ -74,7 +75,7 @@ class CreateEvent:
         return {"eventId": event_id}
 
     async def add_collaborator(
-            self, event_id: str, collaborator_data: dict) -> dict:
+            self, event_id: str, collaborator_data) -> dict:
         """
         Add new collaborator to the event.
 
@@ -103,7 +104,46 @@ class CreateEvent:
 
         # Only regitered if the event is valid
         collaborator = await register_user(collaborator_data)
+
+        event = await self.crud.find(query)
+        collaboration_in_user = EventInUser(**event)
+        await self.users.add_to_set(
+            {"email": collaborator_data.email},
+            "collaborations",
+            collaboration_in_user.dict())
+
         return {"collaboratorId": collaborator.userId}
+
+    async def add_existing_collaborator(
+            self, event_id: str, email: str) -> dict:
+        """
+        Add existing collaborator to the event.
+
+        Params:
+        ------
+        event_id: str - The event uuid.
+        email: str -  The user email.
+
+        Return:
+        ------
+        collaboratorId: The uuid of the created collaborator.
+        """
+        # Find user and carry on only if the user exists
+        user = await self.users.find({"email": email})
+        if not user:
+            return 412
+
+        collaborator_to_event = CollaboratorInfo(**user)
+        query = _make_query(event_id)
+        await self.crud.add_to_set(
+            query, "collaborators", collaborator_to_event.dict())
+
+        event = await self.crud.find(query)
+        collaboration_in_user = EventInUser(**event)
+        await self.users.add_to_set(
+            {"email": email}, "collaborations", collaboration_in_user.dict())
+
+        return {"collaboratorId": user["userId"]}
 
     async def add_speaker(self, event_id: str, speaker_data: dict) -> dict:
         """

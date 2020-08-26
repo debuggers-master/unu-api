@@ -5,6 +5,7 @@ Bussines Logic for create events elemets.
 from db.db import get_collection
 from .utils import _uuid, _make_query, events_crud
 
+
 # COLLECTIONS
 PARTICIPANTS_COLLECTION_NAME = "participants"
 participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
@@ -31,21 +32,38 @@ class CreateEvent:
         event_id: dict - The event uuid created.
         """
         event_id = _uuid()
+        organization_name = event_data.get("organizationName")
+        organization_url = organization_name.replace(" ", "-").lower()
+
         event_data.update({"eventId": event_id})
-        event_data.update({"collaborators": []})
+        event_data.update({"organizationUrl": organization_url})
+        event_data.update({"organizationName": organization_name})
+        event_data.update({"titleHeader": ""})
+        event_data.update({"shortDescription": ""})
+        event_data.update({"description": ""})
+        event_data.update({"imageHeader": ""})
+        event_data.update({"imageEvent": ""})
+        event_data.update({"localTime": ""})
         event_data.update({"speakers": []})
-        event_data.update({"agenda": []})
+        event_data.update({"collaborators": []})
         event_data.update({"associates": []})
         event_data.update({"publicationStatus": 0})
+        event_data.update({"agenda": [{
+            "dayID": _uuid(),
+            "date": event_data.get("startDate"),
+            "conferences": []
+        }]})
 
         inserted_id = await self.crud.create(event_data)
         if not inserted_id:
             return False
 
-        await participants_collection.insert_one({"eventId": event_id, "emails": []})
+        await participants_collection.insert_one(
+            {"eventId": event_id, "emails": []})
         return {"eventId": event_id}
 
-    async def add_collaborator(self, event_id: str, collaborator_data: dict) -> dict:
+    async def add_collaborator(
+            self, event_id: str, collaborator_data: dict) -> dict:
         """
         Add new collaborator to the event.
 
@@ -66,7 +84,8 @@ class CreateEvent:
         #########################
 
         query = _make_query(event_id)
-        modified_count = await self.crud.add_to_set(query, "collaborators", collaborator_data)
+        modified_count = await self.crud.add_to_set(
+            query, "collaborators", collaborator_data)
         if not modified_count:
             return False
         return {"collaboratorId": collaborator_id}
@@ -86,7 +105,8 @@ class CreateEvent:
         speaker_id = _uuid()
         speaker_data.update({"speakerId": speaker_id})
         query = _make_query(event_id)
-        modified_count = await self.crud.add_to_set(query, "speakers", speaker_data)
+        modified_count = await self.crud.add_to_set(
+            query, "speakers", speaker_data)
         if not modified_count:
             return False
         return {"speakerId": speaker_id}
@@ -111,7 +131,8 @@ class CreateEvent:
         associate_id = _uuid()
         associate_data.update({"associateId": associate_id})
         query = _make_query(event_id)
-        modified_count = await self.crud.add_to_set(query, "associates", associate_data)
+        modified_count = await self.crud.add_to_set(
+            query, "associates", associate_data)
         if not modified_count:
             return False
         return {"associateId": associate_id}

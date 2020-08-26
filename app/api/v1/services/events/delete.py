@@ -60,29 +60,32 @@ class DeleteEvent:
         ------
         {deleted: bool} - True if deleted, False if nothig happens.
         """
+
         query = _make_query(event_id)
-        condition = {"collaboratorId": collaborator_id}
-        modified_count = self.crud.pull_array(
-            query, "collaborators", condition)
+        modified_count = await self.crud.pull_array(
+            query=query,
+            array_name="collaborators",
+            condition={"collaboratorId": collaborator_id})
         return self.check_deleted(modified_count)
 
-    async def associates(self, event_id: str, associated_id: str) -> dict:
+    async def associates(self, event_id: str, associate_id: str) -> dict:
         """
         Dellete a associated.
 
         Params:
         ------
         event_id: str - The uuid of the target event.
-        associated_id: str - The uuid of the target associated.
+        associate_id: str - The uuid of the target associated.
 
         Return:
         ------
         {deleted: bool} - True if deleted, False if nothig happens.
         """
         query = _make_query(event_id)
-        condition = {"associatedId": associated_id}
-        modified_count = self.crud.pull_array(
-            query, "associated", condition)
+        modified_count = await self.crud.pull_array(
+            query=query,
+            array_name="associates",
+            condition={"associateId": associate_id})
         return self.check_deleted(modified_count)
 
     def check_deleted(self, count: int) -> dict:

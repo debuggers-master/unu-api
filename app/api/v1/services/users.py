@@ -55,7 +55,6 @@ class UserService:
         user = await self.crud.find(query)
         return user
 
-
     async def update_user(self, user_id: str, user_data: dict) -> dict:
         """
         Update the user info.
@@ -69,9 +68,21 @@ class UserService:
         ------
         updated: dict {"modifiend_count": int} - The number of modified documents.
         """
+
+        existing_user = await self.get_user(email=user_data.get("email"))
+
+        print(existing_user)
+
+        if existing_user:
+            if existing_user.get("userId") == user_id:
+                query = {"userId": user_id}
+                modified_count = await self.crud.update(query, user_data)
+                return {"modifiedCount": modified_count}
+            return False
+
         query = {"userId": user_id}
         modified_count = await self.crud.update(query, user_data)
-        return {"modified_count": modified_count}
+        return {"modifiedCount": modified_count}
 
     async def delete_user(self, user_id: str) -> None:
         """

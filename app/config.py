@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # APP
     APP_NAME: str = "Unu - API"
     API_V1_STR: str = "/api/v1"
-    CORS_ORIGIN: str
+    CORS_ORIGIN: List[str]
 
     # AUTH
     SECRET_JWT: str = token_urlsafe(32)
@@ -34,6 +34,10 @@ class Settings(BaseSettings):
 
     # SEND_GRIND
     SENDGRID_API_KEY: str
+
+    # REDIS_WORKER
+    REDIS_URL: str
+    QUEUES: List[str]
 
     # STORAGE
     GCP_STORAGE_KEY: str

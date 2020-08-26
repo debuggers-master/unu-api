@@ -60,19 +60,19 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
-        query = {"name": organization_data.get("name")}
+        query = {"organizationName": organization_data.get("organizationName")}
         org_exists = await self.crud.find(query)
 
-        #Check is organization name is unique
+        # Check is organization name is unique
         if org_exists is None:
             organization_id = str(uuid4())
             organization_data.update({"organizationId": organization_id})
             # Create the url name
-            organization_name = organization_data.get("name")
-            organization_name = organization_name.replace(" ", "-").lower()
-            organization_data.update({"organizatonName": organization_name})
+            organization_url = organization_data.get("organizationName")
+            organization_url = organization_url.replace(" ", "-").lower()
+            organization_data.update({"organizationUrl": organization_url})
             # Create void List of events
-            organization_data.update({"events":[]})
+            organization_data.update({"events": []})
 
             # Create a new organization
 
@@ -81,20 +81,18 @@ class OrganizationController:
                 query={"userId": user_id},
                 array_name="organizations",
                 data={"organizationId": organization_id,
-                      "name": organization_data.get("name")})
+                      "organizationName": organization_data.get("organizationName")})
             if not modified_count:
                 return {"detail": "Error UserId is not valid"}
 
             # Create a organization document in organizations collections
             inserted_id = await self.crud.create(organization_data)
             if not inserted_id:
-                #Se debe borrar el documento de usuario si este error se presenta
+                # Se debe borrar el documento de usuario si este error se presenta
                 return {"detail": "Error on insert organization document"}
             return {"organizationId": organization_id}
 
         return {"detail": "This Organizations already exists"}
-
-
 
     async def update_organization(
             self, user_id: str, organization_id: str, organization_data: dict) -> dict:
@@ -112,25 +110,24 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
-        for k,v  in list(organization_data.items()):
-            if v is None:
-                del organization_data[k]
+        # Create the url name
+        organization_url = organization_data.get("organizationName")
+        organization_url = organization_url.replace(" ", "-").lower()
+        organization_data.update({"organizationUrl": organization_url})
 
         # Update in the collection
         query_orga = {"organizationId": organization_id}
         modified_count = await self.crud.update(query_orga, organization_data)
         if not modified_count:
-             return False
+            return False
 
-
-        if  organization_data.get("name") is not None:
-            # Update in the user list
-            query = {"userId": user_id,
-                    "organizations.organizationId": organization_id}
-            data = {"organizations.$": {"organizationId": organization_id,
-                                        "name": organization_data.get("name")}}
-            modified_count = await self.users.update(query, data)
-            return {"modifiedCount": modified_count}
+        # Update in the user list
+        query = {"userId": user_id,
+                 "organizations.organizationId": organization_id}
+        data = {"organizations.$": {"organizationId": organization_id,
+                                    "organizationName": organization_data.get("organizationName")}}
+        modified_count = await self.users.update(query, data)
+        return {"modifiedCount": modified_count}
 
     async def delete_organization(self, user_id: str, organization_id: str) -> None:
         """

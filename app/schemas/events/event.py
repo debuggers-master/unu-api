@@ -1,7 +1,7 @@
 """
 Events Schema Models
 """
-from typing import Optional, List
+from typing import Optional, List, Type
 from enum import Enum
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
@@ -19,6 +19,17 @@ class EventId(BaseModel):
                          description="UUID of a event")
 
 
+class NewEvent(BaseModel):
+    """
+    Base model for create a new events
+    """
+    name: str = Field(..., description="The event name")
+    template: str = Field(..., description="The choosen template")
+    url: str = Field(..., description="The event url")
+    startDate: str = Field(..., description="The event start date")
+    organizationName: str = Field(..., description="The organization name")
+
+
 class Templates(str, Enum):
     """
     Template choice list
@@ -32,37 +43,58 @@ class EventUserBase(BaseModel):
     Base Model to form Information
     of event in users document
     """
-    name: str = Field(...,
-                      description="Name of event",
-                      example="Python Week Code")
-    organizationName: str = Field(...,
-                                  description="Name of organization",
-                                  example="Cosas de ingenieros")
-    shortDescription: str = Field(None,
-                                  description="a short description of the event",
-                                  example="Eveneto para programar en python")
+    name: str = Field(
+        ...,
+        description="Name of event",
+        example="Python Week Code")
+
+    organizationName: str = Field(
+        ...,
+        description="Name of organization",
+        example="Cosas de ingenieros")
+
+    shortDescription: str = Field(
+        ...,
+        description="a short description of the event",
+        example="Eveneto para programar en python")
 
 
-class EventBase(EventUserBase):
+class EventBasicInfo(BaseModel):
+    """
+    Base info for events
+    """
+    name: Optional[str]
+    shortDescription: Optional[str]
+    description: Optional[str]
+    titleHeader: Optional[str]
+    imageHeader: Optional[str]
+    imageEvent: Optional[str]
+    localTime: Optional[str]
+
+
+class EventOut(EventBasicInfo):
     """
     Base Model for event
     """
-    organizationId: str = Field(...,
-                                description="UUID of organization")
-    description: str = Field(None,
-                             description="description of the event",
-                             example="Este evento ........")
-    imageHeader: str = Field(None,
-                             description="encoded base64 image")
-    imageEvent: str = Field(None,
-                            description="encoded base64 image")
-    localTime: str = Field(None,
-                           description="UTC of event localization",
-                           example="UTC -5")
-    speakers: Optional[List[SpeakerDB]] = []
-    agenda: Optional[List[Day]] = []
-    associates: Optional[List[AsociateDB]] = []
-    collaborators: Optional[List[CollaboratorDB]] = []
-    publicationStatus: bool = Field(False,
-                                    description="True if is accesible to all public",
-                                    example=False)
+    eventId: Optional[str]
+    organizationName: Optional[str]
+    organizationUrl: Optional[str]
+    template: Optional[str]
+    url: Optional[str]
+    startDate: Optional[str]
+    organizationName: Optional[str]
+
+    speakers: Optional[List[dict]]
+    agenda: Optional[List[dict]]
+    associates: Optional[List[dict]]
+    collaborators: Optional[List[dict]]
+
+    publicationStatus: Optional[bool]
+
+
+class EventIn(BaseModel):
+    """
+    Base model For recive event Body
+    """
+    eventId: str = Field(..., description="The event id")
+    eventData: EventBasicInfo = Field(...)

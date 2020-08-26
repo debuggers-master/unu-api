@@ -2,6 +2,7 @@
 Mails Router - Operations about send mails
 """
 
+from typing import Optional
 from pydantic import BaseModel, Field
 from fastapi import (
     APIRouter, Depends, Form, UploadFile, HTTPException, BackgroundTasks)
@@ -9,7 +10,7 @@ from fastapi import (
 from auth.services import get_current_user
 from schemas.users import UserOut
 from api.v1.services.events.get import GetEvent
-from mails.service import send_special_email
+from mails.service import send_special_email, send_welcome_email
 
 # Router instance
 router = APIRouter()
@@ -47,6 +48,10 @@ async def send_email_to_participants(
 
     event_name = event.get("name")
     to_list = await events_service.get_particpants(eventId)
+
+    if image:
+        image = await image.read()
     background_task.add_task(
-        send_special_email, event_name, message, subject, to_list, image=image)
+        send_welcome_email, "Emanuel", ["emanuelosva@gmail.com"])
+    #event_name, message, subject, to_list, image=image
     return MailResponse()

@@ -1,9 +1,9 @@
 """
 Functions to manage the SendGrid Sender.
 """
+import base64
 from typing import List
 from datetime import datetime
-from fastapi import UploadFile
 
 from mails.templates.welcome import welcome_template
 from mails.templates.event_close import event_close_template
@@ -39,7 +39,7 @@ def send_special_email(
         message: str,
         subjet: str,
         to_list: List[str],
-        image: UploadFile = None,
+        image: bytes = None,
         send_at: datetime = None
 ) -> None:
     """
@@ -53,7 +53,10 @@ def send_special_email(
     to_list: List[str] - The participants emails.
     send_at: datetime - Optional date to send the mail.
     """
-    content = special_message_template(event_name, message)
+    if image:
+        image = str(base64.b64encode(image))
+
+    content = special_message_template(event_name, message, image=image)
     email = sender.create_email(
         to_list=to_list,
         subject=subjet,

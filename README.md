@@ -275,7 +275,7 @@ headers: {Authorization: `Bearer {acces_token}`}
   template: str,
   url: str,
   startDate: str, - date
-  organization: str,
+  organizationName: str,
 }
 ```
 

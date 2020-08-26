@@ -46,6 +46,7 @@ async def send_email_to_participants(
     """
     event = await events_service.get_event(
         eventId, filters=["name", "eventId", "organizationUrl", "url"])
+
     if not event:
         raise not_found_event
 
@@ -58,8 +59,8 @@ async def send_email_to_participants(
 
     content_type = None
     if image:
-        image: bytes = await image.read()
         content_type: str = image.content_type
+        image: bytes = await image.read()
 
     # No blocking the treath with background proccess.
     background_task.add_task(

@@ -4,7 +4,9 @@ Bussines Logic for create events elemets.
 
 from db.db import get_collection, CRUD
 from schemas.users import EventUserBaseDB
+from schemas.events.collaborators import CollaboratorInfo
 from .utils import _uuid, _make_query, events_crud
+from auth.services import register_user
 
 
 # COLLECTIONS
@@ -85,19 +87,23 @@ class CreateEvent:
         ------
         collaboratorId: The uuid of the created collaborator.
         """
-        collaborator_id = _uuid()
-        collaborator_data.update({"collaboratorId": collaborator_id})
+        # Make sure the user is new
+        user = await self.users.find({"email": collaborator_data.email})
+        if user:
+            return 409
 
-        ##########################
-        ##Logic for collaborator##
-        #########################
-
+        # Add the user as collaborator to an existing event
+        collaborator_to_event = CollaboratorInfo(**collaborator_data.dict())
         query = _make_query(event_id)
         modified_count = await self.crud.add_to_set(
-            query, "collaborators", collaborator_data)
+            query, "collaborators", collaborator_to_event.dict())
+
         if not modified_count:
-            return False
-        return {"collaboratorId": collaborator_id}
+            return 404
+
+        # Only regitered if the event is valid
+        collaborator = await register_user(collaborator_data)
+        return {"collaboratorId": collaborator.userId}
 
     async def add_speaker(self, event_id: str, speaker_data: dict) -> dict:
         """

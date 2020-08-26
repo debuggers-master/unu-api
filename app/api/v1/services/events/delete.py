@@ -60,14 +60,15 @@ class DeleteEvent:
         modified_count = self.crud.pull_array(query, "speakers", condition)
         return self.check_deleted(modified_count)
 
-    async def collaborators(self, event_id: str, collaborator_id: str) -> dict:
+    async def collaborators(
+            self, event_id: str, collaborator_email: str) -> dict:
         """
         Dellete a collaborator.
 
         Params:
         ------
         event_id: str - The uuid of the target event.
-        collaborator_id: str - The uuid of the target collaborator.
+        collaborator_email: str - The email of the target collaborator.
 
         Return:
         ------
@@ -78,7 +79,13 @@ class DeleteEvent:
         modified_count = await self.crud.pull_array(
             query=query,
             array_name="collaborators",
-            condition={"collaboratorId": collaborator_id})
+            condition={"email": collaborator_email})
+
+        await self.users.pull_array(
+            query={"email": collaborator_email},
+            array_name="collaborations",
+            condition={"eventId": event_id}
+        )
         return self.check_deleted(modified_count)
 
     async def associates(self, event_id: str, associate_id: str) -> dict:

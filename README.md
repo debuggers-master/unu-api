@@ -161,7 +161,8 @@ headers: {Authorization: `Bearer {acces_token}`}
 {
   userId: str,
   organizationData: {
-    organizationName: str
+    organizationName: str,
+    logoOrganization: str,
   }
 }
 ```
@@ -178,7 +179,8 @@ headers: {Authorization: `Bearer {acces_token}`}
   userId: str
   organizationData: {
     organizationId: str
-    organizationName: str
+    organizationName: str,
+    logoOrganization: str,
   }
 }
 ```
@@ -292,6 +294,7 @@ headers: {Authorization: `Bearer {acces_token}`}
     name: str,
     shortDescription: str,
     description: str,
+    titleHeader: str,
     imageHeader: str, - ecoded base64 image
     imageEvent: str, - ecoded base64 image
     localTime: str - eg. "UTC-5"

@@ -60,13 +60,13 @@ class EmailSender:
         message.to = _users_list
 
         if image:
+            ext = str(content_type).split("/")[1]
             timestamp = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
             message.attachment = Attachment(
                 FileContent(image),
-                FileName(f'event_image-{timestamp}'),
-                FileType(content_type),
-                Disposition('attachment'),
-                ContentId(timestamp))
+                FileName(f'event_image-{timestamp}.{ext}'),
+                FileType(str(content_type)),
+                Disposition('attachment'))
 
         if send_at:
             message.send_at = SendAt(self.get_unix_time(send_at), p=0)

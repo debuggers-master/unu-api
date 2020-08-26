@@ -8,7 +8,7 @@ from datetime import datetime
 from mails.templates.welcome import welcome_template
 from mails.templates.event_close import event_close_template
 from mails.templates.special_message import special_message_template
-from app.worker.main import create_job
+from worker.main import create_job
 
 from .sender import EmailSender
 
@@ -57,7 +57,7 @@ def send_special_email(
     send_at: datetime - Optional date to send the mail.
     """
     if image:
-        image = base64.b64encode(image)
+        image = base64.b64encode(image).decode()
 
     content = special_message_template(event_name, message, event_url)
     email = sender.create_email(

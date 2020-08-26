@@ -2,7 +2,15 @@
 Bussines Logic for update events elemets.
 """
 
+from db.db import get_collection, CRUD
 from .utils import _make_query, events_crud
+
+
+# COLLECTIONS
+PARTICIPANTS_COLLECTION_NAME = "participants"
+participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
+PARTICIPANTS_COLLECTION_NAME = "users"
+users_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
 
 
 class DeleteEvent:
@@ -12,8 +20,10 @@ class DeleteEvent:
 
     def __init__(self):
         self.crud = events_crud
+        self.users = CRUD(users_collection)
+        self.participants = CRUD(participants_collection)
 
-    async def all(self, event_id: str) -> dict:
+    async def all(self, event_id: str, email: str) -> dict:
         """
         Dellete all event info.
 
@@ -27,6 +37,9 @@ class DeleteEvent:
         """
         query = _make_query(event_id)
         deleted_count = await self.crud.delete(query)
+        await self.participants.delete(query)
+        await self.users.pull_array(
+            {"email": email}, "myEvents", {"eventId": event_id})
         return self.check_deleted(deleted_count)
 
     async def speakers(self, event_id: str, speaker_id: str) -> dict:

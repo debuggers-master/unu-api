@@ -10,7 +10,9 @@ from typing import List
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail, From, To, Subject,
-    SendAt, Content, MimeType
+    SendAt, Content, MimeType,
+    Attachment, FileContent, FileName, FileType,
+    Disposition, ContentId
 )
 
 from config import settings  # pylint: disable-msg=E0611
@@ -30,6 +32,8 @@ class EmailSender:
             to_list: List["str"],
             subject: str,
             html_content: str,
+            image: bytes = None,
+            content_type: str = None,
             send_at: datetime = None,
     ) -> Mail:
         """
@@ -54,6 +58,15 @@ class EmailSender:
         for _to in to_list:
             _users_list.append(To(_to))
         message.to = _users_list
+
+        if image:
+            ext = str(content_type).split("/")[1]
+            timestamp = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
+            message.attachment = Attachment(
+                FileContent(image),
+                FileName(f'event_image-{timestamp}.{ext}'),
+                FileType(str(content_type)),
+                Disposition('attachment'))
 
         if send_at:
             message.send_at = SendAt(self.get_unix_time(send_at), p=0)

@@ -1,12 +1,15 @@
 """
 Functions to manage the SendGrid Sender.
 """
+import base64
 from typing import List
 from datetime import datetime
 
 from mails.templates.welcome import welcome_template
 from mails.templates.event_close import event_close_template
 from mails.templates.special_message import special_message_template
+from worker.main import create_job
+
 from .sender import EmailSender
 
 # SendGrid sender abstraction.
@@ -38,7 +41,9 @@ def send_special_email(
         message: str,
         subjet: str,
         to_list: List[str],
-        send_at: datetime = None
+        event_url: str,
+        image: bytes = None,
+        content_type: str = None,
 ) -> None:
     """
     Send a special email.
@@ -51,12 +56,16 @@ def send_special_email(
     to_list: List[str] - The participants emails.
     send_at: datetime - Optional date to send the mail.
     """
-    content = special_message_template(event_name, message)
+    if image:
+        image = base64.b64encode(image).decode()
+
+    content = special_message_template(event_name, message, event_url)
     email = sender.create_email(
         to_list=to_list,
         subject=subjet,
         html_content=content,
-        send_at=send_at,
+        image=image,
+        content_type=content_type,
     )
     sender.send_email(email_to_send=email)
 
@@ -66,6 +75,7 @@ def send_close_event_email(
         event_url: str,
         to_list: List[str],
         send_at: datetime,
+        utc_hours: int = -5,
 ) -> None:
     """
     Send a schedule email to notify that a event is tomorrow.
@@ -80,8 +90,14 @@ def send_close_event_email(
     content = event_close_template(event_name, event_url)
     email = sender.create_email(
         to_list=to_list,
-        subject="Unu Events - Notificación =)",
+        subject="Unu Events - Notificación   =)",
         html_content=content,
-        send_at=send_at,
     )
-    sender.send_email(email_to_send=email)
+
+    job_id = create_job(
+        sender.send_email,
+        date_time=send_at,
+        utc_hours=utc_hours,
+        email_to_send=email)
+
+    return job_id

@@ -30,7 +30,7 @@ credentials_exception = HTTPException(
 pwd_context = CryptContext(schemes=["bcrypt"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-#User service to DB fuctions
+# User service to DB fuctions
 UserMethos = UserService()
 
 

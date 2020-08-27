@@ -7,14 +7,6 @@ from api.v1.routes import events, particpants, user, organizations, mails
 
 api_router = APIRouter()
 
-api_router.include_router(events.router,
-                          prefix="/events",
-                          tags=["Events"])
-
-api_router.include_router(particpants.router,
-                          prefix="/participants",
-                          tags=["Participants"])
-
 api_router.include_router(user.router,
                           prefix="/users",
                           tags=["Users"])
@@ -22,6 +14,14 @@ api_router.include_router(user.router,
 api_router.include_router(organizations.router,
                           prefix="/organizations",
                           tags=["Organizations"])
+
+api_router.include_router(events.router,
+                          prefix="/events",
+                          tags=["Events"])
+
+api_router.include_router(particpants.router,
+                          prefix="/participants",
+                          tags=["Participants"])
 
 api_router.include_router(mails.router,
                           prefix="/mails",

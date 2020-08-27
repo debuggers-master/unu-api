@@ -7,6 +7,7 @@ from storage.service import upload_file
 from schemas.users import EventUserBaseDB
 from schemas.events.event import EventInUser
 from schemas.events.collaborators import CollaboratorInfo
+from schemas.events.speakers import SpeakerInfo
 from .utils import _uuid, _make_query, events_crud
 from auth.services import register_user
 
@@ -146,7 +147,43 @@ class CreateEvent:
 
         return {"collaboratorId": user["userId"]}
 
-    async def add_speaker(self, event_id: str, speaker_data: dict) -> dict:
+    async def add_conference(
+            self, event_id: str, day_id: str, conference_data: dict) -> dict:
+        """
+        Add a new conference to some specific day
+
+        Params:
+        ------
+        event_id: str - The event uuid
+        day_id: str -  The day id
+        confernce_data: dict - The conference data
+
+        Return:
+        ------
+        conferenceId: str - The new conference id
+        speakerId: str -  The new speaker id
+        """
+        conference_id = _uuid()
+        conference_data.update({"conferenceId": conference_id})
+
+        # Image proccessing
+        image_url = await self.upsert_image(conference_data["speakerPhoto"])
+        conference_data.update({"speakerPhoto": image_url})
+
+        # Add conference
+        query = {"eventId": event_id, "agenda.dayId": day_id}
+        path = "agenda.$.conferences"
+        await self.crud.push_nested(query, path, conference_data)
+
+        # Add speaker separatly
+        speaker_data = SpeakerInfo(**conference_data).dict()
+        speaker_id = _uuid()
+        await self.add_speaker(event_id, speaker_data, speaker_id)
+
+        return {"conferenceId": conference_id, "speakerId": "speaker_id"}
+
+    async def add_speaker(
+            self, event_id: str, speaker_data: dict, speaker_id: str) -> dict:
         """
         Add new speaker to the event.
 
@@ -158,14 +195,9 @@ class CreateEvent:
         ------
         speaker_id: The uuid of the created speaker.
         """
-        speaker_id = _uuid()
         speaker_data.update({"speakerId": speaker_id})
         query = _make_query(event_id)
-        modified_count = await self.crud.add_to_set(
-            query, "speakers", speaker_data)
-        if not modified_count:
-            return False
-        return {"speakerId": speaker_id}
+        await self.crud.add_to_set(query, "speakers", speaker_data)
 
     async def add_day(self, event_id: str, day_data: dict) -> dict:
         """

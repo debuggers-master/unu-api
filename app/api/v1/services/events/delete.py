@@ -42,24 +42,6 @@ class DeleteEvent:
             {"email": email}, "myEvents", {"eventId": event_id})
         return self.check_deleted(deleted_count)
 
-    async def speakers(self, event_id: str, speaker_id: str) -> dict:
-        """
-        Dellete a speaker.
-
-        Params:
-        ------
-        event_id: str - The uuid of the target event.
-        speaker_id: str - The uuid of the target speaker.
-
-        Return:
-        ------
-        {deleted: bool} - True if deleted, False if nothig happens.
-        """
-        query = _make_query(event_id)
-        condition = {"speakerId": speaker_id}
-        modified_count = self.crud.pull_array(query, "speakers", condition)
-        return self.check_deleted(modified_count)
-
     async def collaborators(
             self, event_id: str, collaborator_email: str) -> dict:
         """
@@ -128,6 +110,33 @@ class DeleteEvent:
             condition={"dayId": day_id})
 
         return self.check_deleted(modfied_count)
+
+    async def conference(
+            self, event_id: str, day_id: str,
+            conference_id: str, speaker_id: str) -> None:
+        """
+        Delete a existing conference.
+        """
+        query = {
+            "eventId": event_id,
+            "agenda.dayId": day_id}
+        array = "agenda.$.conferences"
+        condition = {"conferenceId": conference_id}
+        await self.crud.pull_array(query, array, condition)
+        await self.speakers(event_id, speaker_id)
+
+    async def speakers(self, event_id: str, speaker_id: str) -> dict:
+        """
+        Dellete a speaker.
+
+        Params:
+        ------
+        event_id: str - The uuid of the target event.
+        speaker_id: str - The uuid of the target speaker.
+        """
+        query = _make_query(event_id)
+        condition = {"speakerId": speaker_id}
+        await self.crud.pull_array(query, "speakers", condition)
 
     def check_deleted(self, count: int) -> dict:
         """

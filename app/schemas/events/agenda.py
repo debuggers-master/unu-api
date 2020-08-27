@@ -2,13 +2,27 @@
 Events Schema Models
 """
 
-from schemas.events.speakers import SpeakerInfo, SpeakerImg
-
 from typing import Optional, List
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
+from schemas.events.speakers import SpeakerInfo
 
-class ConferenceInfo(BaseModel):
+
+class EventId(BaseModel):
+    """
+    Base Model for request or return eventId
+    """
+    eventId: str = Field(..., description="UUID of a event")
+
+
+class DayId(BaseModel):
+    """
+    Base Model for request or return eventId
+    """
+    dayId: str = Field(..., description="UUID of a day")
+
+
+class ConferenceInfo(SpeakerInfo):
     """
     Base Model info  conferences
     """
@@ -26,27 +40,69 @@ class ConferenceInfo(BaseModel):
                          example="13:000")
 
 
-class ConferenceIn(ConferenceInfo, SpeakerInfo, SpeakerImg):
-    """
-    Base Model to add a new conferences
-    """
-
-
-class ConferenceDB(ConferenceInfo, SpeakerInfo, SpeakerImg):
+class ConferenceDB(ConferenceInfo):
     """
     Base Model to Conference
     """
-    conferenceId: str = Field(...,
-                              description="UUID of a conference")
+    conferenceId: str = Field(
+        ...,
+        description="UUID of a conference")
+
+    speakerId: str = Field(..., description="The speaker uuid")
 
 
-class Day(BaseModel):
+class ConferenceIn(EventId, DayId):
+    """
+    Base Model to add a new conferences
+    """
+    conferenceData: ConferenceInfo
+
+
+class ConferenceUpdate(EventId, DayId):
+    """
+    Base Model to add a new conferences
+    """
+    conferenceData: ConferenceDB
+
+
+class ConferenceOnDelete(EventId, DayId):
+    """
+    Base Model to add a new conferences
+    """
+    conferenceId: str = Field(...)
+    speakerId: str = Field(...)
+
+
+class DayInfo(BaseModel):
+    """
+    Principal day info
+    """
+    date: str = Field(..., description="The start day")
+
+
+class DaySaved(DayInfo):
+    """
+    Principal day info
+    """
+    dayId: str = Field(..., description="The day uuid")
+
+
+class DayIn(EventId):
     """
     Base Model Day Events
     """
-    dayId: str = Field(...,
-                       description="UUID of a conference")
-    date: str = Field(...,
-                      description="Date of day evenet DD/MM/YYYY",
-                      example="28/08/2020")
-    conference: Optional[List[ConferenceDB]] = []
+    dayData: DayInfo
+
+
+class DayUpdate(EventId):
+    """
+    Body for update a day
+    """
+    dayData: DaySaved
+
+
+class DayOnDelete(EventId):
+    """
+    Body for update a day
+    """
+    dayId: str = Field(..., description="The day uuid")

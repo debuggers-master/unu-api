@@ -183,7 +183,7 @@ class CreateEvent:
         speaker_data = SpeakerInfo(**conference_data).dict()
         await self.add_speaker(event_id, speaker_data, speaker_id)
 
-        return {"conferenceId": conference_id, "speakerId": "speaker_id"}
+        return {"conferenceId": conference_id, "speakerId": speaker_id}
 
     async def add_speaker(
             self, event_id: str, speaker_data: dict, speaker_id: str) -> dict:

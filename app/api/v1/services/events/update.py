@@ -4,7 +4,7 @@ Bussines Logic for update events elemets.
 
 from storage.service import upload_file
 from schemas.events.speakers import SpeakerInfo
-from .utils import _make_query, events_crud
+from .utils import _make_query, events_crud, get_collection
 
 
 class UpdateEvent:
@@ -115,12 +115,13 @@ class UpdateEvent:
         url_image = await self.update_image(conference_data["speakerPhoto"])
         conference_data.update({"speakerPhoto": url_image})
 
+        conference_id = conference_data["conferenceId"]
         query = {
             "eventId": event_id,
             "agenda.dayId": day_id,
-            "agenda.conferences.conferenceId": conference_data["conferenceId"]
-        }
-        data = {"conferences.$": conference_data}
+            "agenda.conferences.conferenceId": conference_id}
+
+        data = {"agenda.$[].conferences.$": conference_data}
         conf_count = await self.crud.update(query, data)
 
         speaker_data = SpeakerInfo(**conference_data).dict()

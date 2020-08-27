@@ -5,10 +5,10 @@ from typing import Optional, List, Type
 from enum import Enum
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-from schemas.events.speakers import SpeakerDB
-from schemas.events.agenda import Day
-from schemas.events.associates import AsociateDB
-from schemas.events.collaborators import CollaboratorDB
+# from schemas.events.speakers import SpeakerDB
+# from schemas.events.agenda import Day
+# from schemas.events.associates import AsociateDB
+# from schemas.events.collaborators import CollaboratorDB
 
 
 class EventId(BaseModel):
@@ -17,6 +17,15 @@ class EventId(BaseModel):
     """
     eventId: str = Field(...,
                          description="UUID of a event")
+
+
+class EventInUser(EventId):
+    """
+    Schema for event in user.
+    """
+    name: str
+    shortDescription: str
+    organizationName: str
 
 
 class NewEvent(BaseModel):

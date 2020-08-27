@@ -99,6 +99,14 @@ class CRUD:
         updated = await self.coll.update_one(query, operation)
         return int(updated.modified_count)
 
+    async def push_nested(self, query: dict, path: str, data: any) -> int:
+        """
+        Insert a new document in nested element.
+        """
+        operation = {"$push":  {f"{path}": data}}
+        updated = await self.coll.update_one(query, operation)
+        return int(updated.modified_count)
+
     async def pull_array(
             self, query: dict, array_name: str, condition: dict) -> int:
         """

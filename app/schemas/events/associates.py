@@ -13,7 +13,7 @@ class EventId(BaseModel):
                          description="UUID of a event")
 
 
-class AsociateInfo(BaseModel):
+class AssociatedInfo(BaseModel):
     """
     Base Model to add Associate
     """
@@ -23,27 +23,33 @@ class AsociateInfo(BaseModel):
     url: str = Field(None,
                      description="Web page of associate",
                      example="platzi.com")
-
-
-class AsociateImg(BaseModel):
-    """
-    Base Model to get str base64 for Asociate logo
-    """
     logo: str = Field(None,
                       description="encoded base64 image")
 
 
-class AsociateIn(AsociateInfo, AsociateImg):
+class AssociatedInDb(AssociatedInfo):
     """
-    Base Model to add a new Asociate
+    Base Model to add Associate
     """
+    associatedId: str = Field(..., description="The associated uuid")
 
 
-class AsociateDB(AsociateInfo):
+class AssociatedIn(EventId):
     """
-    Base Model to add speaker
+    Body for add associated to an event
     """
-    urlAsociateLogo: str = Field(None,
-                                 description="url of speakerPhoto updloaded to the storage")
-    associatedId: str = Field(...,
-                              description="UUID of a speaker")
+    associatedData: AssociatedInfo
+
+
+class AssociatedUpdate(EventId):
+    """
+    Base Model to add a update a associated
+    """
+    associatedData: AssociatedInDb
+
+
+class AssociatedOnDelete(EventId):
+    """
+    Base Model to update a associated
+    """
+    associatedId: str = Field(..., description="The associated uuid")

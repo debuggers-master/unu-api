@@ -13,11 +13,13 @@ from api.v1.services.events.get import GetEvent
 from auth.services import get_current_user
 
 from schemas.users import UserOut
-from schemas.events.associates import AssociatedIn, AssociatedUpdate, AssociatedOnDelete
+from schemas.events.associates import (
+    AssociatedIn, AssociatedUpdate, AssociatedOnDelete)
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
-from schemas.events.agenda import ConferenceIn, ConferenceUpdate
+from schemas.events.agenda import (
+    ConferenceIn, ConferenceUpdate, ConferenceOnDelete)
 
 # Router instance
 router = APIRouter()
@@ -349,3 +351,17 @@ async def update_a_conference(body: ConferenceUpdate):
         conference_data=body.conferenceData.dict())
 
     return conference_response
+
+
+@router.delete("/conference", status_code=200)
+async def delete_a_conference(body: ConferenceOnDelete):
+    """
+    Delete a existing conference.
+    """
+    await DeleteMethods.conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_id=body.conferenceId,
+        speaker_id=body.speakerId)
+
+    return

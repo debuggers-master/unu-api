@@ -37,32 +37,6 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, new_data)
         return self.check_modified(modified_count)
 
-    async def collaborators(
-            self, event_id: str, collaborator_id: str, new_data: dict) -> dict:
-        """
-        Update one collaborator info.
-
-        Params:
-        ------
-        event_id: str - The uuid of the target event.
-        collaborator_email: str - The email of the target collaborator.
-        new_data: dict - The new data for update.
-
-        Return:
-        ------
-        {modified_count: n} - The number (n) of modified items.
-        """
-        for key, value in list(new_data.items()):
-            if value is None:
-                del new_data[key]
-
-        # Update in the collection
-        query = {"eventId": event_id,
-                 "collaborators.collaboratorId": collaborator_id}
-        data = {"collaborators.$": new_data}
-        modified_count = await self.crud.update(query, data)
-        return self.check_modified(modified_count)
-
     async def speakers(
             self, event_id: str, speaker_id: str, new_data: dict) -> dict:
         """
@@ -83,7 +57,7 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
-    async def associates(
+    async def associateds(
             self, event_id: str, associated_id: str, new_data: dict) -> dict:
         """
         Update one associated info.
@@ -98,9 +72,14 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
-        query = {"event_id": event_id,
+        # Image processing
+        associated_logo = await self.update_image(new_data.get("logo"))
+        new_data.update({"logo": associated_logo})
+
+        query = {"eventId": event_id,
                  "associates.associatedId": associated_id}
         data = {"associates.$": new_data}
+
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 

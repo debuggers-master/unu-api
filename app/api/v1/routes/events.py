@@ -13,7 +13,7 @@ from api.v1.services.events.get import GetEvent
 from auth.services import get_current_user
 
 from schemas.users import UserOut
-from schemas.events.associates import AssociatedIn
+from schemas.events.associates import AssociatedIn, AssociatedUpdate
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 
@@ -225,7 +225,7 @@ async def delete_collaborator(body: CollaboratorOnDelete):
 @router.post("/associates",
              status_code=201,
              response_model=AssociatedResponse)
-async def add_associate(body: AssociatedIn):
+async def add_associated(body: AssociatedIn):
     """
     Add an associate to a event
     using eventId
@@ -238,6 +238,22 @@ async def add_associate(body: AssociatedIn):
     if not associated_id:
         raise not_found
     return associated_id
+
+
+@router.put("/associates",
+            status_code=200,
+            response_model=UpdateResponse)
+async def update_associated(body: AssociatedUpdate):
+    """
+    Update an existing associated.
+    """
+
+    modified_status = await UpdateMethods.associateds(
+        event_id=body.eventId,
+        associated_id=body.associatedData.associatedId,
+        new_data=body.associatedData.dict())
+
+    return modified_status
 
 
 # @router.delete("/associate/",

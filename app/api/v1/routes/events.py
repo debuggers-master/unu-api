@@ -3,8 +3,12 @@ Events Router - Operations about events
 """
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Depends
+import requests
+
+from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
 from pydantic import BaseModel
+
+from config import settings
 from api.v1.services.events.create import CreateEvent
 from api.v1.services.events.delete import DeleteEvent
 from api.v1.services.events.update import UpdateEvent
@@ -395,6 +399,7 @@ async def delete_a_conference(
 async def change_publication_status(
         actualStatus: bool,
         eventId: str,
+        backgroud_tasks: BackgroundTasks,
         current_user: UserOut = Depends(get_current_user)):
     """
     Change the publication status of the event.
@@ -403,4 +408,9 @@ async def change_publication_status(
         eventId, actualStatus, current_user.email)
     if response == 403:
         raise HTTPException(status_code=403, detail="Operation Forbbiden")
+
+    # Schedule email to participats
+    url = f"{settings.HOST}/api/v1/mails/alert?eventId={eventId}"
+    backgroud_tasks.add_task(requests.post, url)
+
     return response

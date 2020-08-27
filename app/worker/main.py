@@ -59,7 +59,7 @@ def create_job(
 ##          Queue Worker Setup           ##
 ###########################################
 
-def __run_worker():
+def __run_worker() -> None:
     """
     Start a worker to manage the enqueue jobs.
     """

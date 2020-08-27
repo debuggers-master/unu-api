@@ -56,10 +56,13 @@ class OrganizationIn(UserId):
     organizationData: OrganizationBase
 
 
-class OrganizationOut(OrganizationId, OrganizationImg):
+class OrganizationOut(OrganizationId):
     """
     Base Model returned when a new organization is  just created
     """
+    organizationName: str = Field(...,
+                                  description="name of organization",
+                                  example="Cosas de ingenieros")
 
 
 class OrganizationBaseUpdate(OrganizationBase, OrganizationId):

@@ -118,7 +118,10 @@ class OrganizationController:
                 "organizationLogo": image_url}
 
     async def update_organization(
-            self, user_id: str, organization_id: str, organization_data: dict) -> dict:
+            self, user_id: str,
+            organization_id: str,
+            organization_data: dict
+    ) -> dict:
         """
         Update a existing organization.
 
@@ -133,74 +136,38 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
+        # Check is organization name is unique
         query = {"organizationName": organization_data.get("organizationName")}
         org_exists = await self.crud.find(query)
-        # Check is organization name is unique
-        if org_exists:
-            if org_exists.get("organizationId") == organization_id:
-                # Create the url name
-                organization_url = organization_data.get("organizationName")
-                organization_url = organization_url.replace(" ", "-").lower()
-                organization_data.update({"organizationUrl": organization_url})
-                # Upload Image
-                url = ""
-                org_logo = organization_data.get("organizationLogo", "")
-                if org_logo:
-                    if org_logo.startswith("https"):
-                        url = org_logo
-                    elif org_logo.startswith("data"):
-                        url = await upload_file(
-                            file_base64=organization_data.get("organizationLogo"))
-                        print(url)
-                        organization_data.update({"organizationLogo": url})
-
-                # Update in the collection
-                query_orga = {"organizationId": organization_id}
-                modified_count = await self.crud.update(query_orga, organization_data)
-                print(modified_count)
-                if not modified_count:
-                    return {"modifiedCount": modified_count,
-                            "url": {"organizationLogo": url}}
-                # Update in the user list
-                query = {"userId": user_id,
-                         "organizations.organizationId": organization_id}
-                data = {"organizations.$": {"organizationId": organization_id,
-                                            "organizationName": organization_data.get("organizationName")}}
-                modified_count = await self.users.update(query, data)
-
-                return {"modifiedCount": modified_count,
-                        "url": {"organizationLogo": url}}
+        if not org_exists:
             return False
 
-        # Create the url name
-        organization_url = organization_data.get("organizationName")
-        organization_url = organization_url.replace(" ", "-").lower()
-        organization_data.update({"organizationUrl": organization_url})
-        # Upload Image
-        url = ""
-        org_logo = organization_data.get("organizationLogo", "")
-        if org_logo:
-            if org_logo.startswith("https"):
-                url = org_logo
-            elif org_logo.startswith("data"):
-                url = await upload_file(
-                    file_base64=organization_data.get("organizationLogo"))
-                print(url)
-                organization_data.update({"organizationLogo": url})
+        if not org_exists.get("organizationId") == organization_id:
+            return False
+
+        # Image proccessing
+        logo = organization_data.get("organizationLogo")
+        image_url = await update_image(image=logo)
+        organization_data.update({"organizationLogo": image_url})
 
         # Update in the collection
-        query_orga = {"organizationId": organization_id}
-        modified_count = await self.crud.update(query_orga, organization_data)
+        query = {"organizationId": organization_id}
+        modified_count = await self.crud.update(query, organization_data)
         if not modified_count:
-            return False
-        # Update in the user list
+            # The collection is the same
+            return {"modifiedCount": modified_count,
+                    "url": {"organizationLogo": image_url}}
+
+        # Update in the user list in background
+        new_data = {"organizationId": organization_id,
+                    "organizationName": organization_data["organizationName"]}
         query = {"userId": user_id,
                  "organizations.organizationId": organization_id}
-        data = {"organizations.$": {"organizationId": organization_id,
-                                    "organizationName": organization_data.get("organizationName")}}
-        modified_count = await self.users.update(query, data)
+        data = {"organizations.$": new_data}
+        self.backgroud_task.add_task(self.users.update, query, data)
+
         return {"modifiedCount": modified_count,
-                "url": {"organizationLogo": url}}
+                "url": {"organizationLogo": image_url}}
 
     async def delete_organization(self, user_id: str, organization_id: str) -> None:
         """

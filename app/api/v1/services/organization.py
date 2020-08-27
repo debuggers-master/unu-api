@@ -100,7 +100,7 @@ class OrganizationController:
         if not inserted_id:
             return {"detail": "Error on saving"}
 
-        # Add the organization info to the user.
+        # Add the organization info into the user.
         organization_name = organization_data.get("organizationName")
         modified_count = await self.users.add_to_set(
             query={"userId": user_id},
@@ -169,7 +169,8 @@ class OrganizationController:
         return {"modifiedCount": modified_count,
                 "url": {"organizationLogo": image_url}}
 
-    async def delete_organization(self, user_id: str, organization_id: str) -> None:
+    async def delete_organization(
+            self, user_id: str, organization_id: str) -> None:
         """
         Delete an existing organization and all events related to it.
 
@@ -177,8 +178,6 @@ class OrganizationController:
         ------
         user_id: str - The user id.
         organization_id: str - The organization id.
-
-        Return: None
         """
         await self.crud.delete({"organizationId": organization_id})
         query = {"userId": user_id}
@@ -188,4 +187,6 @@ class OrganizationController:
             condition={"organizationId": organization_id})
 
         if modified_count:
-            await self.events.delete_many({"organizationId": organization_id})
+            # Delete all associated events in background
+            query = {"organizationId": organization_id}
+            self.backgroud_task.add_task(self.events.delete_many, query)

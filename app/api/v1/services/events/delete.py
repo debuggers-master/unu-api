@@ -108,6 +108,27 @@ class DeleteEvent:
             condition={"associatedId": associate_id})
         return self.check_deleted(modified_count)
 
+    async def days(self, event_id, day_id) -> None:
+        """
+        Dellete a day.
+
+        Params:
+        ------
+        event_id: str - The uuid of the target event.
+        day_id: str - The uuid of the target day.
+
+        Return:
+        ------
+        {deleted: bool} - True if deleted, False if nothig happens.
+        """
+        query = _make_query(event_id)
+        modfied_count = await self.crud.pull_array(
+            query=query,
+            array_name="agenda",
+            condition={"dayId": day_id})
+
+        return self.check_deleted(modfied_count)
+
     def check_deleted(self, count: int) -> dict:
         """
         Check if the count is grather than 0

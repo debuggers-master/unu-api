@@ -13,7 +13,7 @@ from api.v1.services.events.get import GetEvent
 from auth.services import get_current_user
 
 from schemas.users import UserOut
-from schemas.events.associates import AssociatedIn, AssociatedUpdate
+from schemas.events.associates import AssociatedIn, AssociatedUpdate, AssociatedOnDelete
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 
@@ -256,16 +256,17 @@ async def update_associated(body: AssociatedUpdate):
     return modified_status
 
 
-# @router.delete("/associate/",
-#                status_code=204)
-# async def delete_associate(associate: AssociateDelete):
-#     """
-#     Delete  a associate into  a event
-#     using eventId and associateId
-#     """
-#     await DeleteMethods.associates(
-#         event_id=associate.eventId,
-#         associate_id=associate.associateId)
+@router.delete("/associates",
+               status_code=204)
+async def delete_associate(body: AssociatedOnDelete):
+    """
+    Delete  a associate into  a event
+    using eventId and associateId
+    """
+    await DeleteMethods.associates(
+        event_id=body.eventId,
+        associate_id=body.associatedId)
+
 # @router.put("/associate/",
 #             status_code=200)
 # async def updatee_associate(associate: AsociateUpdate):

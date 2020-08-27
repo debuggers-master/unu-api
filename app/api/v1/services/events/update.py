@@ -3,6 +3,7 @@ Bussines Logic for update events elemets.
 """
 
 from storage.service import upload_file
+from schemas.events.speakers import SpeakerInfo
 from .utils import _make_query, events_crud
 
 
@@ -35,26 +36,6 @@ class UpdateEvent:
 
         query = _make_query(event_id)
         modified_count = await self.crud.update(query, new_data)
-        return self.check_modified(modified_count)
-
-    async def speakers(
-            self, event_id: str, speaker_id: str, new_data: dict) -> dict:
-        """
-        Update the speakers data.
-
-        Params:
-        ------
-        event_id: str - The uuid of the target event.
-        speaker_id: str - The uuid of the target speaker.
-        new_data: dict - The new data for update.
-
-        Return:
-        ------
-        {modified_count: n} - The number (n) of modified items.
-        """
-        query = {"event_id": event_id, "speakers.speakerId": speaker_id}
-        data = {"speakers.$": new_data}
-        modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
     async def associateds(
@@ -114,6 +95,59 @@ class UpdateEvent:
         data = {"agenda.$.date": day_data["date"]}
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
+
+    async def conference(
+            self, event_id: str, day_id: str, conference_data: dict) -> dict:
+        """
+        Update a  conference in some specific day
+
+        Params:
+        ------
+        event_id: str - The event uuid
+        day_id: str -  The day id
+        confernce_data: dict - The conference data
+
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        # Image proccessing
+        url_image = await self.update_image(conference_data["speakerPhoto"])
+        conference_data.update({"speakerPhoto": url_image})
+
+        query = {
+            "eventId": event_id,
+            "agenda.dayId": day_id,
+            "agenda.conferences.conferenceId": conference_data["conferenceId"]
+        }
+        data = {"conferences.$": conference_data}
+        conf_count = await self.crud.update(query, data)
+
+        speaker_data = SpeakerInfo(**conference_data).dict()
+        speaker_data.update({"speakerId": conference_data["speakerId"]})
+        speaker_count = await self.speakers(event_id, speaker_data)
+
+        return {"modifiedCount": conf_count + speaker_count}
+
+    async def speakers(
+            self, event_id: str, speaker_data: dict) -> dict:
+        """
+        Update the speakers data.
+
+        Params:
+        ------
+        event_id: str - The uuid of the target event.
+        speaker_data: dict - The new data for update.
+
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        query = {"eventId": event_id,
+                 "speakers.speakerId": speaker_data["speakerId"]}
+        data = {"speakers.$": speaker_data}
+        modified_count = await self.crud.update(query, data)
+        return modified_count
 
     async def chnage_status(
             self, event_id: str, actual_status: bool) -> dict:

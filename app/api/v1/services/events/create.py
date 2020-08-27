@@ -8,8 +8,8 @@ from schemas.users import EventUserBaseDB
 from schemas.events.event import EventInUser
 from schemas.events.collaborators import CollaboratorInfo
 from schemas.events.speakers import SpeakerInfo
-from .utils import _uuid, _make_query, events_crud
 from auth.services import register_user
+from .utils import _uuid, _make_query, events_crud
 
 
 # COLLECTIONS
@@ -164,7 +164,9 @@ class CreateEvent:
         speakerId: str -  The new speaker id
         """
         conference_id = _uuid()
+        speaker_id = _uuid()
         conference_data.update({"conferenceId": conference_id})
+        conference_data.update({"speakerId": speaker_id})
 
         # Image proccessing
         image_url = await self.upsert_image(conference_data["speakerPhoto"])
@@ -179,7 +181,6 @@ class CreateEvent:
 
         # Add speaker separatly
         speaker_data = SpeakerInfo(**conference_data).dict()
-        speaker_id = _uuid()
         await self.add_speaker(event_id, speaker_data, speaker_id)
 
         return {"conferenceId": conference_id, "speakerId": "speaker_id"}

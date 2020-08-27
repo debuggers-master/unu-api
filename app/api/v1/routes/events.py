@@ -17,6 +17,7 @@ from schemas.events.associates import AssociatedIn, AssociatedUpdate, Associated
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
+from schemas.events.agenda import ConferenceIn
 
 # Router instance
 router = APIRouter()
@@ -69,6 +70,14 @@ class DayResponse(BaseModel):
     Response class.
     """
     dayId: str
+
+
+class ConferenceResponse(BaseModel):
+    """
+    Response class.
+    """
+    conferenceId: str
+    speakerId: str
 
 
 # Exceptions
@@ -308,3 +317,22 @@ async def delete_day(body: DayOnDelete):
     await DeleteMethods.days(
         event_id=body.eventId, day_id=body.dayId)
     return
+
+
+###########################################
+##      Events/conferences API CRUD      ##
+###########################################
+
+@router.post("/conference", status_code=201, response_model=ConferenceResponse)
+async def create_a_conference(body: ConferenceIn):
+    """
+    Create a new conference.
+    """
+    conference_response = await CreateMethods.add_conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_data=body.conferenceData.dict())
+
+    if not conference_response:
+        raise not_found
+    return conference_response

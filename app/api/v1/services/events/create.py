@@ -173,7 +173,9 @@ class CreateEvent:
         # Add conference
         query = {"eventId": event_id, "agenda.dayId": day_id}
         path = "agenda.$.conferences"
-        await self.crud.push_nested(query, path, conference_data)
+        pushed = await self.crud.push_nested(query, path, conference_data)
+        if not pushed:
+            return False
 
         # Add speaker separatly
         speaker_data = SpeakerInfo(**conference_data).dict()

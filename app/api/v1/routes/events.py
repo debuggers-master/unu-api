@@ -16,6 +16,7 @@ from schemas.users import UserOut
 from schemas.events.associates import AssociatedIn, AssociatedUpdate, AssociatedOnDelete
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
+from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
 
 # Router instance
 router = APIRouter()
@@ -61,6 +62,13 @@ class AssociatedResponse(BaseModel):
     Response class.
     """
     associatedId: str
+
+
+class DayResponse(BaseModel):
+    """
+    Response class.
+    """
+    dayId: str
 
 
 # Exceptions
@@ -203,8 +211,7 @@ async def add_collaborator(
     return result
 
 
-@router.delete("/collaborators",
-               status_code=204)
+@router.delete("/collaborators", status_code=204)
 async def delete_collaborator(body: CollaboratorOnDelete):
     """
     Delete  a collaborator.
@@ -222,9 +229,7 @@ async def delete_collaborator(body: CollaboratorOnDelete):
 ###########################################
 
 
-@router.post("/associates",
-             status_code=201,
-             response_model=AssociatedResponse)
+@router.post("/associates", status_code=201, response_model=AssociatedResponse)
 async def add_associated(body: AssociatedIn):
     """
     Add an associate to a event
@@ -240,9 +245,7 @@ async def add_associated(body: AssociatedIn):
     return associated_id
 
 
-@router.put("/associates",
-            status_code=200,
-            response_model=UpdateResponse)
+@router.put("/associates", status_code=200, response_model=UpdateResponse)
 async def update_associated(body: AssociatedUpdate):
     """
     Update an existing associated.
@@ -256,8 +259,7 @@ async def update_associated(body: AssociatedUpdate):
     return modified_status
 
 
-@router.delete("/associates",
-               status_code=204)
+@router.delete("/associates", status_code=204)
 async def delete_associate(body: AssociatedOnDelete):
     """
     Delete  a associate into  a event
@@ -267,32 +269,19 @@ async def delete_associate(body: AssociatedOnDelete):
         event_id=body.eventId,
         associate_id=body.associatedId)
 
-# @router.put("/associate/",
-#             status_code=200)
-# async def updatee_associate(associate: AsociateUpdate):
-#     """
-#     Update  a associate into  a event
-#     using eventId and associateId
-#     """
-# #######################
-# ## Speakers API CRUD ##
-# #######################
-# @router.post("/speaker/",
-#              status_code=200,
-#              response_model=SpeakerOut)
-# async def add_speaker(new_speaker:SpeakerIn):
-#     """
-#     Add a Speaker to a event
-#     using eventId
-#     """
-#     ##base64img= new_associate.logo
-#     ##############################
-#     ## URL created  Image Logic ##
-#     ##############################
-#     speaker = new_speaker.spekerInfo.dict()
-#     speaker.update({"url_photo": "url_photo"})
-#     speaker_id = await CreateMethods.add_speaker(
-#                             event_id=new_speaker.eventId,
-#                             speaker_data=new_speaker.spekerInfo)
-#     # No se de donde toma el associateId :O
-#     return AssociateOut(**associate)
+
+###########################################
+##          Events/day API CRUD          ##
+###########################################
+
+@router.post("/day", status_code=201, response_model=DayResponse)
+async def create_day(body: DayIn):
+    """
+    Add a new day to agenda.
+    """
+    day_id = await CreateMethods.add_day(
+        event_id=body.eventId, day_data=body.dayData.dict())
+
+    if not day_id:
+        raise HTTPException(status_code=409, detail="The date is used")
+    return day_id

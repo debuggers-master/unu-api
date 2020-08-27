@@ -285,3 +285,16 @@ async def create_day(body: DayIn):
     if not day_id:
         raise HTTPException(status_code=409, detail="The date is used")
     return day_id
+
+
+@router.put("/day", status_code=200, response_model=UpdateResponse)
+async def update_day(body: DayUpdate):
+    """
+    Update a existing day in agenda.
+    """
+    day_id = await UpdateMethods.days(
+        event_id=body.eventId, day_data=body.dayData.dict())
+
+    if not day_id:
+        raise HTTPException(status_code=409, detail="The date is used")
+    return day_id

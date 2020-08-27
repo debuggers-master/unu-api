@@ -57,7 +57,7 @@ class CreateEvent:
         event_data.update({"associates": []})
         event_data.update({"publicationStatus": 0})
         event_data.update({"agenda": [{
-            "dayID": _uuid(),
+            "dayId": _uuid(),
             "date": event_data.get("startDate"),
             "conferences": []
         }]})
@@ -167,9 +167,34 @@ class CreateEvent:
             return False
         return {"speakerId": speaker_id}
 
-    #########################
-    # Create agenda (Falta) #
-    #########################
+    async def add_day(self, event_id: str, day_data: dict) -> dict:
+        """
+        Add a new day to agenda.
+
+        Params:
+        ------
+        event_id: str - The event uuid.
+        day_data: dict - The day data
+
+        Return:
+        ------
+        dayId: The uuid of the day
+        """
+        day_id = _uuid()
+        day_data.update({"dayId": day_id})
+        day_data.update({"conferences": []})
+
+        # Verify the date is not the same
+        day = await self.crud.find(
+            {"eventId": event_id, "agenda.date": day_data["date"]})
+        if day:
+            return False
+
+        query = _make_query(event_id)
+        modified_count = await self.crud.add_to_set(query, "agenda", day_data)
+        if not modified_count:
+            return False
+        return {"dayId": day_id}
 
     async def add_associates(self, event_id: str, associated_data) -> dict:
         """

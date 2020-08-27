@@ -55,6 +55,15 @@ class CollaboratorDB(UserId):
                       example="Mario Barbosa")
 
 
+class CollaborationsDB(EventId):
+    """
+    User Base to Collaborator Information
+    """
+    name: Optional[str] = Field(description="The event name")
+    shortDescription: Optional[str] = Field(description="Event description")
+    organizationName: Optional[str] = Field(description="Organization name")
+
+
 class UserBase(BaseModel):
     """
     Base Model for user

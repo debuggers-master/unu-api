@@ -2,7 +2,7 @@
 Organizations  Schema Models
 """
 
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
@@ -37,8 +37,8 @@ class OrganizationImg(BaseModel):
     """
     BaseModel for organizationLogo
     """
-    organizationLogo: str = Field(None,
-                                  description="b64 encoded image as input, URL image as out")
+    organizationLogo: Optional[str]
+
 
 class OrganizationBase(OrganizationImg):
     """
@@ -66,6 +66,7 @@ class OrganizationBaseUpdate(OrganizationBase, OrganizationId):
     """
     Base Model to update a Organization
     """
+
 
 class OrganizationUpdate(UserId):
     """

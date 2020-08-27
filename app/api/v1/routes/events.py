@@ -97,7 +97,8 @@ conflict_request = HTTPException(
              status_code=201,
              response_model=EventResponse)
 async def create_event(
-        new_event: NewEvent, curret_user: UserOut = Depends(get_current_user)):
+        new_event: NewEvent,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Create a new event
     """
@@ -169,7 +170,9 @@ async def get_events_count_participants(eventId: str = Query(...)):
 @router.put("/",
             status_code=200,
             response_model=UpdateResponse)
-async def update_event(update_info: EventIn):
+async def update_event(
+        update_info: EventIn,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Update a created event.
     """
@@ -200,7 +203,8 @@ async def delete_event(
              response_model=CollaboratorResponse)
 async def add_collaborator(
         info: NewCollaborator,
-        existing: Optional[bool] = Query(False)):
+        existing: Optional[bool] = Query(False),
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Add a collaborator to a event
     using eventId
@@ -223,7 +227,9 @@ async def add_collaborator(
 
 
 @router.delete("/collaborators", status_code=204)
-async def delete_collaborator(body: CollaboratorOnDelete):
+async def delete_collaborator(
+        body: CollaboratorOnDelete,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Delete  a collaborator.
     """
@@ -241,7 +247,9 @@ async def delete_collaborator(body: CollaboratorOnDelete):
 
 
 @router.post("/associates", status_code=201, response_model=AssociatedResponse)
-async def add_associated(body: AssociatedIn):
+async def add_associated(
+        body: AssociatedIn,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Add an associate to a event
     using eventId
@@ -257,7 +265,9 @@ async def add_associated(body: AssociatedIn):
 
 
 @router.put("/associates", status_code=200, response_model=UpdateResponse)
-async def update_associated(body: AssociatedUpdate):
+async def update_associated(
+        body: AssociatedUpdate,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Update an existing associated.
     """
@@ -271,7 +281,9 @@ async def update_associated(body: AssociatedUpdate):
 
 
 @router.delete("/associates", status_code=204)
-async def delete_associate(body: AssociatedOnDelete):
+async def delete_associate(
+        body: AssociatedOnDelete,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Delete  a associate into  a event
     using eventId and associateId
@@ -286,7 +298,8 @@ async def delete_associate(body: AssociatedOnDelete):
 ###########################################
 
 @router.post("/day", status_code=201, response_model=DayResponse)
-async def create_day(body: DayIn):
+async def create_day(
+        body: DayIn, curret_user: UserOut = Depends(get_current_user)):
     """
     Add a new day to agenda.
     """
@@ -299,7 +312,8 @@ async def create_day(body: DayIn):
 
 
 @router.put("/day", status_code=200, response_model=UpdateResponse)
-async def update_day(body: DayUpdate):
+async def update_day(
+        body: DayUpdate, curret_user: UserOut = Depends(get_current_user)):
     """
     Update a existing day in agenda.
     """
@@ -312,7 +326,8 @@ async def update_day(body: DayUpdate):
 
 
 @router.delete("/day", status_code=204)
-async def delete_day(body: DayOnDelete):
+async def delete_day(
+        body: DayOnDelete, curret_user: UserOut = Depends(get_current_user)):
     """
     Delete a existing day in agenda.
     """
@@ -326,7 +341,8 @@ async def delete_day(body: DayOnDelete):
 ###########################################
 
 @router.post("/conference", status_code=201, response_model=ConferenceResponse)
-async def create_a_conference(body: ConferenceIn):
+async def create_a_conference(
+        body: ConferenceIn, curret_user: UserOut = Depends(get_current_user)):
     """
     Create a new conference.
     """
@@ -341,7 +357,9 @@ async def create_a_conference(body: ConferenceIn):
 
 
 @router.put("/conference", status_code=200, response_model=UpdateResponse)
-async def update_a_conference(body: ConferenceUpdate):
+async def update_a_conference(
+        body: ConferenceUpdate,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Update a existing conference.
     """
@@ -354,7 +372,9 @@ async def update_a_conference(body: ConferenceUpdate):
 
 
 @router.delete("/conference", status_code=200)
-async def delete_a_conference(body: ConferenceOnDelete):
+async def delete_a_conference(
+        body: ConferenceOnDelete,
+        curret_user: UserOut = Depends(get_current_user)):
     """
     Delete a existing conference.
     """

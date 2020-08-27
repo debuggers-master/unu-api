@@ -504,6 +504,7 @@ headers: {Authorization: `Bearer {acces_token}`}
     twitter: str,
     rol: str,
     speakerPhoto: str,
+    speakerId: str
   }
 }
 ```
@@ -520,6 +521,7 @@ headers: {Authorization: `Bearer {acces_token}`}
   eventId: str,
   dayId: str,
   conferenceId: str,
+  speakerId: str,
 }
 ```
 

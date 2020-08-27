@@ -1,9 +1,9 @@
 """
 Collaboratos Schema Models
 """
-from pydantic import BaseModel, Field, EmailStr
 
-from schemas.users import UserBase
+from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
 
 
 class EventId(BaseModel):
@@ -18,53 +18,41 @@ class CollaboratorInfo(BaseModel):
     """
     User Base to Collaborator Information
     """
-    email: EmailStr = Field(...,
-                            description="Email of user",
-                            example="name_last@organization.com")
-    name: str = Field(None,
-                      description="Name of collaborator",
-                      example="Mario Barbosa")
+
+    email: EmailStr = Field(
+        ...,
+        description="Email of user",
+        example="name_last@organization.com")
+
+    firstName: str = Field(
+        ...,
+        description="Name of collaborator",
+        example="Bruce")
+
+    lastName: str = Field(
+        ...,
+        description="Lastname of collaborator",
+        example="Banner")
 
 
-class CollaboratorDB(CollaboratorInfo):
+class CollaboratorInDb(CollaboratorInfo):
     """
-    Base Model to add Collaborators
+    Schema or collaborator in db
     """
-    collaboratorId: str = Field(None,
-                                description="Unique collaborator uuid identifier")
+    userId: Optional[str]
+    password: str = Field(..., decription="The collaborator password")
 
 
-class CollaboratorOut(BaseModel):
+class NewCollaborator(EventId):
     """
-    Base Model returned when a new collaborator is just added
+    Body for new collaborator
     """
-    collaboratorId: str = Field(None,
-                                description="Unique collaborator uuid identifier")
+    collaboratorData: Optional[CollaboratorInDb]
+    email: Optional[str]
 
 
-class CollaboratorDelete(EventId, CollaboratorOut):
+class CollaboratorOnDelete(EventId):
     """
-    Base Model to delele a collaborator
+    Body for delete a collaborator
     """
-
-
-class CollaboratorData(BaseModel):
-    """
-    Base Model Collaboration Data
-    """
-    email: EmailStr = Field(None,
-                            description="Email of user",
-                            example="name_last@organization.com")
-    firstName: str = Field(None,
-                           description="Name of user",
-                           example="Mario")
-    lastName: str = Field(None,
-                          description="Lastname of user",
-                          example="Barbosa")
-
-
-class CollaboratorUpdate(CollaboratorDelete):
-    """
-    Base Model to update a collaborator
-    """
-    collaboratorData: CollaboratorData
+    email: str = Field(..., description="The collaborator email")

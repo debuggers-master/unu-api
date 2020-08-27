@@ -27,6 +27,7 @@ class GetEvent:
 
     def __init__(self):
         self.crud = events_crud
+        self.participants = participants_collection
 
     async def get_event(
             self,
@@ -70,11 +71,15 @@ class GetEvent:
         event_list: list- A list with all events finded.
         """
 
-        query = {"organizationName": organization_name, "url": event_url}
-        event = await events_crud.find(query, filters=filters, excludes=excludes)
-        if not event.get("publucationStatus"):
-            return False
-        return event
+        query = {"organizationUrl": organization_name, "url": event_url}
+        event = await self.crud.find(
+            query, filters=filters, excludes=excludes)
+
+        if event:
+            if not event.get("publucationStatus"):
+                return False
+            return event
+        return False
 
     async def get_published_events(self) -> list:
         """
@@ -84,9 +89,9 @@ class GetEvent:
         ------
         events: - List[EventOut] - a list of events.
         """
-        now = datetime.now()
-        today = date(now.year, now.month, now.day)
-        query = {"publicationStatus": 1, "startDate": {"$gte": today}}
+        # now = datetime.now()
+        # today = date(now.year, now.month, now.day)
+        query = {"publicationStatus": 1}
         filters = ["eventId", "name", "startDate", "organizationName"]
         events = await self.crud.find(query, only_one=False, filters=filters)
         return events
@@ -103,7 +108,7 @@ class GetEvent:
         ------
         count: int - The number of particpants
         """
-        count = await participants_collection.find_one({"eventId": event_id})
+        count = await self.participants.find_one({"eventId": event_id})
         return {"participants": len(count.get("emails"))}
 
     async def get_particpants(self, event_id: str) -> int:

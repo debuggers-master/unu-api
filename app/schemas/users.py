@@ -26,9 +26,6 @@ class EventUserBase(BaseModel):
     organizationName: str = Field(...,
                                   description="Name of organization",
                                   example="Cosas de ingenieros")
-    shortDescription: str = Field(None,
-                                  description="a short description of the event",
-                                  example="Eveneto para programar en python")
 
 
 class EventUserBaseDB(EventUserBase, EventId):

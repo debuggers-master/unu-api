@@ -99,7 +99,16 @@ class CRUD:
         updated = await self.coll.update_one(query, operation)
         return int(updated.modified_count)
 
-    async def pull_array(self, query: dict, array_name: str, condition: dict) -> int:
+    async def push_nested(self, query: dict, path: str, data: any) -> int:
+        """
+        Insert a new document in nested element.
+        """
+        operation = {"$push":  {f"{path}": data}}
+        updated = await self.coll.update_one(query, operation)
+        return int(updated.modified_count)
+
+    async def pull_array(
+            self, query: dict, array_name: str, condition: dict) -> int:
         """
         Remove a item from a list that matches the condition.
         """
@@ -139,9 +148,9 @@ class CRUD:
             document = await self.coll.find_one(query, query_filter)
             return jsonify(document)
 
-        cursor = await self.coll.find(query, query_filter)
+        cursor = self.coll.find(query, query_filter)
         items = []
-        for document in await cursor.to_list():
+        for document in await cursor.to_list(length=100):
             items.append(document)
 
         return items

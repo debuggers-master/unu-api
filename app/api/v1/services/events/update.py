@@ -2,7 +2,9 @@
 Bussines Logic for update events elemets.
 """
 
-from .utils import _make_query, events_crud
+from storage.service import upload_file
+from schemas.events.speakers import SpeakerInfo
+from .utils import _make_query, events_crud, get_collection
 
 
 class UpdateEvent:
@@ -26,55 +28,18 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
+        # Update image only if are new files
+        image_header = await self.update_image(new_data["imageHeader"])
+        image_event = await self.update_image(new_data["imageEvent"])
+        new_data.update({"imageHeader": image_header})
+        new_data.update({"imageEvent": image_event})
+
         query = _make_query(event_id)
         modified_count = await self.crud.update(query, new_data)
         return self.check_modified(modified_count)
 
-    async def collaborators(self, event_id: str, collaborator_id: str, new_data: dict) -> dict:
-        """
-        Update one collaborator info.
-
-        Params:
-        ------
-        event_id: str - The uuid of the target event.
-        collaborator_email: str - The email of the target collaborator.
-        new_data: dict - The new data for update.
-
-        Return:
-        ------
-        {modified_count: n} - The number (n) of modified items.
-        """
-        for key, value in list(new_data.items()):
-            if value is None:
-                del new_data[key]
-
-        # Update in the collection
-        query = {"eventId": event_id,
-                 "collaborators.collaboratorId": collaborator_id}
-        data = {"collaborators.$": new_data}
-        modified_count = await self.crud.update(query, data)
-        return self.check_modified(modified_count)
-
-    async def speakers(self, event_id: str, speaker_id: str, new_data: dict) -> dict:
-        """
-        Update the speakers data.
-
-        Params:
-        ------
-        event_id: str - The uuid of the target event.
-        speaker_id: str - The uuid of the target speaker.
-        new_data: dict - The new data for update.
-
-        Return:
-        ------
-        {modified_count: n} - The number (n) of modified items.
-        """
-        query = {"event_id": event_id, "speakers.speakerId": speaker_id}
-        data = {"speakers.$": new_data}
-        modified_count = await self.crud.update(query, data)
-        return self.check_modified(modified_count)
-
-    async def associates(self, event_id: str, associated_id: str, new_data: dict) -> dict:
+    async def associateds(
+            self, event_id: str, associated_id: str, new_data: dict) -> dict:
         """
         Update one associated info.
 
@@ -88,17 +53,105 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
-        query = {"event_id": event_id,
+        # Image processing
+        associated_logo = await self.update_image(new_data.get("logo"))
+        new_data.update({"logo": associated_logo})
+
+        query = {"eventId": event_id,
                  "associates.associatedId": associated_id}
         data = {"associates.$": new_data}
+
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
-    ###################
-    ## Agenda (Falta)##
-    ###################
+    async def days(self, event_id: str, day_data: dict):
+        """
+        Update a existing day
+        event_id: str - The event uuid.
+        day_data: bool - The day date to update.
 
-    async def chnage_status(self, event_id: str, actual_status: bool) -> dict:
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        # Verify the date is not the same
+        day = await self.crud.find({
+            "eventId": event_id,
+            "agenda.dayId": day_data["dayId"],
+            "agenda.date": day_data["date"],
+        })
+        if day:
+            # The date doesn't have changes
+            return self.check_modified(False)
+
+        day_couped = await self.crud.find({
+            "eventId": event_id,
+            "agenda.date": day_data["date"],
+        })
+        if day_couped:
+            return False
+
+        query = {"eventId": event_id, "agenda.dayId": day_data["dayId"]}
+        data = {"agenda.$.date": day_data["date"]}
+        modified_count = await self.crud.update(query, data)
+        return self.check_modified(modified_count)
+
+    async def conference(
+            self, event_id: str, day_id: str, conference_data: dict) -> dict:
+        """
+        Update a  conference in some specific day
+
+        Params:
+        ------
+        event_id: str - The event uuid
+        day_id: str -  The day id
+        confernce_data: dict - The conference data
+
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        # Image proccessing
+        url_image = await self.update_image(conference_data["speakerPhoto"])
+        conference_data.update({"speakerPhoto": url_image})
+
+        conference_id = conference_data["conferenceId"]
+        query = {
+            "eventId": event_id,
+            "agenda.dayId": day_id,
+            "agenda.conferences.conferenceId": conference_id}
+
+        data = {"agenda.$[].conferences.$": conference_data}
+        conf_count = await self.crud.update(query, data)
+
+        speaker_data = SpeakerInfo(**conference_data).dict()
+        speaker_data.update({"speakerId": conference_data["speakerId"]})
+        speaker_count = await self.speakers(event_id, speaker_data)
+
+        return {"modifiedCount": conf_count + speaker_count}
+
+    async def speakers(
+            self, event_id: str, speaker_data: dict) -> dict:
+        """
+        Update the speakers data.
+
+        Params:
+        ------
+        event_id: str - The uuid of the target event.
+        speaker_data: dict - The new data for update.
+
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        query = {"eventId": event_id,
+                 "speakers.speakerId": speaker_data["speakerId"]}
+        data = {"speakers.$": speaker_data}
+        modified_count = await self.crud.update(query, data)
+        return modified_count
+
+    async def chnage_status(
+            self, event_id: str, actual_status: bool) -> dict:
         """
         Change the actual a publication status.
 
@@ -119,5 +172,17 @@ class UpdateEvent:
         Check if the modified_count is grather than 0
         """
         if not modified_count:
-            return False
+            return {"modifiedCount": 0}
         return {"modifiedCount": modified_count}
+
+    async def update_image(self, image: str) -> str:
+        """
+        Update the url for image if it is new.
+        """
+        prefix = image.split(":")[0]
+        if prefix == "data":
+            new_image_url = await upload_file(file_base64=image)
+            return new_image_url
+        if prefix in ("http", ""):
+            return image
+        return image

@@ -1,183 +1,367 @@
 """
 Events Router - Operations about events
 """
+from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException
-
-# from schemas.events.event import EventIn, EventOut
-# from schemas.events.event import InformationIn, InformationDB
+from fastapi import APIRouter, HTTPException, Query, Depends
+from pydantic import BaseModel
 from api.v1.services.events.create import CreateEvent
 from api.v1.services.events.delete import DeleteEvent
 from api.v1.services.events.update import UpdateEvent
+from api.v1.services.events.get import GetEvent
 
-# from schemas.events.collaborators import CollaboratorIn, CollaboratorOut, CollaboratorDelete, CollaboratorUpdate
-# from schemas.events.associates import AssociateIn, AssociateOut, AssociateDelete, AsociateUpdate
-# from schemas.events.speakers import SpeakerIn, SpeakerOut, SpeakerDelete, SpeakerUpdate
+from auth.services import get_current_user
+
+from schemas.users import UserOut
+from schemas.events.associates import (
+    AssociatedIn, AssociatedUpdate, AssociatedOnDelete)
+from schemas.events.event import NewEvent, EventOut, EventIn
+from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
+from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
+from schemas.events.agenda import (
+    ConferenceIn, ConferenceUpdate, ConferenceOnDelete)
 
 # Router instance
 router = APIRouter()
+
+# Services
 CreateMethods = CreateEvent()
+ReadMethods = GetEvent()
 DeleteMethods = DeleteEvent()
 UpdateMethods = UpdateEvent()
 
 
-# @router.post("",
-#             status_code=200,
-#             response_model=EventOut)
-# async def create_event(new_event: EventIn):
-#     """
-#     Create a new event
-#     """
+# Response Model
+class EventResponse(BaseModel):
+    """
+    Response class.
+    """
+    eventId: str
 
 
-#     eventId = await CreateMethods.create_event(event_data=new_event.dict())
-
-#     return  eventId
-
-
-# @router.get("",
-#             status_code=200,
-#             response_model=EventOut)
-# async def get_event(get_event: EventIn):
-#     """
-#     Get a event using eventId
-#     """
+class CountParticipantsResponse(BaseModel):
+    """
+    Response class.
+    """
+    participants: int
 
 
-# @router.put("",
-#             status_code=200,
-#             response_model=EventOut)
-# async def update_event(update_event: EventIn):
-#     """
-#     Update a create event
-#     """
+class UpdateResponse(BaseModel):
+    """
+    Response class.
+    """
+    modifiedCount: int
 
 
-# @router.delete("",
-#                status_code=200)
-# async def delete_event(event: EventIn):
-#     """
-#     Get create a new event
-#     """
+class CollaboratorResponse(BaseModel):
+    """
+    Response class.
+    """
+    collaboratorId: str
 
 
-# ##########################
-# ##Collaborators API CRUD##
-# ##########################
-
-# @router.post("/collaborator/",
-#              status_code=200,
-#             response_model=CollaboratorOut)
-# async def add_collaborator(new_collaborator: CollaboratorIn):
-#     """
-#     Add a collaborator to a event
-#     using eventId
-#     """
-#     collaborator_id = await CreateMethods.add_collaborator(event_id=new_collaborator.eventId,
-#                                                           collaborator_data=new_collaborator.collaboratorInfo.dict())
-#     if collaborator_id is  False:
-#         raise HTTPException(status_code=500,
-#                             detail="Error Adding Collaborator, Maybe EventId is Wrong")
-#     return collaborator_id
-
-# @router.delete("/collaborator/",
-#                status_code=204)
-# async def delete_collaborator(collaborator: CollaboratorDelete):
-#     """
-#     Delete  a collaborator into  a event
-#     using eventId and collaboratorId
-#     """
-#     await DeleteMethods.collaborators(
-#         event_id=collaborator.eventId,
-#         collaborator_id=collaborator.collaboratorId)
+class AssociatedResponse(BaseModel):
+    """
+    Response class.
+    """
+    associatedId: str
 
 
-# @router.put("/collaborator/",
-#             status_code=204)
-# async def update_collaborator(collaborator: CollaboratorUpdate):
-#     """
-#     Update a collaborator into  a event
-#     using eventId and collaboratorId
-#     """
-#     await UpdateMethods.collaborators(
-#         event_id=collaborator.eventId,
-#         collaborator_id=collaborator.collaboratorId,
-#         new_data=collaborator.collaboratorData.dict())
+class DayResponse(BaseModel):
+    """
+    Response class.
+    """
+    dayId: str
 
 
-# #######################
-# ##ASSOCIATES API CRUD##
-# #######################
-# @router.post("/associate/",
-#              status_code=201,
-#              response_model=AssociateOut)
-# async def add_associate(new_associate: AssociateIn):
-#     """
-#     Add an associate to a event
-#     using eventId
-#     """
-
-#     ##base64img= new_associate.logo
-
-#     #######################
-#     ## URL created  Image Logic ##
-#     #######################
-
-#     associate = new_associate.asociateInfo.dict()
-#     associate.update({"url_logo": "url_logo"})
-
-#     associate_id = await CreateMethods.add_associates(
-#                                 event_id=new_associate.eventId,
-#                                 associate_data=associate)
-
-#     # No se de donde toma el associateId :O
-#     return AssociateOut(**associate)
-
-# @router.delete("/associate/",
-#                status_code=204)
-# async def delete_associate(associate: AssociateDelete):
-#     """
-#     Delete  a associate into  a event
-#     using eventId and associateId
-#     """
-#     await DeleteMethods.associates(
-#         event_id=associate.eventId,
-#         associate_id=associate.associateId)
-
-# @router.put("/associate/",
-#             status_code=200)
-# async def updatee_associate(associate: AsociateUpdate):
-#     """
-#     Update  a associate into  a event
-#     using eventId and associateId
-#     """
+class ConferenceResponse(BaseModel):
+    """
+    Response class.
+    """
+    conferenceId: str
+    speakerId: str
 
 
-# #######################
-# ## Speakers API CRUD ##
-# #######################
+# Exceptions
+server_error = HTTPException(status_code=500, detail="Internal server error")
+not_found = HTTPException(status_code=404, detail="Not found")
+conflict_request = HTTPException(
+    status_code=409, detail="The user already exists")
 
-# @router.post("/speaker/",
-#              status_code=200,
-#              response_model=SpeakerOut)
-# async def add_speaker(new_speaker:SpeakerIn):
-#     """
-#     Add a Speaker to a event
-#     using eventId
-#     """
 
-#     ##base64img= new_associate.logo
+###########################################
+##            Events API CRUD            ##
+###########################################
 
-#     ##############################
-#     ## URL created  Image Logic ##
-#     ##############################
+@router.post("/",
+             status_code=201,
+             response_model=EventResponse)
+async def create_event(
+        new_event: NewEvent, curret_user: UserOut = Depends(get_current_user)):
+    """
+    Create a new event
+    """
+    event_id = await CreateMethods.create_event(
+        new_event.dict(), curret_user.email)
+    if not event_id:
+        raise server_error
+    return event_id
 
-#     speaker = new_speaker.spekerInfo.dict()
-#     speaker.update({"url_photo": "url_photo"})
 
-#     speaker_id = await CreateMethods.add_speaker(
-#                             event_id=new_speaker.eventId,
-#                             speaker_data=new_speaker.spekerInfo)
+@router.get("/",
+            status_code=200,
+            response_model=EventOut)
+async def get_event(
+        eventId: str = Query(..., description="The event id"),
+        filters: Optional[list] = Query(None),
+        excludes: Optional[list] = Query(None)):
+    """
+    Get a event using eventId
+    """
+    event_info = await ReadMethods.get_event(
+        event_id=eventId, filters=filters, excludes=excludes)
+    if not event_info:
+        raise not_found
+    return event_info
 
-#     # No se de donde toma el associateId :O
-#     return AssociateOut(**associate)
+
+@router.get("/from-url",
+            status_code=200,
+            response_model=EventOut)
+async def get_event_from_url(
+        organizationName: str = Query(...),
+        url: str = Query(..., description="The custom event url"),
+        filters: Optional[list] = Query(None),
+        excludes: Optional[list] = Query(None)):
+    """
+    Get a event using eventId
+    """
+    event_info = await ReadMethods.get_event_from_url(
+        organizationName, url,
+        filters=filters, excludes=excludes)
+    if not event_info:
+        raise not_found
+    return event_info
+
+
+@router.get("/list",
+            status_code=200,
+            response_model=List[EventOut])
+async def get_published_events():
+    """
+    Retrieve a list with all published events.
+    """
+    event_list = await ReadMethods.get_published_events()
+    return event_list
+
+
+@router.get("/count-participants",
+            status_code=200,
+            response_model=CountParticipantsResponse)
+async def get_events_count_participants(eventId: str = Query(...)):
+    """
+    Return the number of registered participants to an event.
+    """
+    count = await ReadMethods.get_count_particpants(event_id=eventId)
+    return count
+
+
+@router.put("/",
+            status_code=200,
+            response_model=UpdateResponse)
+async def update_event(update_info: EventIn):
+    """
+    Update a created event.
+    """
+    updated = await UpdateMethods.principal_info(
+        event_id=update_info.eventId, new_data=update_info.eventData.dict())
+    return updated
+
+
+@router.delete("/", status_code=204)
+async def delete_event(
+        eventId: str = Query(...),
+        current_user: UserOut = Depends(get_current_user)):
+    """
+    Delete a existing event
+    """
+    deleted = await DeleteMethods.all(eventId, current_user.email)
+    if not deleted:
+        raise not_found
+    return
+
+
+###########################################
+##     Events/Collaborators API CRUD     ##
+###########################################
+
+@router.post("/collaborators",
+             status_code=200,
+             response_model=CollaboratorResponse)
+async def add_collaborator(
+        info: NewCollaborator,
+        existing: Optional[bool] = Query(False)):
+    """
+    Add a collaborator to a event
+    using eventId
+    """
+    if existing:
+        result = await CreateMethods.add_existing_collaborator(
+            event_id=info.eventId, email=info.email)
+    else:
+        result = await CreateMethods.add_collaborator(
+            event_id=info.eventId,
+            collaborator_data=info.collaboratorData)
+
+    if result == 404:
+        raise not_found
+    if result == 409:
+        raise conflict_request
+    if result == 412:
+        raise HTTPException(status_code=412, detail="The user must be created")
+    return result
+
+
+@router.delete("/collaborators", status_code=204)
+async def delete_collaborator(body: CollaboratorOnDelete):
+    """
+    Delete  a collaborator.
+    """
+    deleted = await DeleteMethods.collaborators(
+        event_id=body.eventId, collaborator_email=body.email)
+
+    if not deleted:
+        raise not_found
+    return
+
+
+###########################################
+##      Events/Associateds API CRUD      ##
+###########################################
+
+
+@router.post("/associates", status_code=201, response_model=AssociatedResponse)
+async def add_associated(body: AssociatedIn):
+    """
+    Add an associate to a event
+    using eventId
+    """
+
+    associated_id = await CreateMethods.add_associates(
+        event_id=body.eventId,
+        associated_data=body.associatedData.dict())
+
+    if not associated_id:
+        raise not_found
+    return associated_id
+
+
+@router.put("/associates", status_code=200, response_model=UpdateResponse)
+async def update_associated(body: AssociatedUpdate):
+    """
+    Update an existing associated.
+    """
+
+    modified_status = await UpdateMethods.associateds(
+        event_id=body.eventId,
+        associated_id=body.associatedData.associatedId,
+        new_data=body.associatedData.dict())
+
+    return modified_status
+
+
+@router.delete("/associates", status_code=204)
+async def delete_associate(body: AssociatedOnDelete):
+    """
+    Delete  a associate into  a event
+    using eventId and associateId
+    """
+    await DeleteMethods.associates(
+        event_id=body.eventId,
+        associate_id=body.associatedId)
+
+
+###########################################
+##          Events/day API CRUD          ##
+###########################################
+
+@router.post("/day", status_code=201, response_model=DayResponse)
+async def create_day(body: DayIn):
+    """
+    Add a new day to agenda.
+    """
+    day_id = await CreateMethods.add_day(
+        event_id=body.eventId, day_data=body.dayData.dict())
+
+    if not day_id:
+        raise HTTPException(status_code=409, detail="The date is used")
+    return day_id
+
+
+@router.put("/day", status_code=200, response_model=UpdateResponse)
+async def update_day(body: DayUpdate):
+    """
+    Update a existing day in agenda.
+    """
+    day_id = await UpdateMethods.days(
+        event_id=body.eventId, day_data=body.dayData.dict())
+
+    if not day_id:
+        raise HTTPException(status_code=409, detail="The date is used")
+    return day_id
+
+
+@router.delete("/day", status_code=204)
+async def delete_day(body: DayOnDelete):
+    """
+    Delete a existing day in agenda.
+    """
+    await DeleteMethods.days(
+        event_id=body.eventId, day_id=body.dayId)
+    return
+
+
+###########################################
+##      Events/conferences API CRUD      ##
+###########################################
+
+@router.post("/conference", status_code=201, response_model=ConferenceResponse)
+async def create_a_conference(body: ConferenceIn):
+    """
+    Create a new conference.
+    """
+    conference_response = await CreateMethods.add_conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_data=body.conferenceData.dict())
+
+    if not conference_response:
+        raise not_found
+    return conference_response
+
+
+@router.put("/conference", status_code=200, response_model=UpdateResponse)
+async def update_a_conference(body: ConferenceUpdate):
+    """
+    Update a existing conference.
+    """
+    conference_response = await UpdateMethods.conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_data=body.conferenceData.dict())
+
+    return conference_response
+
+
+@router.delete("/conference", status_code=200)
+async def delete_a_conference(body: ConferenceOnDelete):
+    """
+    Delete a existing conference.
+    """
+    await DeleteMethods.conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_id=body.conferenceId,
+        speaker_id=body.speakerId)
+
+    return

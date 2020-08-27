@@ -105,7 +105,7 @@ class DeleteEvent:
         modified_count = await self.crud.pull_array(
             query=query,
             array_name="associates",
-            condition={"associateId": associate_id})
+            condition={"associatedId": associate_id})
         return self.check_deleted(modified_count)
 
     def check_deleted(self, count: int) -> dict:

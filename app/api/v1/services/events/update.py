@@ -83,9 +83,37 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, data)
         return self.check_modified(modified_count)
 
-    ###################
-    ## Agenda (Falta)##
-    ###################
+    async def days(self, event_id: str, day_data: dict):
+        """
+        Update a existing day
+        event_id: str - The event uuid.
+        day_data: bool - The day date to update.
+
+        Return:
+        ------
+        {modified_count: n} - The number (n) of modified items.
+        """
+        # Verify the date is not the same
+        day = await self.crud.find({
+            "eventId": event_id,
+            "agenda.dayId": day_data["dayId"],
+            "agenda.date": day_data["date"],
+        })
+        if day:
+            # The date doesn't have changes
+            return self.check_modified(False)
+
+        day_couped = await self.crud.find({
+            "eventId": event_id,
+            "agenda.date": day_data["date"],
+        })
+        if day_couped:
+            return False
+
+        query = {"eventId": event_id, "agenda.dayId": day_data["dayId"]}
+        data = {"agenda.$.date": day_data["date"]}
+        modified_count = await self.crud.update(query, data)
+        return self.check_modified(modified_count)
 
     async def chnage_status(
             self, event_id: str, actual_status: bool) -> dict:

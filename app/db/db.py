@@ -4,13 +4,18 @@ Db - Monglo Client instance and DB connection.
 
 import json
 from typing import List
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
 
 from config import settings  # pylint: disable-msg=E0611
 
-# Instance the motor-mongo client
+
+###########################################
+##             DB Connection             ##
+###########################################
+
 CLUSTER = settings.DB_CLUSTER
 NAME = settings.DB_NAME
 USER = settings.DB_USERNAME
@@ -24,7 +29,9 @@ client = AsyncIOMotorClient(connection_str)
 db = client[settings.DB_NAME]
 
 
-# ------------------- DB Collection and Parcer bson ------------------- #
+###########################################
+##         Collection Instance           ##
+###########################################
 
 def get_collection(collection_name: str):
     """
@@ -45,6 +52,10 @@ def get_collection(collection_name: str):
     return collection
 
 
+###########################################
+##             Parser Functions          ##
+###########################################
+
 def jsonify(data: BSON) -> dict:
     """
     Dumps a bson to json object.
@@ -63,7 +74,9 @@ def jsonify(data: BSON) -> dict:
     return json.loads(dumps(data))
 
 
-# ------------------------ CRUD class ------------------------ #
+###########################################
+##         Injectable CRUD Class         ##
+###########################################
 class CRUD:
     """
     Crud operations.
@@ -75,6 +88,9 @@ class CRUD:
     """
 
     def __init__(self, collection):
+        """
+        Collection injection on initialzation.
+        """
         self.coll = collection
 
     async def create(self, document_data: dict) -> str:
@@ -138,16 +154,19 @@ class CRUD:
         """
         Retrieve the data that matches with the query and the filters.
         """
+        # Create the query filter
         query_filter = None
         if filters is not None:
             query_filter = self.generate_query_filter(filters)
         if excludes is not None:
             query_filter = self.generate_query_filter(excludes, excludes=True)
 
+        # For find a single document
         if only_one:
             document = await self.coll.find_one(query, query_filter)
             return jsonify(document)
 
+        # For find multiple documents
         cursor = self.coll.find(query, query_filter)
         items = []
         for document in await cursor.to_list(length=100):
@@ -158,7 +177,7 @@ class CRUD:
     def generate_query_filter(
             self, filter_list: list = None, excludes: bool = False) -> dict:
         """
-        Generate a dict with the correct query filter
+        Generate a dict with the correct mongo query filter
         """
 
         objet_filter = {}

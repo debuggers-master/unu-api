@@ -4,34 +4,40 @@ Authorization endpoints.
 
 from fastapi import APIRouter, HTTPException, status, BackgroundTasks
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
-from mails.service import send_welcome_email
-from api.v1.services.users import UserService  # pylint: disable-msg=E0611
-from schemas.users import UserOut, UserIn
-from .services import (
-    authenticate_user,
-    credentials_exception,
-    create_access_token,
-    Token,
-    register_user)
 
-# Router instance
+from mails.service import send_welcome_email
+from schemas.users import UserOut, UserIn
+
+from .services import (
+    authenticate_user, credentials_exception,
+    create_access_token, Token, register_user, users_crud)
+
+
+###########################################
+##             Router Instance           ##
+###########################################
+
 auth_router = APIRouter()
 
-# User service to DB fuctions
-UserMethos = UserService()
 
+###########################################
+##      Request and Response Models      ##
+###########################################
 
-# Login Request
 class LoginRequest(BaseModel):
     """
     Login request schema.
     """
-    email: str = Field(...,
-                       description="User email",
-                       example="mariobarbosa777@hotmail.com")
-    password: str = Field(...,
-                          description="user password",
-                          example="user123")
+    email: str = Field(
+        ...,
+        description="user email",
+        example="stan_lee@marvel.com"
+    )
+    password: str = Field(
+        ...,
+        description="user password",
+        example="with_great_power_comes_great_responsibility"
+    )
 
 
 class AuthResponse(Token):
@@ -41,18 +47,22 @@ class AuthResponse(Token):
     user: UserOut
 
 
-# -------------------- Auth router ------------------------- #
+###########################################
+##               Auth Router             ##
+###########################################
 
-@auth_router.post("/login",
-                  status_code=200,
-                  response_model=AuthResponse)
-async def login_for_acces_token(login_data: LoginRequest):
+@auth_router.post(
+    "/login",
+    status_code=200,
+    response_model=AuthResponse)
+async def login_for_acces_token(body: LoginRequest):
     """
-    Verify the user credentials and return a jwt.
+    Verify the user credentials and return jwt and user info.
     """
-    user = await authenticate_user(login_data.email, login_data.password)
+    user = await authenticate_user(body.email, body.password)
     if not user:
         raise credentials_exception
+
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
@@ -64,12 +74,11 @@ async def signup(user: UserIn, backgroud_task: BackgroundTasks):
     """
     Register a new user and login the user.
     """
-    existing_user = await UserMethos.get_user(email=user.email)
+    existing_user = await users_crud.find({"email": user.email})
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="The email already exists"
-        )
+            detail="The email already exists")
 
     # Only make register if the user is new.
     new_user = await register_user(user)

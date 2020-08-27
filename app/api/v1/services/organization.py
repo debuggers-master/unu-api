@@ -3,12 +3,9 @@ Bussines logic about organizations.
 """
 
 from uuid import uuid4
-
 from fastapi import BackgroundTasks
 
-from storage.service import upload_file
 from db.db import get_collection, CRUD
-
 from .utils import update_image
 
 ###########################################

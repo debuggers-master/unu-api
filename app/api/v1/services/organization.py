@@ -2,33 +2,45 @@
 Bussines logic about organizations.
 """
 
-from storage.service import upload_file
 from uuid import uuid4
+
+from fastapi import BackgroundTasks
+
+from storage.service import upload_file
 from db.db import get_collection, CRUD
 
-# COLLECTIONS
+from .utils import update_image
+
+###########################################
+##          Collection Instances         ##
+###########################################
 USER_COLLECTION_NAME = "users"
-ORGANIZATIONS_COLLECTION_NAME = "organizations"
-EVENTS_COLLECTION_NAME = "events"
-
-
-# DB collection instances
 users_collection = get_collection(USER_COLLECTION_NAME)
+
+ORGANIZATIONS_COLLECTION_NAME = "organizations"
 organizations_collection = get_collection(ORGANIZATIONS_COLLECTION_NAME)
+
+EVENTS_COLLECTION_NAME = "events"
 events_collection = get_collection(EVENTS_COLLECTION_NAME)
 
 
-# ------------------ Organization controller operations ----------------- #
+###########################################
+##      Organization Service Class       ##
+###########################################
 
 class OrganizationController:
     """
     Opeartions about organizations.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Crud instances of the collections needed.
+        """
         self.crud = CRUD(organizations_collection)
         self.users = CRUD(users_collection)
         self.events = CRUD(events_collection)
+        self.backgroud_task = BackgroundTasks()
 
     async def get_organization(self, organization_id: str) -> dict:
         """
@@ -46,10 +58,11 @@ class OrganizationController:
         organization = await self.crud.find(query)
         return organization
 
-    async def add_organization(self, user_id: str, organization_data: dict) -> dict:
+    async def add_organization(
+            self, user_id: str, organization_data: dict) -> dict:
         """
         Add a new organization to the organizations user list
-        and also  in organizations document
+        and in organizations document
 
         Params:
         ------
@@ -61,50 +74,48 @@ class OrganizationController:
         organizationId: str - The organization uuid unique identifier.
         """
 
+        # Check if organization name is unique
         query = {"organizationName": organization_data.get("organizationName")}
         org_exists = await self.crud.find(query)
+        if org_exists is not None:
+            return {"detail": "This Organizations already exists"}
 
-        # Check is organization name is unique
-        if org_exists is None:
-            organization_id = str(uuid4())
-            organization_data.update({"organizationId": organization_id})
-            # Create the url name
-            organization_url = organization_data.get("organizationName")
-            organization_url = organization_url.replace(" ", "-").lower()
-            organization_data.update({"organizationUrl": organization_url})
-            # Create void List of events
-            organization_data.update({"events": []})
+        # Complete all fields
+        organization_id = str(uuid4())
+        organization_data.update({"organizationId": organization_id})
 
-            #Upload Image
-            url = ""
-            org_logo = organization_data.get("organizationLogo","")
-            if org_logo:
-                if org_logo.startswith("https"):
-                    pass
-                elif org_logo.startswith("data"):
-                    url = await upload_file(
-                            file_base64=organization_data.get("organizationLogo"))
-                    print(url)
-                    organization_data.update({"organizationLogo":url})
+        organization_url = organization_data.get("organizationName")
+        organization_url = organization_url.replace(" ", "-").lower()
+        organization_data.update({"organizationUrl": organization_url})
 
-            # Add the organization info to the user.
-            modified_count = await self.users.add_to_set(
-                query={"userId": user_id},
-                array_name="organizations",
-                data={"organizationId": organization_id,
-                      "organizationName": organization_data.get("organizationName")})
-            if not modified_count:
-                return {"detail": "Error UserId is not valid"}
+        organization_data.update({"events": []})
 
-            # Create a organization document in organizations collections
-            inserted_id = await self.crud.create(organization_data)
-            if not inserted_id:
-                # Se debe borrar el documento de usuario si este error se presenta
-                return {"detail": "Error on insert organization document"}
-            return {"organizationId": organization_id,
-                    "organizationLogo": url}
+        # Image proccessing
+        logo = organization_data.get("organizationLogo")
+        image_url = await update_image(image=logo)
+        organization_data.update({"organizationLogo": image_url})
 
-        return {"detail": "This Organizations already exists"}
+        # Create a organization document in organizations collections
+        inserted_id = await self.crud.create(organization_data)
+        if not inserted_id:
+            return {"detail": "Error on saving"}
+
+        # Add the organization info to the user.
+        organization_name = organization_data.get("organizationName")
+        modified_count = await self.users.add_to_set(
+            query={"userId": user_id},
+            array_name="organizations",
+            data={"organizationId": organization_id,
+                  "organizationName": organization_name})
+
+        if not modified_count:
+            self.backgroud_task.add_task(
+                self.delete_organization, user_id,
+                organization_id)
+            return {"detail": "User not Found"}
+
+        return {"organizationId": organization_id,
+                "organizationLogo": image_url}
 
     async def update_organization(
             self, user_id: str, organization_id: str, organization_data: dict) -> dict:
@@ -131,17 +142,17 @@ class OrganizationController:
                 organization_url = organization_data.get("organizationName")
                 organization_url = organization_url.replace(" ", "-").lower()
                 organization_data.update({"organizationUrl": organization_url})
-                #Upload Image
+                # Upload Image
                 url = ""
-                org_logo = organization_data.get("organizationLogo","")
+                org_logo = organization_data.get("organizationLogo", "")
                 if org_logo:
                     if org_logo.startswith("https"):
-                        url  = org_logo
+                        url = org_logo
                     elif org_logo.startswith("data"):
                         url = await upload_file(
-                                file_base64=organization_data.get("organizationLogo"))
+                            file_base64=organization_data.get("organizationLogo"))
                         print(url)
-                        organization_data.update({"organizationLogo":url})
+                        organization_data.update({"organizationLogo": url})
 
                 # Update in the collection
                 query_orga = {"organizationId": organization_id}
@@ -149,34 +160,33 @@ class OrganizationController:
                 print(modified_count)
                 if not modified_count:
                     return {"modifiedCount": modified_count,
-                            "url":{"organizationLogo":url}}
+                            "url": {"organizationLogo": url}}
                 # Update in the user list
                 query = {"userId": user_id,
-                        "organizations.organizationId": organization_id}
+                         "organizations.organizationId": organization_id}
                 data = {"organizations.$": {"organizationId": organization_id,
                                             "organizationName": organization_data.get("organizationName")}}
                 modified_count = await self.users.update(query, data)
 
-                
                 return {"modifiedCount": modified_count,
-                        "url":{"organizationLogo":url}}
+                        "url": {"organizationLogo": url}}
             return False
 
         # Create the url name
         organization_url = organization_data.get("organizationName")
         organization_url = organization_url.replace(" ", "-").lower()
         organization_data.update({"organizationUrl": organization_url})
-        #Upload Image
+        # Upload Image
         url = ""
-        org_logo = organization_data.get("organizationLogo","")
+        org_logo = organization_data.get("organizationLogo", "")
         if org_logo:
             if org_logo.startswith("https"):
-                url  = org_logo
+                url = org_logo
             elif org_logo.startswith("data"):
                 url = await upload_file(
-                        file_base64=organization_data.get("organizationLogo"))
+                    file_base64=organization_data.get("organizationLogo"))
                 print(url)
-                organization_data.update({"organizationLogo":url})
+                organization_data.update({"organizationLogo": url})
 
         # Update in the collection
         query_orga = {"organizationId": organization_id}
@@ -185,12 +195,12 @@ class OrganizationController:
             return False
         # Update in the user list
         query = {"userId": user_id,
-                "organizations.organizationId": organization_id}
+                 "organizations.organizationId": organization_id}
         data = {"organizations.$": {"organizationId": organization_id,
                                     "organizationName": organization_data.get("organizationName")}}
         modified_count = await self.users.update(query, data)
         return {"modifiedCount": modified_count,
-                "url":{"organizationLogo":url}}
+                "url": {"organizationLogo": url}}
 
     async def delete_organization(self, user_id: str, organization_id: str) -> None:
         """

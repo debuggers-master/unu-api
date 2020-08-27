@@ -1,11 +1,16 @@
 """
-Google Cloud Storage connection.
+Google Cloud Storage - Connection.
 """
 
 from google.cloud import storage
 from google.auth.exceptions import DefaultCredentialsError
+
 from config import settings  # pylint: disable-msg=E0611
 
+
+###########################################
+##           Bucket Connection           ##
+###########################################
 
 async def get_storage_bucket():
     """
@@ -16,7 +21,7 @@ async def get_storage_bucket():
         client = storage.Client()
     except DefaultCredentialsError:
         client = storage.Client(settings.GOOGLE_APPLICATION_CREDENTIALS)
-    except Exception:
+    except Exception:  # pylint: disable-msg=E0611
         return False
     bucket = client.bucket(buckent_name)
     return bucket

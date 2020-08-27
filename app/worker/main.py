@@ -1,5 +1,5 @@
 """
-Redis Queue - For manage background proccess.
+Redis Queue Module - For manage background proccess.
 """
 
 from datetime import datetime, timedelta
@@ -44,6 +44,7 @@ def create_job(
         seconds = date_time - utc_to_place_time
         minutes = seconds.seconds / 60
 
+        # Enqueue the job.
         job = redis_queue.enqueue_in(
             time_delta=timedelta(minutes=minutes),
             func=function,
@@ -53,6 +54,10 @@ def create_job(
 
         return job.get_id()
 
+
+###########################################
+##          Queue Worker Setup           ##
+###########################################
 
 def __run_worker():
     """

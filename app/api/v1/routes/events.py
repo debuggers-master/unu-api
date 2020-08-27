@@ -298,3 +298,13 @@ async def update_day(body: DayUpdate):
     if not day_id:
         raise HTTPException(status_code=409, detail="The date is used")
     return day_id
+
+
+@router.delete("/day", status_code=204)
+async def delete_day(body: DayOnDelete):
+    """
+    Delete a existing day in agenda.
+    """
+    await DeleteMethods.days(
+        event_id=body.eventId, day_id=body.dayId)
+    return

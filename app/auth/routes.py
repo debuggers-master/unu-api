@@ -2,8 +2,9 @@
 Authorization endpoints.
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
+from mails.service import send_welcome_email
 from api.v1.services.users import UserService  # pylint: disable-msg=E0611
 from schemas.users import UserOut, UserIn
 from .services import (
@@ -59,7 +60,7 @@ async def login_for_acces_token(login_data: LoginRequest):
 @auth_router.post("/signup",
                   status_code=201,
                   response_model=AuthResponse)
-async def signup(user: UserIn):
+async def signup(user: UserIn, backgroud_task: BackgroundTasks):
     """
     Register a new user and login the user.
     """
@@ -74,5 +75,10 @@ async def signup(user: UserIn):
     new_user = await register_user(user)
     if not new_user:
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    # Send welcome email in background
+    backgroud_task.add_task(send_welcome_email, user.firstName, user.email)
+
     access_token = create_access_token(data={"sub": new_user.email})
-    return {"access_token": access_token, "token_type": "Bearer", "user": new_user}
+    return {"access_token": access_token,
+            "token_type": "Bearer", "user": new_user}

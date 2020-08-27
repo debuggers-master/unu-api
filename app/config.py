@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Unu - API"
     API_V1_STR: str = "/api/v1"
     CORS_ORIGIN: List[str]
+    HOST: str = " http://35.239.16.11"
 
     # AUTH
     SECRET_JWT: str = token_urlsafe(32)

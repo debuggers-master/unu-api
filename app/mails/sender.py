@@ -1,5 +1,5 @@
 """
-Emails sender. Sendgrid implementation.
+Emails sender class - Sendgrid implementation.
 """
 
 
@@ -9,14 +9,17 @@ from typing import List
 
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
-    Mail, From, To, Subject,
-    SendAt, Content, MimeType,
-    Attachment, FileContent, FileName, FileType,
-    Disposition, ContentId
+    Mail, From, To, Subject, SendAt,
+    Content, MimeType, Attachment, FileContent,
+    FileName, FileType, Disposition
 )
 
 from config import settings  # pylint: disable-msg=E0611
 
+
+###########################################
+##       Email Sender Abstraction        ##
+###########################################
 
 class EmailSender:
     """
@@ -25,7 +28,7 @@ class EmailSender:
 
     def __init__(self):
         self.sendgrid = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        self.from_email = "unu.events@gmail.com"
+        self.from_email = settings.EMAIL_SENDER
 
     def create_email(
             self,
@@ -44,6 +47,8 @@ class EmailSender:
         to_list: List[str] - The recipients list.
         subject: str - The email subject.
         html_contentet: str - HTML text to fill the email.
+        image: bytes - A optional image to attachment in email.
+        content_type: str - The content type of the image.
         send_at: datetime - The datetime when the email must be sended.
 
         Return:

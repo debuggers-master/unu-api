@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
     # --- SEND_GRIND --- #
     SENDGRID_API_KEY: str
+    EMAIL_SENDER: str = "unu.events@gmail.com"
 
     # --- REDIS_WORKER --- #
     REDIS_URL: str

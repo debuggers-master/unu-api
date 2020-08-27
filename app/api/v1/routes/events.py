@@ -17,7 +17,7 @@ from schemas.events.associates import AssociatedIn, AssociatedUpdate, Associated
 from schemas.events.event import NewEvent, EventOut, EventIn
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
-from schemas.events.agenda import ConferenceIn
+from schemas.events.agenda import ConferenceIn, ConferenceUpdate
 
 # Router instance
 router = APIRouter()
@@ -335,4 +335,17 @@ async def create_a_conference(body: ConferenceIn):
 
     if not conference_response:
         raise not_found
+    return conference_response
+
+
+@router.put("/conference", status_code=200, response_model=UpdateResponse)
+async def update_a_conference(body: ConferenceUpdate):
+    """
+    Update a existing conference.
+    """
+    conference_response = await UpdateMethods.conference(
+        event_id=body.eventId,
+        day_id=body.dayId,
+        conference_data=body.conferenceData.dict())
+
     return conference_response

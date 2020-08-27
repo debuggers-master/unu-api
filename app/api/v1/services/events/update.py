@@ -150,8 +150,8 @@ class UpdateEvent:
         modified_count = await self.crud.update(query, data)
         return modified_count
 
-    async def chnage_status(
-            self, event_id: str, actual_status: bool) -> dict:
+    async def change_status(
+            self, event_id: str, actual_status: bool, email: str) -> dict:
         """
         Change the actual a publication status.
 
@@ -159,9 +159,19 @@ class UpdateEvent:
         ------
         event_id: str - The event uuid.
         actual_status: bool - The actual publication status.
+        email: str - The email of the current user
 
-        Return: True
+        Return: bool
         """
+        __users = get_collection("users")
+        user = __users.find({"email": email})
+        user_events = user["myEvents"]
+        is_user_admin = list(
+            filter(lambda ev: ev.get("eventId") == event_id, user_events))
+        is_user_admin = bool(is_user_admin[0])
+        if not is_user_admin:
+            return 403
+
         query = _make_query(event_id)
         status = not actual_status
         await self.crud.update(query, {"publicationStatus": status})

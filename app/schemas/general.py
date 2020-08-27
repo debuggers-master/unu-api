@@ -14,6 +14,7 @@ class ModifiedCount(BaseModel):
                                description="Modified values in update",
                                example="1")
 
+
 class ModifiedCountUrls(ModifiedCount):
     """
     Base Model for modifiedCount

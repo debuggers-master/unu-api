@@ -385,3 +385,22 @@ async def delete_a_conference(
         speaker_id=body.speakerId)
 
     return
+
+
+###########################################
+##     Events/change-status API CRUD     ##
+###########################################
+
+@router.put("/change-status", status_code=200, response_model=dict)
+async def change_publication_status(
+        actualStatus: bool,
+        eventId: str,
+        current_user: UserOut = Depends(get_current_user)):
+    """
+    Change the publication status of the event.
+    """
+    response = await UpdateMethods.change_status(
+        eventId, actualStatus, current_user.email)
+    if response == 403:
+        raise HTTPException(status_code=403, detail="Operation Forbbiden")
+    return response

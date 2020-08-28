@@ -82,8 +82,6 @@ def send_close_event_email(
         event_name: str,
         event_url: str,
         to_list: List[str],
-        send_at: datetime,
-        utc_hours: int = -5,
 ) -> str:
     """
     Send a schedule email to notify that a event is tomorrow.
@@ -93,8 +91,6 @@ def send_close_event_email(
     event_name: str - The event name.
     event_url: str - The public event url.
     to_list: List[str] - The participants emails.
-    send_at: datetime - The date to send the mail.
-    utc_hours: int - The GTM of the event.
     """
     # Create mail
     content = event_close_template(event_name, event_url)
@@ -104,11 +100,4 @@ def send_close_event_email(
         html_content=content,
     )
 
-    # Schedule mail
-    job_id = create_job(
-        sender.send_email,
-        date_time=send_at,
-        utc_hours=utc_hours,
-        email_to_send=email)
-
-    return job_id
+    sender.send_email(email)

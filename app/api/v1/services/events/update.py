@@ -7,6 +7,10 @@ from schemas.events.speakers import SpeakerInfo
 from .utils import _make_query, events_crud, get_collection
 
 
+###########################################
+##         Events - Update Service       ##
+###########################################
+
 class UpdateEvent:
     """
     Methods for update event elemnts.
@@ -163,15 +167,19 @@ class UpdateEvent:
 
         Return: bool
         """
+        # Check authorization
         __users = get_collection("users")
         user = __users.find({"email": email})
         user_events = user["myEvents"]
+
         is_user_admin = list(
             filter(lambda ev: ev.get("eventId") == event_id, user_events))
         is_user_admin = bool(is_user_admin[0])
+
         if not is_user_admin:
             return 403
 
+        # Update the status only if the owner call this edpoint.
         query = _make_query(event_id)
         status = not actual_status
         await self.crud.update(query, {"publicationStatus": status})

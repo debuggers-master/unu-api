@@ -84,9 +84,12 @@ async def delete_organization(
     """
     Delete and organization
     """
-    await OrganizationMethods.delete_organization(
+    res = await OrganizationMethods.delete_organization(
         user_id=current_user.userId,
         organization_id=organization.organizationId)
+
+    if res == 403:
+        raise HTTPException(status_code=403, detail="Forbbiden")
 
 
 @router.get(

@@ -80,6 +80,7 @@ class OrganizationController:
 
         # Complete all fields
         organization_id = str(uuid4())
+        organization_data.update({"userOwner": user_id})
         organization_data.update({"organizationId": organization_id})
 
         organization_name = organization_data.get("organizationName")
@@ -133,10 +134,15 @@ class OrganizationController:
 
         # Check is organization name is unique
         organization_name = organization_data.get("organizationName")
-        query = {"organizationId": organization_id}
+        query = {"organizationName": organization_name}
         org_exists = await self.crud.find(query)
-        if org_exists["organizationName"] == organization_name:
-            return False
+
+        if org_exists:
+            if org_exists["organizationId"] != organization_id:
+                return False
+
+        # Get actual data to update relational entities
+        org_exists = await self.crud.find({"organizationId": organization_id})
 
         # Image proccessing
         logo = organization_data.get("organizationLogo")
@@ -187,18 +193,19 @@ class OrganizationController:
         if not org:
             return None
 
-        query = {"userId": user_id}
-        modified_count = await self.users.pull_array(
-            query=query,
+        if org.get("userOwner") != user_id:
+            return 403
+
+        await self.users.pull_array(
+            query={"userId": user_id},
             array_name="organizations",
             condition={"organizationId": organization_id})
 
-        if modified_count:
-            # Remove organization
-            await self.crud.delete(query)
-            # Remove all related events
-            query = {"organizationUrl": org["organizationUrl"]}
-            await self.events.delete_many(query)
+        # Remove organization
+        await self.crud.delete(query)
+        # Remove all related events
+        query = {"organizationUrl": org["organizationUrl"]}
+        await self.events.delete_many(query)
 
     def create_url(self, organization_name: str):
         """

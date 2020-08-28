@@ -11,6 +11,7 @@ from .utils import update_image
 ###########################################
 ##          Collection Instances         ##
 ###########################################
+
 USER_COLLECTION_NAME = "users"
 users_collection = get_collection(USER_COLLECTION_NAME)
 
@@ -81,8 +82,8 @@ class OrganizationController:
         organization_id = str(uuid4())
         organization_data.update({"organizationId": organization_id})
 
-        organization_url = organization_data.get("organizationName")
-        organization_url = organization_url.replace(" ", "-").lower()
+        organization_name = organization_data.get("organizationName")
+        organization_url = self.create_url(organization_name)
         organization_data.update({"organizationUrl": organization_url})
 
         organization_data.update({"events": []})
@@ -98,7 +99,6 @@ class OrganizationController:
             return {"detail": "Error on saving"}
 
         # Add the organization info into the user.
-        organization_name = organization_data.get("organizationName")
         modified_count = await self.users.add_to_set(
             query={"userId": user_id},
             array_name="organizations",
@@ -106,9 +106,7 @@ class OrganizationController:
                   "organizationName": organization_name})
 
         if not modified_count:
-            self.backgroud_task.add_task(
-                self.delete_organization, user_id,
-                organization_id)
+            await self.delete_organization(user_id, organization_id)
             return {"detail": "User not Found"}
 
         return {"organizationId": organization_id,
@@ -134,18 +132,20 @@ class OrganizationController:
         """
 
         # Check is organization name is unique
-        query = {"organizationName": organization_data.get("organizationName")}
+        organization_name = organization_data.get("organizationName")
+        query = {"organizationId": organization_id}
         org_exists = await self.crud.find(query)
-        if not org_exists:
-            return False
-
-        if not org_exists.get("organizationId") == organization_id:
+        if org_exists["organizationName"] == organization_name:
             return False
 
         # Image proccessing
         logo = organization_data.get("organizationLogo")
         image_url = await update_image(image=logo)
         organization_data.update({"organizationLogo": image_url})
+
+        # Update url
+        new_url = self.create_url(organization_name)
+        organization_data.update({"organizationUrl": new_url})
 
         # Update in the collection
         query = {"organizationId": organization_id}
@@ -161,7 +161,13 @@ class OrganizationController:
         query = {"userId": user_id,
                  "organizations.organizationId": organization_id}
         data = {"organizations.$": new_data}
-        self.backgroud_task.add_task(self.users.update, query, data)
+        await self.users.update(query, data)
+
+        # Update all events
+        org_url = org_exists["organizationUrl"]
+        await self.events.update(
+            {"organizationUrl": org_url},
+            {"organizationName": organization_name, "organizationUrl": new_url})
 
         return {"modifiedCount": modified_count,
                 "url": {"organizationLogo": image_url}}
@@ -176,7 +182,12 @@ class OrganizationController:
         user_id: str - The user id.
         organization_id: str - The organization id.
         """
-        await self.crud.delete({"organizationId": organization_id})
+        query = {"organizationId": organization_id}
+        org = await self.crud.find(query)
+        if not org:
+            return None
+
+        await self.crud.delete(query)
         query = {"userId": user_id}
         modified_count = await self.users.pull_array(
             query=query,
@@ -184,6 +195,12 @@ class OrganizationController:
             condition={"organizationId": organization_id})
 
         if modified_count:
-            # Delete all associated events in background
-            query = {"organizationId": organization_id}
-            self.backgroud_task.add_task(self.events.delete_many, query)
+            query = {"organizationUrl": org["organizationUrl"]}
+            await self.events.delete_many(query)
+
+    def create_url(self, organization_name: str):
+        """
+        Create a correct url
+        """
+        organization_url = organization_name.replace(" ", "-").lower()
+        return organization_url

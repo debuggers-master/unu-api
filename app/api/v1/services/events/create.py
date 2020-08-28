@@ -221,6 +221,11 @@ class CreateEvent:
         ------
         speaker_id: The uuid of the created speaker.
         """
+        existing_speaker = await self.crud.find(
+            {"eventId": event_id, "speakers.twitter": speaker_data["twitter"]})
+        if existing_speaker:
+            return None
+        # Only add if the speaker is new
         speaker_data.update({"speakerId": speaker_id})
         query = _make_query(event_id)
         await self.crud.add_to_set(query, "speakers", speaker_data)

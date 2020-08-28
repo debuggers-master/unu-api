@@ -142,7 +142,8 @@ class OrganizationController:
                 return False
 
         # Get actual data to update relational entities
-        org_exists = await self.crud.find({"organizationId": organization_id})
+        query = {"organizationId": organization_id}
+        org_exists = await self.crud.find(query)
 
         # Image proccessing
         logo = organization_data.get("organizationLogo")
@@ -154,7 +155,6 @@ class OrganizationController:
         organization_data.update({"organizationUrl": new_url})
 
         # Update in the collection
-        query = {"organizationId": organization_id}
         modified_count = await self.crud.update(query, organization_data)
         if not modified_count:
             # The collection is the same

@@ -32,9 +32,9 @@ UserMethods = UserService()
     status_code=200,
     response_model=UserOut,
     responses={"404": {}})
-async def update_user(current_user: UserOut = Depends(get_current_user)):
+async def get_loged_user(current_user: UserOut = Depends(get_current_user)):
     """
-    Get user info
+    Get user info of loged user.
     """
     user = await UserMethods.get_user(current_user.email)
 

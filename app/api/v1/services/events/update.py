@@ -206,7 +206,7 @@ class UpdateEvent:
         """
         # Check authorization
         __users = get_collection("users")
-        user = __users.find({"email": email})
+        user = await __users.find({"email": email})
         user_events = user["myEvents"]
 
         is_user_admin = list(

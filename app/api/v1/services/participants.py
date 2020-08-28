@@ -41,5 +41,7 @@ class ParticipantsServices:
         """
         query = {"eventId": event_id}
         data = particpant_email
+
+        # Add to set ensure that the emails is unique.
         modified_count = await self.crud.add_to_set(query, "emails", data)
         return {"registered": bool(modified_count)}

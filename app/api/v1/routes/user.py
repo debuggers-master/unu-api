@@ -27,13 +27,33 @@ UserMethods = UserService()
 ##          Users API Endpoints          ##
 ###########################################
 
+@router.get(
+    "",
+    status_code=200,
+    response_model=UserOut,
+    responses={"404": {}})
+async def update_user(current_user: UserOut = Depends(get_current_user)):
+    """
+    Get user info
+    """
+    user = await UserMethods.get_user(current_user.email)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Not Found")
+
+    return user
+
+
 @router.put(
     "",
     status_code=200,
     response_model=ModifiedCount,
     responses={"409": {}})
-async def update_user(user: UserUpdate,
-                      current_user: UserOut = Depends(get_current_user)):
+async def update_user(
+        user: UserUpdate,
+        current_user: UserOut = Depends(get_current_user)):
     """
     Update an User
     """

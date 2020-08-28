@@ -1,5 +1,5 @@
 """
-Services utils functions,
+Services utils functions.
 """
 
 from storage.service import upload_file

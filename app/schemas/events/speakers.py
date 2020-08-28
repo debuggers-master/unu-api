@@ -1,8 +1,9 @@
 """
 Speakers Schema Models
 """
-from typing import Optional, List
-from pydantic import BaseModel, Field
+
+from typing import Optional
+from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
 class SpeakerInfo(BaseModel):
@@ -32,3 +33,10 @@ class SpeakerInfo(BaseModel):
     speakerPhoto: str = Field(
         ...,
         description="Speaker image")
+
+
+class SpeakerDB(SpeakerInfo):
+    """
+    Speaker in db Model
+    """
+    speakerId: Optional[str] = Field("", description="The speaker uuid")

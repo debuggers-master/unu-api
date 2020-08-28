@@ -10,9 +10,9 @@ def test_login_succes(client, auth_response):
     """
     print("""POST - /auth/login  - 200 Ok""")
 
-    email = "emanuelosva@gmail.com"
-    name = "Emanuel"
-    lastname = "Osorio"
+    email = "stan@gmail.com"
+    name = "Stan"
+    lastname = "Lee"
     body = {"email": f"{email}", "password": "user123"}
     response = client.post('/auth/login', json=body)
     # Should response status 200

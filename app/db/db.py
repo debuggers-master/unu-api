@@ -129,12 +129,16 @@ class CRUD:
         return int(updated.modified_count)
 
     async def pull_array(
-            self, query: dict, array_name: str, condition: dict) -> int:
+            self, query: dict, array_name: str,
+            condition: dict, many: bool = False) -> int:
         """
         Remove a item from a list that matches the condition.
         """
         operation = {"$pull": {f"{array_name}": condition}}
-        updated = await self.coll.update_one(query, operation)
+        if many:
+            updated = await self.coll.update_many(query, operation)
+        else:
+            updated = await self.coll.update_one(query, operation)
         return int(updated.modified_count)
 
     async def delete(self, query: dict) -> int:

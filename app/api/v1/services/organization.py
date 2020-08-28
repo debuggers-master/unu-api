@@ -196,16 +196,23 @@ class OrganizationController:
         if org.get("userOwner") != user_id:
             return 403
 
+        # Remove organization
+        await self.crud.delete(query)
+
+        # Remove from user
         await self.users.pull_array(
             query={"userId": user_id},
             array_name="organizations",
             condition={"organizationId": organization_id})
 
-        # Remove organization
-        await self.crud.delete(query)
         # Remove all related events
         query = {"organizationUrl": org["organizationUrl"]}
         await self.events.delete_many(query)
+        await self.users.pull_array(
+            query={"userId": user_id},
+            array_name="events",
+            condition={"organizationName": org["organizationName"]},
+            many=True)
 
     def create_url(self, organization_name: str):
         """

@@ -1,19 +1,21 @@
 """
 Events Router - Operations about events
 """
-from typing import List, Optional
 
+from typing import List, Optional
+from datetime import datetime, timedelta
 import requests
 
-from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Query, Depends
+from pydantic import BaseModel  # pylint: disable-msg=E0611
 
-from config import settings
+from config import settings  # pylint: disable-msg=E0611
 from api.v1.services.events.create import CreateEvent
 from api.v1.services.events.delete import DeleteEvent
 from api.v1.services.events.update import UpdateEvent
 from api.v1.services.events.get import GetEvent
 
+from worker.main import create_job
 from auth.services import get_current_user
 
 from schemas.users import UserOut
@@ -25,17 +27,26 @@ from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
 from schemas.events.agenda import (
     ConferenceIn, ConferenceUpdate, ConferenceOnDelete)
 
-# Router instance
+
+###########################################
+##            Router Instance            ##
+###########################################
+
 router = APIRouter()
 
-# Services
+###########################################
+##            Events Services            ##
+###########################################
+
 CreateMethods = CreateEvent()
 ReadMethods = GetEvent()
 DeleteMethods = DeleteEvent()
 UpdateMethods = UpdateEvent()
 
 
-# Response Model
+###########################################
+##                   Models              ##
+###########################################
 class EventResponse(BaseModel):
     """
     Response class.
@@ -86,7 +97,10 @@ class ConferenceResponse(BaseModel):
     speakerId: str
 
 
-# Exceptions
+###########################################
+##               Exceptions              ##
+###########################################
+
 server_error = HTTPException(status_code=500, detail="Internal server error")
 not_found = HTTPException(status_code=404, detail="Not found")
 conflict_request = HTTPException(
@@ -97,9 +111,10 @@ conflict_request = HTTPException(
 ##            Events API CRUD            ##
 ###########################################
 
-@router.post("/",
-             status_code=201,
-             response_model=EventResponse)
+@router.post(
+    "/",
+    status_code=201,
+    response_model=EventResponse)
 async def create_event(
         new_event: NewEvent,
         curret_user: UserOut = Depends(get_current_user)):
@@ -108,14 +123,16 @@ async def create_event(
     """
     event_id = await CreateMethods.create_event(
         new_event.dict(), curret_user.email)
+
     if not event_id:
         raise server_error
     return event_id
 
 
-@router.get("/",
-            status_code=200,
-            response_model=EventOut)
+@router.get(
+    "/",
+    status_code=200,
+    response_model=EventOut)
 async def get_event(
         eventId: str = Query(..., description="The event id"),
         filters: Optional[list] = Query(None),
@@ -125,14 +142,16 @@ async def get_event(
     """
     event_info = await ReadMethods.get_event(
         event_id=eventId, filters=filters, excludes=excludes)
+
     if not event_info:
         raise not_found
     return event_info
 
 
-@router.get("/from-url",
-            status_code=200,
-            response_model=EventOut)
+@router.get(
+    "/from-url",
+    status_code=200,
+    response_model=EventOut)
 async def get_event_from_url(
         organizationName: str = Query(...),
         url: str = Query(..., description="The custom event url"),
@@ -144,14 +163,16 @@ async def get_event_from_url(
     event_info = await ReadMethods.get_event_from_url(
         organizationName, url,
         filters=filters, excludes=excludes)
+
     if not event_info:
         raise not_found
     return event_info
 
 
-@router.get("/list",
-            status_code=200,
-            response_model=List[EventOut])
+@router.get(
+    "/list",
+    status_code=200,
+    response_model=List[EventOut])
 async def get_published_events():
     """
     Retrieve a list with all published events.
@@ -160,9 +181,10 @@ async def get_published_events():
     return event_list
 
 
-@router.get("/count-participants",
-            status_code=200,
-            response_model=CountParticipantsResponse)
+@router.get(
+    "/count-participants",
+    status_code=200,
+    response_model=CountParticipantsResponse)
 async def get_events_count_participants(eventId: str = Query(...)):
     """
     Return the number of registered participants to an event.
@@ -171,9 +193,10 @@ async def get_events_count_participants(eventId: str = Query(...)):
     return count
 
 
-@router.put("/",
-            status_code=200,
-            response_model=UpdateResponse)
+@router.put(
+    "/",
+    status_code=200,
+    response_model=UpdateResponse)
 async def update_event(
         update_info: EventIn,
         curret_user: UserOut = Depends(get_current_user)):
@@ -193,18 +216,19 @@ async def delete_event(
     Delete a existing event
     """
     deleted = await DeleteMethods.all(eventId, current_user.email)
+
     if not deleted:
         raise not_found
-    return
 
 
 ###########################################
 ##     Events/Collaborators API CRUD     ##
 ###########################################
 
-@router.post("/collaborators",
-             status_code=200,
-             response_model=CollaboratorResponse)
+@router.post(
+    "/collaborators",
+    status_code=200,
+    response_model=CollaboratorResponse)
 async def add_collaborator(
         info: NewCollaborator,
         existing: Optional[bool] = Query(False),
@@ -392,14 +416,13 @@ async def delete_a_conference(
 
 
 ###########################################
-##     Events/change-status API CRUD     ##
+##       Events/change-status API        ##
 ###########################################
 
 @router.put("/change-status", status_code=200, response_model=dict)
 async def change_publication_status(
         actualStatus: bool,
         eventId: str,
-        backgroud_tasks: BackgroundTasks,
         current_user: UserOut = Depends(get_current_user)):
     """
     Change the publication status of the event.
@@ -409,8 +432,18 @@ async def change_publication_status(
     if response == 403:
         raise HTTPException(status_code=403, detail="Operation Forbbiden")
 
-    # Schedule email to participats
+    # Schedule email to participats one day before the event
+    event = await ReadMethods.get_event(eventId)
+    local_time: str = event.get("localTime")
+    utc_hours: int = int(local_time.split("C")[1])
+    start_date: str = event.get("startDate")
+
+    # Convert 'Tue Aug 25 2020 20:32:08' -> 'Tue-Aug-25-2020-20'
+    date_string = start_date.replace(" ", "-").split(":")[0]
+    date_time = datetime.strptime(date_string, "%a-%b-%d-%Y-%H")
+    send_at = date_time - timedelta(days=1)
+
     url = f"{settings.HOST}/api/v1/mails/alert?eventId={eventId}"
-    backgroud_tasks.add_task(requests.post, url)
+    create_job(requests.post, date_time=send_at, utc_hours=utc_hours, url=url)
 
     return response

@@ -15,6 +15,7 @@ from api.v1.services.users import UserService
 
 router = APIRouter()
 
+
 ###########################################
 ##         User Service Instance         ##
 ###########################################

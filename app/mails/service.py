@@ -12,11 +12,16 @@ from worker.main import create_job
 
 from .sender import EmailSender
 
-# SendGrid sender abstraction.
+###########################################
+##       Email Sender Abstraction        ##
+###########################################
+
 sender = EmailSender()
 
 
-# ----------------------- Email functions ---------------------- #
+###########################################
+##             Email Functions           ##
+###########################################
 
 def send_welcome_email(username: str, email: str) -> None:
     """
@@ -54,6 +59,9 @@ def send_special_email(
     message: str - The message to participants.
     subject: str - The email sibject.
     to_list: List[str] - The participants emails.
+    event_url: str - The url of the currect event.
+    image: bytes - Optional image.
+    content_type: str - The content type of the optional image.
     send_at: datetime - Optional date to send the mail.
     """
     if image:
@@ -74,9 +82,7 @@ def send_close_event_email(
         event_name: str,
         event_url: str,
         to_list: List[str],
-        send_at: datetime,
-        utc_hours: int = -5,
-) -> None:
+) -> str:
     """
     Send a schedule email to notify that a event is tomorrow.
 
@@ -85,8 +91,8 @@ def send_close_event_email(
     event_name: str - The event name.
     event_url: str - The public event url.
     to_list: List[str] - The participants emails.
-    send_at: datetime - The date to send the mail.
     """
+    # Create mail
     content = event_close_template(event_name, event_url)
     email = sender.create_email(
         to_list=to_list,
@@ -94,10 +100,4 @@ def send_close_event_email(
         html_content=content,
     )
 
-    job_id = create_job(
-        sender.send_email,
-        date_time=send_at,
-        utc_hours=utc_hours,
-        email_to_send=email)
-
-    return job_id
+    sender.send_email(email)

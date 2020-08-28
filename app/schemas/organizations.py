@@ -10,27 +10,30 @@ class Events(BaseModel):
     """
     Base Model for request or return eventId
     """
-    eventId: str = Field(...,
-                         description="UUID of a event")
-    name: str = Field(...,
-                      description="Name of event",
-                      example="Python Week Code")
+    eventId: str = Field(
+        ...,
+        description="UUID of a event")
+
+    name: str = Field(
+        ...,
+        description="Name of event",
+        example="Python Week Code")
 
 
 class UserId(BaseModel):
     """
     Base Model for request or return organizationId
     """
-    userId: str = Field(...,
-                        description="UUID of a user")
+    userId: str = Field(..., description="UUID of a user")
 
 
 class OrganizationId(BaseModel):
     """
     Base Model for request or return organizationId
     """
-    organizationId: str = Field(None,
-                                description="UUID of a organization")
+    organizationId: str = Field(
+        None,
+        description="UUID of a organization")
 
 
 class OrganizationImg(BaseModel):
@@ -44,9 +47,17 @@ class OrganizationBase(OrganizationImg):
     """
     Base Model for organization Base
     """
-    organizationName: str = Field(...,
-                                  description="name of organization",
-                                  example="Cosas de ingenieros")
+    organizationName: str = Field(
+        ...,
+        description="name of organization",
+        example="Cosas de ingenieros")
+
+
+class OrganizationResponse(OrganizationId):
+    """
+    Base Model for response organization creation
+    """
+    organizationLogo: str
 
 
 class OrganizationIn(UserId):
@@ -56,10 +67,14 @@ class OrganizationIn(UserId):
     organizationData: OrganizationBase
 
 
-class OrganizationOut(OrganizationId, OrganizationImg):
+class OrganizationOut(OrganizationId):
     """
     Base Model returned when a new organization is  just created
     """
+    organizationName: str = Field(
+        ...,
+        description="name of organization",
+        example="Cosas de ingenieros")
 
 
 class OrganizationBaseUpdate(OrganizationBase, OrganizationId):
@@ -85,6 +100,8 @@ class OrganizationGet(OrganizationId, OrganizationBase):
     """
     Base model returned from DB
     """
-    organizationUrl: str = Field(None,
-                                 description="Organization url formed by the name")
+    organizationUrl: str = Field(
+        None,
+        description="Organization url formed by the name")
+
     events: List[Events]

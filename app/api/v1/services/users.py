@@ -4,25 +4,32 @@ Bussiness logic about user operations.
 
 from db.db import get_collection, CRUD
 
-# COLLECTIONS
-USER_COLLECTION_NAME = "users"
+###########################################
+##       Users Collection Instance       ##
+###########################################
 
-# DB collection instances
+USER_COLLECTION_NAME = "users"
 users_collection = get_collection(USER_COLLECTION_NAME)
 
 
-# ------------------ User controller operations ----------------- #
+###########################################
+##            User Service Class         ##
+###########################################
+
 class UserService:
     """
     Operations about users.
     """
 
     def __init__(self):
+        """
+        Crud instance of the user collection.
+        """
         self.crud = CRUD(users_collection)
 
-    async def create_user(self, user_data: dict) -> dict:
+    async def create_user(self, user_data: dict) -> str:
         """
-        Creare a new user.
+        Create a new user.
 
         Params:
         ------
@@ -30,7 +37,7 @@ class UserService:
 
         Return:
         ------
-        user_id: dict - The user uuid created.
+        user_id: str - The user uuid created.
         """
 
         inserted_id = await self.crud.create(user_data)
@@ -62,24 +69,21 @@ class UserService:
         Params:
         ------
         user_id: str - The user uuid also called userId.
-        user_data: dict - The data to update. Can be all user data or only one field.
+        user_data: dict - The data to update.
+                          Can be all user data or only one field.
 
         Return:
         ------
-        updated: dict {"modifiend_count": int} - The number of modified documents.
+        {"modifiendCount": int} - The number of modified documents.
         """
 
         existing_user = await self.get_user(email=user_data.get("email"))
-
-        print(existing_user)
-
         if existing_user:
-            if existing_user.get("userId") == user_id:
-                query = {"userId": user_id}
-                modified_count = await self.crud.update(query, user_data)
-                return {"modifiedCount": modified_count}
-            return False
+            if not existing_user.get("userId") == user_id:
+                # The user is not authorized
+                return False
 
+        # The user is authenticated and authorized.
         query = {"userId": user_id}
         modified_count = await self.crud.update(query, user_data)
         return {"modifiedCount": modified_count}

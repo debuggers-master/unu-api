@@ -43,16 +43,14 @@ class UserId(BaseModel):
                         description="UUID of a user")
 
 
-class CollaboratorDB(UserId):
+class EventInUSer(BaseModel):
     """
     User Base to Collaborator Information
     """
-    email: EmailStr = Field(...,
-                            description="Email of user",
-                            example="name_last@organization.com")
-    name: str = Field(None,
-                      description="Name of collaborator",
-                      example="Mario Barbosa")
+    name: Optional[str] = Field("", description="The event name")
+    shortDescription: Optional[str] = Field(
+        "", description="Event description")
+    organizationName: Optional[str] = Field("", description="Organization")
 
 
 class CollaborationsDB(EventId):
@@ -93,7 +91,7 @@ class UserOut(UserId, UserBase):
     """
     organizations: Optional[List[OrganizationOut]] = []
     myEvents: Optional[List[EventUserBaseDB]] = []
-    collaborations: Optional[List[CollaboratorDB]] = []
+    collaborations: Optional[List[EventInUSer]] = []
 
 
 class UserUpdate(UserId):

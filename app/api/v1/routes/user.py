@@ -1,48 +1,65 @@
 """
 User Router - Operations about users
 """
-from fastapi import APIRouter, HTTPException, Depends  # pylint: disable-msg=E0611
+from fastapi import APIRouter, HTTPException, Depends, Query
 
+from auth.services import get_current_user
 from schemas.general import ModifiedCount
 from schemas.users import UserUpdate, UserOut
-from api.v1.services.users import UserService  # pylint: disable-msg=E0611
-from auth.services import get_current_user
+from api.v1.services.users import UserService
 
 
-# Router instance
+###########################################
+##            Router Instance            ##
+###########################################
+
 router = APIRouter()
 
-UserMethos = UserService()
+
+###########################################
+##         User Service Instance         ##
+###########################################
+
+UserMethods = UserService()
 
 
-@router.put("",
-            status_code=200,
-            response_model=ModifiedCount)
+###########################################
+##          Users API Endpoints          ##
+###########################################
+
+@router.put(
+    "",
+    status_code=200,
+    response_model=ModifiedCount,
+    responses={"409": {}})
 async def update_user(user: UserUpdate,
                       current_user: UserOut = Depends(get_current_user)):
     """
     Update an User
     """
-    modified_count = await UserMethos.update_user(
-        user_id=user.userId,
+    modified_count = await UserMethods.update_user(
+        user_id=current_user.userId,
         user_data=user.userData.dict())
 
     if modified_count is False:
         raise HTTPException(
             status_code=409,
-            detail="The email is already used by another user")
+            detail="Email alreayd used")
 
     return modified_count
 
 
-@router.delete("",
-               status_code=204)
-async def delete_user(userId: str,
-                      current_user: UserOut = Depends(get_current_user)):
+@router.delete(
+    "",
+    status_code=204,
+    responses={"403": {}})
+async def delete_user(
+        userId: str = Query(...),
+        current_user: UserOut = Depends(get_current_user)):
     """
     Delete an User
     """
-    await UserMethos.delete_user(user_id=userId)
+    if current_user.userId != userId:
+        raise HTTPException(status_code=403, detail="Forbbiden")
 
-    # add Delete Events associated with user
-    # add Delete Organizations associated with user
+    await UserMethods.delete_user(user_id=userId)

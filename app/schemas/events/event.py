@@ -1,14 +1,14 @@
 """
 Events Schema Models
 """
-from typing import Optional, List, Type
+from typing import Optional, List
 from enum import Enum
 from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
-# from schemas.events.speakers import SpeakerDB
-# from schemas.events.agenda import Day
-# from schemas.events.associates import AsociateDB
-# from schemas.events.collaborators import CollaboratorDB
+from schemas.events.speakers import SpeakerDB
+from schemas.events.agenda import Day
+from schemas.events.associates import AssociatedInDb
+from schemas.events.collaborators import CollaboratorInEvent
 
 
 class EventId(BaseModel):
@@ -21,7 +21,7 @@ class EventId(BaseModel):
 
 class EventInUser(EventId):
     """
-    Schema for event in user.
+    Base Model schema for event in user.
     """
     name: str
     shortDescription: str
@@ -30,7 +30,7 @@ class EventInUser(EventId):
 
 class NewEvent(BaseModel):
     """
-    Base model for create a new events
+    Base model of body for create a new event.
     """
     name: str = Field(..., description="The event name")
     template: str = Field(..., description="The choosen template")
@@ -65,25 +65,26 @@ class EventUserBase(BaseModel):
     shortDescription: str = Field(
         ...,
         description="a short description of the event",
-        example="Eveneto para programar en python")
+        example="Aprende a programar un uno de los mejores lenguajes")
 
 
 class EventBasicInfo(BaseModel):
     """
     Base info for events
     """
-    name: Optional[str]
-    shortDescription: Optional[str]
-    description: Optional[str]
-    titleHeader: Optional[str]
-    imageHeader: Optional[str]
-    imageEvent: Optional[str]
-    localTime: Optional[str]
+    name: Optional[str] = Field(description="The event name")
+    shortDescription: Optional[str] = Field(description="A short description")
+    description: Optional[str] = Field(description="Event description")
+    titleHeader: Optional[str] = Field(description="Event title")
+    imageHeader: Optional[str] = Field(description="Banner image")
+    imageEvent: Optional[str] = Field(description="A related image")
+    localTime: Optional[str] = Field(
+        description="The UTC time of the event eg.(-5)")
 
 
 class EventOut(EventBasicInfo):
     """
-    Base Model for event
+    Base Model for event response.
     """
     eventId: Optional[str]
     organizationName: Optional[str]
@@ -93,17 +94,17 @@ class EventOut(EventBasicInfo):
     startDate: Optional[str]
     organizationName: Optional[str]
 
-    speakers: Optional[List[dict]]
-    agenda: Optional[List[dict]]
-    associates: Optional[List[dict]]
-    collaborators: Optional[List[dict]]
+    speakers: Optional[List[SpeakerDB]]
+    agenda: Optional[List[Day]]
+    associates: Optional[List[AssociatedInDb]]
+    collaborators: Optional[List[CollaboratorInEvent]]
 
     publicationStatus: Optional[bool]
 
 
 class EventIn(BaseModel):
     """
-    Base model For recive event Body
+    Base model of body for event calls.
     """
     eventId: str = Field(..., description="The event id")
     eventData: EventBasicInfo = Field(...)

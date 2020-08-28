@@ -1,5 +1,5 @@
 """
-Redis queue for manage background proccess.
+Redis Queue Module - For manage background proccess.
 """
 
 from datetime import datetime, timedelta
@@ -10,10 +10,15 @@ from rq import Queue, Connection, Retry, Worker
 from config import settings  # pylint: disable-msg=E0611
 
 
+###########################################
+##         Job Queue (schedule)          ##
+###########################################
+
 def create_job(
         function: callable,
         date_time: datetime,
         utc_hours: int = 0,
+        queue_name: str = "email",
         **kwargs,
 ) -> str:
     """
@@ -24,6 +29,7 @@ def create_job(
     function: callable - The job function
     date_time: datetime - The specific time when the job must be executed
     utc_hours: int - Eg: -5 or +2 The specific GTM.
+    queue_name: str - The name of the task queue.
 
     Return:
     ------
@@ -31,13 +37,14 @@ def create_job(
     """
 
     with Connection(redis.from_url(settings.REDIS_URL)):
-        redis_queue = Queue("email")
+        redis_queue = Queue(queue_name)
 
         # Fix the correct time to execute.
         utc_to_place_time = datetime.utcnow() + timedelta(hours=utc_hours)
         seconds = date_time - utc_to_place_time
         minutes = seconds.seconds / 60
 
+        # Enqueue the job.
         job = redis_queue.enqueue_in(
             time_delta=timedelta(minutes=minutes),
             func=function,
@@ -48,7 +55,11 @@ def create_job(
         return job.get_id()
 
 
-def __run_worker():
+###########################################
+##          Queue Worker Setup           ##
+###########################################
+
+def __run_worker() -> None:
     """
     Start a worker to manage the enqueue jobs.
     """

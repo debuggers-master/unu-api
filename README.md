@@ -635,14 +635,17 @@ event: {
       date: str, // Date
       conferences: [
         {
-          conferenceId: str,
           name: str,
           description: str,
-          startHour: str, - date
-          endHour: str -  date
+          startHour: str,
+          endHour: str,
+          conferenceId: str,
           speakerName: str,
+          speakerBio: str,
+          twitter: str,
           rol: str,
           speakerPhoto: str,
+          speakerId: str
         }
       ]
     }
@@ -652,13 +655,14 @@ event: {
       name: str,
       url: str,
       logo: str, //url
+      associatedId: str,
     }
   ],
   collaborators: [
     {
-      userId: str,
-      name: str,
-      email: str,
+    email: str,
+    firstName: str,
+    lastName: str,
     }
   ],
   publicationStatus: Boolean // True if is accesible to all public

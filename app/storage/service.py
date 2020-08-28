@@ -1,28 +1,37 @@
 """
-Storage files functions.
+Google Cloud Storage- Upload Functions.
 """
 
-from uuid import uuid4
-from datetime import datetime
 import os
 import base64
+from uuid import uuid4
+from datetime import datetime
 
-from fastapi import status, HTTPException, UploadFile
 import six
+from fastapi import status, HTTPException, UploadFile
 
 from config import settings  # pylint: disable-msg=E0611
 from .connect import get_storage_bucket
 
 
+###########################################
+##           Auxiliar Functions          ##
+###########################################
+
 def _check_extension(filename: str) -> None:
     """
-    Check if the extension is allowed.
+    Check if the extension is allowed. If not
+    raise a bad request exception.
+
+    Params:
+    ------
+    filename: str - The file filename
     """
     _, ext = os.path.splitext(filename)
     if ext.replace(".", "") not in settings.ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"The image extension can only be {settings.ALLOWED_EXTENSIONS}"
+            detail=f"Only alowed extensions: {settings.ALLOWED_EXTENSIONS}"
         )
 
 
@@ -30,11 +39,23 @@ def _unique_filename(filename: str) -> str:
     """
     Generates a unique filename that is unlikely to collide with existing
     objects in Google Cloud Storage.
+
+    Params:
+    ------
+    filename: str - The current filename
+
+    Return:
+    ------
+    filename: str - A unique filename.
     """
     date = datetime.utcnow().strftime("%Y-%m-%d-%H%M%S")
     basename, extension = filename.rsplit('.', 1)
     return "{0}-{1}-{2}.{3}".format(basename, date, str(uuid4()), extension)
 
+
+###########################################
+##           Storage Functions           ##
+###########################################
 
 async def upload_file(file_base64: str = "", file: UploadFile = None) -> str:
     """
@@ -45,12 +66,12 @@ async def upload_file(file_base64: str = "", file: UploadFile = None) -> str:
     ------
     file_base64: str - The file to upload encoded in base 64.
     file: UploadFile - The file to upload
-    * You only pass one option.
+    * Set only one option.
 
     Return:
     ------
-    url: str - The file public url
-        If some error occurs. Return False.
+    url: str - The file public url.
+               If some error occurs returns False.
     """
 
     if file_base64:
@@ -72,7 +93,7 @@ async def upload_file(file_base64: str = "", file: UploadFile = None) -> str:
     try:
         blob = bucket.blob(filename)
     except (AttributeError, KeyError):
-        # If the bucket is missing cause credential exception
+        # If the bucket is missing for credentials exception.
         return False
 
     if file_base64:

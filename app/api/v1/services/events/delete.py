@@ -6,12 +6,18 @@ from db.db import get_collection, CRUD
 from .utils import _make_query, events_crud
 
 
-# COLLECTIONS
-PARTICIPANTS_COLLECTION_NAME = "participants"
-participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
-PARTICIPANTS_COLLECTION_NAME = "users"
-users_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
+###########################################
+##          Collection Instances         ##
+###########################################
 
+participants_collection = get_collection("participants")
+users_collection = get_collection("users")
+organizations_collection = get_collection("organizations")
+
+
+###########################################
+##        Events - Delete Service        ##
+###########################################
 
 class DeleteEvent:
     """
@@ -22,6 +28,7 @@ class DeleteEvent:
         self.crud = events_crud
         self.users = CRUD(users_collection)
         self.participants = CRUD(participants_collection)
+        self.organizations = CRUD(organizations_collection)
 
     async def all(self, event_id: str, email: str) -> dict:
         """
@@ -36,10 +43,23 @@ class DeleteEvent:
         {deleted: bool} - True if deleted, False if nothig happens.
         """
         query = _make_query(event_id)
+        event = await self.crud.find(query)
+        # Keep the proccess only if the event exist.
+        if not event:
+            return None
+
+        # Delete event
         deleted_count = await self.crud.delete(query)
+        # Delete the participants collection
         await self.participants.delete(query)
+        # Delete event from user owner
         await self.users.pull_array(
             {"email": email}, "myEvents", {"eventId": event_id})
+        # Delete from organization
+        await self.organizations.pull_array(
+            {"organizationUrl": event["organizationUrl"]},
+            "events", {"eventId": event_id})
+
         return self.check_deleted(deleted_count)
 
     async def collaborators(

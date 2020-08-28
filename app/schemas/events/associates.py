@@ -1,55 +1,59 @@
 """
 Associates schema Models
 """
-from typing import Optional
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field  # pylint: disable-msg=E0611
 
 
 class EventId(BaseModel):
     """
-    Base Model for request or return eventId
+    Base Model for request or return eventId.
     """
-    eventId: str = Field(...,
-                         description="UUID of a event")
+    eventId: str = Field(..., description="UUID of a event")
 
 
 class AssociatedInfo(BaseModel):
     """
-    Base Model to add Associate
+    Base Model associated principal info.
     """
-    name: str = Field(None,
-                      description="Name of Associate",
-                      example="Platzi")
-    url: str = Field(None,
-                     description="Web page of associate",
-                     example="platzi.com")
-    logo: str = Field(None,
-                      description="encoded base64 image")
+    name: str = Field(
+        None,
+        description="Name of Associate",
+        example="Platzi")
+
+    url: str = Field(
+        None,
+        description="Web page of associate",
+        example="platzi.com")
+
+    logo: str = Field(
+        None,
+        description="encoded base64 image")
 
 
 class AssociatedInDb(AssociatedInfo):
     """
-    Base Model to add Associate
+    Base Model to store Associated in db.
     """
     associatedId: str = Field(..., description="The associated uuid")
 
 
 class AssociatedIn(EventId):
     """
-    Body for add associated to an event
+    Base Model of request body to add a Associated.
     """
     associatedData: AssociatedInfo
 
 
 class AssociatedUpdate(EventId):
     """
-    Base Model to add a update a associated
+    Base Model of request body to update a Associated.
     """
     associatedData: AssociatedInDb
 
 
 class AssociatedOnDelete(EventId):
     """
-    Base Model to update a associated
+    Base Model of request body to delete a Associated.
     """
     associatedId: str = Field(..., description="The associated uuid")

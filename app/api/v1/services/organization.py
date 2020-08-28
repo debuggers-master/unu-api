@@ -76,7 +76,7 @@ class OrganizationController:
         query = {"organizationName": organization_data.get("organizationName")}
         org_exists = await self.crud.find(query)
         if org_exists is not None:
-            return {"detail": "This Organizations already exists"}
+            return 409
 
         # Complete all fields
         organization_id = str(uuid4())
@@ -96,7 +96,7 @@ class OrganizationController:
         # Create a organization document in organizations collections
         inserted_id = await self.crud.create(organization_data)
         if not inserted_id:
-            return {"detail": "Error on saving"}
+            return 500
 
         # Add the organization info into the user.
         modified_count = await self.users.add_to_set(
@@ -187,7 +187,6 @@ class OrganizationController:
         if not org:
             return None
 
-        await self.crud.delete(query)
         query = {"userId": user_id}
         modified_count = await self.users.pull_array(
             query=query,
@@ -195,6 +194,9 @@ class OrganizationController:
             condition={"organizationId": organization_id})
 
         if modified_count:
+            # Remove organization
+            await self.crud.delete(query)
+            # Remove all related events
             query = {"organizationUrl": org["organizationUrl"]}
             await self.events.delete_many(query)
 

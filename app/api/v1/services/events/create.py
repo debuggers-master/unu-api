@@ -9,24 +9,32 @@ from schemas.events.event import EventInUser
 from schemas.events.collaborators import CollaboratorInfo
 from schemas.events.speakers import SpeakerInfo
 from auth.services import register_user
+
 from .utils import _uuid, _make_query, events_crud
 
 
-# COLLECTIONS
-PARTICIPANTS_COLLECTION_NAME = "participants"
-participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
-PARTICIPANTS_COLLECTION_NAME = "users"
-users_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
+###########################################
+##          Collection Instances         ##
+###########################################
+
+participants_collection = get_collection("participants")
+users_collection = get_collection("users")
+organizations_collection = get_collection("organizations")
 
 
+###########################################
+##        Events - Create Service        ##
+###########################################
 class CreateEvent:
     """
-    Methos for create event elements.
+    Methods for create event elements.
     """
 
     def __init__(self):
         self.crud = events_crud
         self.users = CRUD(users_collection)
+        self.participants = CRUD(participants_collection)
+        self.organizations = CRUD(organizations_collection)
 
     async def create_event(self, event_data: dict, user_email: str) -> dict:
         """
@@ -41,6 +49,7 @@ class CreateEvent:
         event_id: dict - The event uuid created.
         """
         event_id = _uuid()
+
         organization_name = event_data.get("organizationName")
         organization_url = organization_name.replace(" ", "-").lower()
 
@@ -67,12 +76,19 @@ class CreateEvent:
         if not inserted_id:
             return False
 
-        await participants_collection.insert_one(
-            {"eventId": event_id, "emails": []})
+        # Add participants collections
+        await self.participants.create({
+            "eventId": event_id, "emails": []})
 
+        # Update myEvents in User collection
         event_in_user = EventUserBaseDB(**event_data)
         await self.users.add_to_set(
             {"email": user_email}, "myEvents", event_in_user.dict())
+
+        # Update in the organization
+        data = {"eventId": event_id, "name": event_data["name"]}
+        await self.organizations.add_to_set(
+            {"organizationName": organization_name}, "events", data)
 
         return {"eventId": event_id}
 

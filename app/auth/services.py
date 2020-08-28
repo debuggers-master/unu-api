@@ -43,8 +43,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 ###########################################
 ##          Users CRUD Instance          ##
 ###########################################
-
-users_crud = CRUD(get_collection("users"))
+users_collection = get_collection("users")
+users_crud = CRUD(users_collection)
 
 
 ###########################################

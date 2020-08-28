@@ -29,7 +29,7 @@ class UpdateEvent:
     def __init__(self):
         self.crud = events_crud
         self.users = CRUD(users_collection)
-        self.organization = CRUD(organizations_collection)
+        self.organizations = CRUD(organizations_collection)
 
     async def principal_info(self, event_id: str, new_data: dict) -> dict:
         """
@@ -68,8 +68,14 @@ class UpdateEvent:
 
         # Update my collaborations
         query = {"collaborations.eventId": event_id}
-        data = {"collaborations.$.name": new_data["name"]}
+        data = {"collaborations.$.name": new_data["name"],
+                "collaborations.$.shortDescription": new_data["shortDescription"]}
         await self.users.update(query, data, many=True)
+
+        # Update the organizations
+        query = {"events.eventId": event_id}
+        data = {"events.$.name": new_data["name"]}
+        await self.organizations.update(query, data)
 
         return self.check_modified(modified_count)
 

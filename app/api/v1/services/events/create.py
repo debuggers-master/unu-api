@@ -50,9 +50,11 @@ class CreateEvent:
         """
         event_id = _uuid()
 
+        # Create the correct organization url
         organization_name = event_data.get("organizationName")
         organization_url = organization_name.replace(" ", "-").lower()
 
+        # Add all void structure
         event_data.update({"eventId": event_id})
         event_data.update({"organizationUrl": organization_url})
         event_data.update({"organizationName": organization_name})
@@ -72,6 +74,7 @@ class CreateEvent:
             "conferences": []
         }]})
 
+        # Create the event
         inserted_id = await self.crud.create(event_data)
         if not inserted_id:
             return False
@@ -118,11 +121,13 @@ class CreateEvent:
             query, "collaborators", collaborator_to_event.dict())
 
         if not modified_count:
+            # The event doesn't exist
             return 404
 
         # Only regitered if the event is valid
         collaborator = await register_user(collaborator_data)
 
+        # Add the event to user collaborations
         event = await self.crud.find(query)
         collaboration_in_user = EventInUser(**event)
         await self.users.add_to_set(
@@ -151,11 +156,13 @@ class CreateEvent:
         if not user:
             return 412
 
+        # Add the user to event collaborator
         collaborator_to_event = CollaboratorInfo(**user)
         query = _make_query(event_id)
         await self.crud.add_to_set(
             query, "collaborators", collaborator_to_event.dict())
 
+        # Add the event to user collaborations
         event = await self.crud.find(query)
         collaboration_in_user = EventInUser(**event)
         await self.users.add_to_set(
@@ -241,6 +248,7 @@ class CreateEvent:
         if day:
             return False
 
+        # Add the new day
         query = _make_query(event_id)
         modified_count = await self.crud.add_to_set(query, "agenda", day_data)
         if not modified_count:

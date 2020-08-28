@@ -2,9 +2,19 @@
 Bussines Logic for update events elemets.
 """
 
+from db.db import get_collection, CRUD
 from storage.service import upload_file
 from schemas.events.speakers import SpeakerInfo
+
 from .utils import _make_query, events_crud, get_collection
+
+
+###########################################
+##          Collection Instances         ##
+###########################################
+
+users_collection = get_collection("users")
+organizations_collection = get_collection("organizations")
 
 
 ###########################################
@@ -18,6 +28,8 @@ class UpdateEvent:
 
     def __init__(self):
         self.crud = events_crud
+        self.users = CRUD(users_collection)
+        self.organization = CRUD(organizations_collection)
 
     async def principal_info(self, event_id: str, new_data: dict) -> dict:
         """
@@ -32,14 +44,33 @@ class UpdateEvent:
         ------
         {modified_count: n} - The number (n) of modified items.
         """
+        # Check if event exists
+        query = _make_query(event_id)
+        event = await self.crud.find(query)
+        if not event:
+            return self.check_modified(False)
+
         # Update image only if are new files
         image_header = await self.update_image(new_data["imageHeader"])
         image_event = await self.update_image(new_data["imageEvent"])
         new_data.update({"imageHeader": image_header})
         new_data.update({"imageEvent": image_event})
 
-        query = _make_query(event_id)
+        # Update event
         modified_count = await self.crud.update(query, new_data)
+        if not modified_count:
+            return self.check_modified(modified_count)
+
+        # Update in myEvents list
+        query = {"myEvents.eventId": event_id}
+        data = {"myEvents.$.name": new_data["name"]}
+        await self.users.update(query, data)
+
+        # Update my collaborations
+        query = {"collaborations.eventId": event_id}
+        data = {"collaborations.$.name": new_data["name"]}
+        await self.users.update(query, data, many=True)
+
         return self.check_modified(modified_count)
 
     async def associateds(

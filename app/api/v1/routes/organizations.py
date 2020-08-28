@@ -77,7 +77,9 @@ async def update_organization(
     return modified_count
 
 
-@router.delete("", status_code=204)
+@router.delete(
+    "", status_code=204,
+    responses={"403": {}})
 async def delete_organization(
         organization: OrganizationDelete,
         current_user: UserOut = Depends(get_current_user)):

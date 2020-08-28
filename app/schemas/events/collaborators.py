@@ -3,49 +3,48 @@ Collaboratos Schema Models
 """
 
 from typing import Optional
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr  # pylint: disable-msg=E0611
 
 
 class EventId(BaseModel):
     """
-    Base Model for request or return eventId
+    Base Model for request or return eventId.
     """
-    eventId: str = Field(...,
-                         description="UUID of a event")
+    eventId: str = Field(...,  description="UUID of a event")
 
 
 class CollaboratorInfo(BaseModel):
     """
-    User Base to Collaborator Information
+    Base Model of Collaborator information.
     """
 
     email: EmailStr = Field(
         ...,
         description="Email of user",
-        example="name_last@organization.com")
+        example="stan_lee@marvel.com")
 
     firstName: str = Field(
         ...,
         description="Name of collaborator",
-        example="Bruce")
+        example="Stan")
 
     lastName: str = Field(
         ...,
         description="Lastname of collaborator",
-        example="Banner")
+        example="Lee")
 
 
 class CollaboratorInDb(CollaboratorInfo):
     """
-    Schema or collaborator in db
+    Base Model to store a Collaborator.
     """
-    userId: Optional[str]
+    userId: Optional[str] = Field(description="UUID of the event")
     password: str = Field(..., decription="The collaborator password")
 
 
 class NewCollaborator(EventId):
     """
-    Body for new collaborator
+    Base Model of body to add a new Collaborator.
     """
     collaboratorData: Optional[CollaboratorInDb]
     email: Optional[str]
@@ -53,6 +52,15 @@ class NewCollaborator(EventId):
 
 class CollaboratorOnDelete(EventId):
     """
-    Body for delete a collaborator
+    Base Model of body to delete a Collaborator.
     """
     email: str = Field(..., description="The collaborator email")
+
+
+class CollaboratorInEvent(BaseModel):
+    """
+    Base Model schema for collaborators in event list.
+    """
+    email: str
+    firstName: str
+    lastName: str

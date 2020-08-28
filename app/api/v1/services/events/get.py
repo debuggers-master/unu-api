@@ -6,28 +6,27 @@ from typing import List
 from datetime import date, datetime
 
 from db.db import get_collection, CRUD
-from .utils import _make_query
+from .utils import _make_query, events_crud
 
-# COLLECTIONS
-EVENTS_COLLECTION_NAME = "events"
-PARTICIPANTS_COLLECTION_NAME = "participants"
+###########################################
+##          Collection Instances         ##
+###########################################
+
+participants_collection = get_collection("participants")
 
 
-# DB collection instances
-events_collection = get_collection(EVENTS_COLLECTION_NAME)
-events_crud = CRUD(events_collection)
-
-participants_collection = get_collection(PARTICIPANTS_COLLECTION_NAME)
-
+###########################################
+##          Events - Read Service        ##
+###########################################
 
 class GetEvent:
     """
-    Methos for retrieve events information.
+    Methods for retrieve events information.
     """
 
     def __init__(self):
         self.crud = events_crud
-        self.participants = participants_collection
+        self.participants = CRUD(participants_collection)
 
     async def get_event(
             self,
@@ -75,11 +74,15 @@ class GetEvent:
         event = await self.crud.find(
             query, filters=filters, excludes=excludes)
 
-        if event:
-            if not event.get("publucationStatus"):
-                return False
-            return event
-        return False
+        # Any match
+        if not event:
+            return False
+
+        # The event is not public
+        if not event.get("publicationStatus"):
+            return False
+
+        return event
 
     async def get_published_events(self) -> list:
         """
@@ -108,7 +111,7 @@ class GetEvent:
         ------
         count: int - The number of particpants
         """
-        count = await self.participants.find_one({"eventId": event_id})
+        count = await self.participants.find({"eventId": event_id})
         return {"participants": len(count.get("emails"))}
 
     async def get_particpants(self, event_id: str) -> int:
@@ -123,5 +126,5 @@ class GetEvent:
         ------
         participants: int - The list of particpants
         """
-        participnats = await participants_collection.find_one({"eventId": event_id})
+        participnats = await self.participants.find({"eventId": event_id})
         return participnats.get("emails")

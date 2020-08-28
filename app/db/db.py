@@ -100,11 +100,16 @@ class CRUD:
         created = await self.coll.insert_one(document_data)
         return str(created.inserted_id)
 
-    async def update(self, query: dict, document_data: dict) -> int:
+    async def update(
+            self, query: dict, document_data: dict, many: bool = False) -> int:
         """
         Update an existing document.
         """
-        updated = await self.coll.update_one(query, {"$set": document_data})
+        if many:
+            updated = await self.coll.update_many(
+                query, {"$set": document_data})
+        else:
+            updated = await self.coll.update_one(query, {"$set": document_data})
         return int(updated.modified_count)
 
     async def add_to_set(self, query: dict, array_name: str, data: any) -> int:

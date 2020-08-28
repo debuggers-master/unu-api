@@ -53,6 +53,13 @@ class OrganizationBase(OrganizationImg):
         example="Cosas de ingenieros")
 
 
+class OrganizationResponse(OrganizationId):
+    """
+    Base Model for response organization creation
+    """
+    organizationLogo: str
+
+
 class OrganizationIn(UserId):
     """
     Base Model for creates new organization

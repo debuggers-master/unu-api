@@ -169,6 +169,18 @@ class OrganizationController:
         data = {"organizations.$": new_data}
         await self.users.update(query, data)
 
+        # Update the sublists myEvents
+        query = {"myEvents.organizationName": org_exists["organizationName"]}
+        data = {"myEvents.$.organizationName": new_data["organizationName"]}
+
+        # Update the sublists collaborations
+        await self.users.update(query, data)
+        query = {
+            "collaborations.organizationName": org_exists["organizationName"]}
+        data = {
+            "collaborations.$.organizationName": new_data["organizationName"]}
+        await self.users.update(query, data, many=True)
+
         # Update all events
         org_url = org_exists["organizationUrl"]
         await self.events.update(

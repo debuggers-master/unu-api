@@ -38,7 +38,36 @@ def test_user():
         "name": "Stan",
         "lastName": "Lee",
         "email": "stan@gmail.com",
+        "password": "user123",
         "userId": "aabe7a81-2f32-43ff-a767-c13a776fbf4c"
+    }
+
+
+@pytest.fixture()
+def dummy_user():
+    """
+    Return the test user dummy for all operations
+    """
+    return {
+        "name": "Steve",
+        "lastName": "Jobs",
+        "email": "jobs@apple.com",
+        "password": "user123",
+        "userId": "08d6a082-20ee-4aa6-9f02-64a89086e990"
+    }
+
+
+@pytest.fixture()
+def test_organization():
+    """
+    Return the test organization
+    """
+    return {
+        "organizationLogo": "",
+        "organizationName": "Testing",
+        "organizationId": "b86e537e-48c7-483c-815f-2665d5618f38",
+        "organizationUrl": "testing",
+        "events": []
     }
 
 

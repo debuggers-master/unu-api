@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 
 
-@pytest.mark.skip(reason="Evite create many organization")
+# @pytest.mark.skip(reason="Evite create many organization")
 def test_create_organization(client, get_token, dummy_user, test_organization):
     """
     Testing for create a organization.

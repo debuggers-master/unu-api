@@ -1,6 +1,7 @@
 """
 Auth endpoints test
 """
+from uuid import uuid4
 import pytest
 
 
@@ -75,14 +76,14 @@ def test_signup_user_exists(client):
     assert actuall == expected
 
 
-@pytest.mark.skip(reason="To not create many users")
+# @pytest.mark.skip(reason="To not create many users")
 def test_signup_succes(client, auth_response):
     """
     Test login endpoint,
     """
     print("""POST - /auth/signup  - 200 Ok""")
 
-    email = "vickytone@hey.com"
+    email = f"vickytone{str(uuid4())}@hey.com"
     name = "Vicky"
     lastname = "Stone"
     body = {

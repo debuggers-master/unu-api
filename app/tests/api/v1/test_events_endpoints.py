@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 
 
-@pytest.mark.skip(reason="Don't create many events")
+# @pytest.mark.skip(reason="Don't create many events")
 def test_create_events(client, test_event, get_token, dummy_user):
     """
     Testing for create events.
@@ -57,22 +57,6 @@ def test_update_event(client, test_event, get_token, dummy_user):
     assert response.json() == {"modifiedCount": 0}
 
 
-@pytest.mark.skip(reason="Don't create many associateds")
-def test_get_event(client, test_event, get_token, dummy_user):
-    """
-    Testing for get event
-    """
-    token = get_token(dummy_user["email"])
-    event_id = test_event["eventId"]
-
-    response = client.get(
-        f"/api/v1/events?eventId={event_id}",
-        headers={"Authorization": f"Bearer {token}"})
-
-    assert response.status_code == 200
-    assert response.json()["eventId"] == event_id
-
-
 def test_event_count_participants(client, test_event, get_token, dummy_user):
     """
     Testing for get event
@@ -88,7 +72,7 @@ def test_event_count_participants(client, test_event, get_token, dummy_user):
     assert isinstance(response.json()["participants"], int)
 
 
-@pytest.mark.skip(reason="Don't create many associateds")
+# @pytest.mark.skip(reason="Don't create many associateds")
 def test_event_add_associated(
         client, test_event, get_token, dummy_user, test_associated):
     """
@@ -138,7 +122,7 @@ def test_event_update_associated(
     assert response.json() == {"modifiedCount": 0}
 
 
-@pytest.mark.skip(reason="")
+# @pytest.mark.skip(reason="")
 def test_event_add_day(
         client, test_event, get_token, dummy_user):
     """
@@ -251,7 +235,7 @@ def test_event_update_conference(
         json=body)
 
     assert response.status_code == 200
-    assert response.json() == {"modifiedCount": 0}
+    assert response.json() == {"modifiedCount": 1}
 
 
 def test_event_register_participants(client, test_event):

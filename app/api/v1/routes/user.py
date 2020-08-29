@@ -37,12 +37,6 @@ async def get_loged_user(current_user: UserOut = Depends(get_current_user)):
     Get user info of loged user.
     """
     user = await UserMethods.get_user(current_user.email)
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="Not Found")
-
     return user
 
 
@@ -61,10 +55,8 @@ async def update_user(
         user_id=current_user.userId,
         user_data=user.userData.dict())
 
-    if modified_count is False:
-        raise HTTPException(
-            status_code=409,
-            detail="Email alreayd used")
+    if modified_count == 409:
+        raise HTTPException(status_code=409, detail="Email alreayd used")
 
     return modified_count
 

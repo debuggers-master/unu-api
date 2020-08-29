@@ -5,7 +5,7 @@ import pytest
 from app.storage.service import upload_file
 
 
-@pytest.mark.skip(reason="No uploan many files")
+# @pytest.mark.skip(reason="No uploan many files")
 @pytest.mark.asyncio
 async def test_upload_file_b64():
     """

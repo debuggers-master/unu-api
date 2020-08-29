@@ -127,4 +127,6 @@ class GetEvent:
         participants: int - The list of particpants
         """
         participnats = await self.participants.find({"eventId": event_id})
-        return participnats.get("emails")
+        if participnats:
+            return participnats.get("emails")
+        return []

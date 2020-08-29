@@ -36,7 +36,7 @@ class MailResponse(BaseModel):
     """
     The mail response.
     """
-    detail: str = Field("Emails sended", description="De sended status")
+    detail: str = Field("Emails sended", description="The sended status")
 
 
 ###########################################
@@ -117,6 +117,8 @@ async def send_alert_event_message_to_participants(
         eventId,
         filters=["name", "url", "organizationUrl", "startDate", "localTime"])
 
+    if not event:
+        return MailResponse()
     url = event.get("url")
     organization_url = event.get("organizationUrl")
     event_url = f"{organization_url}/{url}"

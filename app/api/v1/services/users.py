@@ -76,12 +76,14 @@ class UserService:
         ------
         {"modifiendCount": int} - The number of modified documents.
         """
+        # Get the current info
+        existing_user = await self.crud.find({"userId": user_id})
 
-        existing_user = await self.get_user(email=user_data.get("email"))
-        if existing_user:
-            if not existing_user.get("userId") == user_id:
-                # The user is not authorized
-                return False
+        # If the user change the email check that it is not ocuped
+        if existing_user.get("email") != user_data.get("email"):
+            ocuped_email = await self.get_user(email=user_data.get("email"))
+            if ocuped_email:
+                return 409
 
         # The user is authenticated and authorized.
         query = {"userId": user_id}

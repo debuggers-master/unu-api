@@ -205,13 +205,12 @@ class UpdateEvent:
         Return: bool
         """
         # Check authorization
-        __users = get_collection("users")
-        user = __users.find({"email": email})
+        user = await self.users.find({"email": email})
         user_events = user["myEvents"]
 
         is_user_admin = list(
             filter(lambda ev: ev.get("eventId") == event_id, user_events))
-        is_user_admin = bool(is_user_admin[0])
+        is_user_admin = bool(len(is_user_admin))
 
         if not is_user_admin:
             return 403

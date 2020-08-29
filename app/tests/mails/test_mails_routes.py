@@ -4,7 +4,7 @@ Mails routes testing.
 import pytest
 
 
-@pytest.mark.skip(reason="No send many emails")
+# @pytest.mark.skip(reason="No send many emails")
 def test_send_welcome_email(client):
     """
     Testing send welcome email.
@@ -16,7 +16,7 @@ def test_send_welcome_email(client):
     assert actual == {"detail": "Emails sended"}
 
 
-@pytest.mark.skip(reason="No send many emails")
+# @pytest.mark.skip(reason="No send many emails")
 def test_send_event_alert_email(client):
     """
     Testing send welcome email.

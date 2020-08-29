@@ -21,7 +21,7 @@ from auth.services import get_current_user
 from schemas.users import UserOut
 from schemas.events.associates import (
     AssociatedIn, AssociatedUpdate, AssociatedOnDelete)
-from schemas.events.event import NewEvent, EventOut, EventIn
+from schemas.events.event import NewEvent, EventOut, EventIn, EventPublishOut
 from schemas.events.collaborators import NewCollaborator, CollaboratorOnDelete
 from schemas.events.agenda import DayIn, DayUpdate, DayOnDelete
 from schemas.events.agenda import (
@@ -172,12 +172,13 @@ async def get_event_from_url(
 @router.get(
     "/list",
     status_code=200,
-    response_model=List[EventOut])
+    response_model=List[EventPublishOut])
 async def get_published_events():
     """
     Retrieve a list with all published events.
     """
     event_list = await ReadMethods.get_published_events()
+    print(event_list)
     return event_list
 
 

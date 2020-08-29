@@ -34,7 +34,12 @@ def test_user():
     """
     Return the test user
     """
-    return {"name": "Stan", "lastName": "Lee", "email": "stan@gmail.com"}
+    return {
+        "name": "Stan",
+        "lastName": "Lee",
+        "email": "stan@gmail.com",
+        "userId": "aabe7a81-2f32-43ff-a767-c13a776fbf4c"
+    }
 
 
 @pytest.fixture()

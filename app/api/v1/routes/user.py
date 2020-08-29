@@ -37,12 +37,6 @@ async def get_loged_user(current_user: UserOut = Depends(get_current_user)):
     Get user info of loged user.
     """
     user = await UserMethods.get_user(current_user.email)
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="Not Found")
-
     return user
 
 

@@ -55,10 +55,8 @@ async def update_user(
         user_id=current_user.userId,
         user_data=user.userData.dict())
 
-    if modified_count is False:
-        raise HTTPException(
-            status_code=409,
-            detail="Email alreayd used")
+    if modified_count == 409:
+        raise HTTPException(status_code=409, detail="Email alreayd used")
 
     return modified_count
 

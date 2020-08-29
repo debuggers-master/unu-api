@@ -86,3 +86,6 @@ class ErroLogger:
           <li><h4>Error: {dict_error["exception"]}</h4></li>
         </ul>
         """
+
+
+error_logger = ErroLogger()

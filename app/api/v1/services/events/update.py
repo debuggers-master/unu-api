@@ -204,23 +204,23 @@ class UpdateEvent:
 
         Return: bool
         """
+
+
+        
         # Check authorization
-        __users = get_collection("users")
-        user = __users.find({"email": email})
+        user = await self.users.find({"email": email})
         user_events = user["myEvents"]
 
-        is_user_admin = list(
-            filter(lambda ev: ev.get("eventId") == event_id, user_events))
-        is_user_admin = bool(is_user_admin[0])
+        for event in user_events:
+            if event_id == event["eventId"]:
+                # Update the status only if the owner call this edpoint.
+                query = _make_query(event_id)
+                status = not actual_status
+                await self.crud.update(query, {"publicationStatus": status})
+                return {"actualStatus": status}
+        return 403
 
-        if not is_user_admin:
-            return 403
 
-        # Update the status only if the owner call this edpoint.
-        query = _make_query(event_id)
-        status = not actual_status
-        await self.crud.update(query, {"publicationStatus": status})
-        return {"actualStatus": status}
 
     def check_modified(self, modified_count: int) -> dict:
         """

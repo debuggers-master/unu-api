@@ -67,7 +67,7 @@ class CreateEvent:
         event_data.update({"speakers": []})
         event_data.update({"collaborators": []})
         event_data.update({"associates": []})
-        event_data.update({"publicationStatus": 0})
+        event_data.update({"publicationStatus": False})
         event_data.update({"agenda": [{
             "dayId": _uuid(),
             "date": event_data.get("startDate"),

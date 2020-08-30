@@ -50,6 +50,15 @@ class UpdateEvent:
         if not event:
             return self.check_modified(False)
 
+        #Check url exits
+        query_url = {"organizationName": event_data.get("organizationName"),
+            "url":event_data.get("url")}
+        same_url_in_org = await self.crud.find(query_url)
+
+        if same_url_in_org:
+            return 409
+            
+
         # Update image only if are new files
         image_header = await self.update_image(new_data["imageHeader"])
         image_event = await self.update_image(new_data["imageEvent"])
@@ -220,6 +229,7 @@ class UpdateEvent:
         status = not actual_status
         await self.crud.update(query, {"publicationStatus": status})
         return {"actualStatus": status}
+
 
     def check_modified(self, modified_count: int) -> dict:
         """

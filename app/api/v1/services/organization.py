@@ -202,11 +202,15 @@ class OrganizationController:
         """
         query = {"organizationId": organization_id}
         org = await self.crud.find(query)
+
         if not org:
             return None
 
         if org.get("userOwner") != user_id:
             return 403
+
+        
+        events_org = org["events"]
 
         # Remove organization
         await self.crud.delete(query)
@@ -225,6 +229,18 @@ class OrganizationController:
             array_name="events",
             condition={"organizationName": org["organizationName"]},
             many=True)
+
+        #Remove all  my_events Related in users own docs
+        for event in events_org:
+            print("Deleted Event")
+            await self.users.pull_array(
+                query={"userId": user_id},
+                array_name="myEvents",
+                condition={"eventId": event["eventId"]}
+            )
+        
+        # Delete collaborations related events Related in user docs
+
 
     def create_url(self, organization_name: str):
         """

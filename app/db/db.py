@@ -9,7 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
 
-from error_logger.main import error_logger
+from logger.main import ErrorLogger
 from config import settings  # pylint: disable-msg=E0611
 
 
@@ -25,10 +25,7 @@ CONFIG = "retryWrites=true&w=majority"
 
 connection_str = f"mongodb+srv://{USER}:{PASSWORD}@{CLUSTER}/{NAME}?{CONFIG}"
 
-try:
-    client = AsyncIOMotorClient(connection_str)
-except Exception as ex:  # pylint: disable-msg=W0703
-    error_logger.register(ex)
+client = AsyncIOMotorClient(connection_str)
 
 # Get dabase
 db = client[settings.DB_NAME]
@@ -77,6 +74,9 @@ def jsonify(data: BSON) -> dict:
     """
 
     return json.loads(dumps(data))
+
+
+error_logger = ErrorLogger(get_collection)
 
 
 ###########################################

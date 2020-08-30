@@ -5,7 +5,6 @@ Error Logger Module
 import traceback
 from datetime import datetime
 
-from db.db import get_collection, CRUD
 from mails.sender import EmailSender
 
 from config import settings  # pylint: disable-msg=E0611
@@ -21,10 +20,9 @@ class ErrorLogger:
     Error logger implementation
     """
 
-    def __init__(self):
+    def __init__(self, get_collection):
         self.sender = EmailSender()
         self.collection = get_collection("errors")
-        self.crud = CRUD(self.collection)
 
     async def register(self, _exception):
         """
@@ -35,7 +33,7 @@ class ErrorLogger:
         # Notify the admin
         self.send_email_to_admin(error_dict)
         # Save on db
-        await self.crud.create(error_dict)
+        await self.collection.insert_one(error_dict)
 
     def format_db(self, _exception):
         """
@@ -86,6 +84,3 @@ class ErrorLogger:
           <li><h4>Error: {dict_error["exception"]}</h4></li>
         </ul>
         """
-
-
-error_logger = ErrorLogger()

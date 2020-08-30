@@ -9,6 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson.json_util import dumps
 from bson import BSON
 
+from error_logger.main import error_logger
 from config import settings  # pylint: disable-msg=E0611
 
 
@@ -23,7 +24,11 @@ PASSWORD = settings.DB_PASSWORD
 CONFIG = "retryWrites=true&w=majority"
 
 connection_str = f"mongodb+srv://{USER}:{PASSWORD}@{CLUSTER}/{NAME}?{CONFIG}"
-client = AsyncIOMotorClient(connection_str)
+
+try:
+    client = AsyncIOMotorClient(connection_str)
+except Exception as ex:  # pylint: disable-msg=W0703
+    error_logger.register(ex)
 
 # Get dabase
 db = client[settings.DB_NAME]
@@ -97,7 +102,10 @@ class CRUD:
         """
         Create a new document in collection.
         """
-        created = await self.coll.insert_one(document_data)
+        try:
+            created = await self.coll.insert_one(document_data)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
         return str(created.inserted_id)
 
     async def update(
@@ -106,10 +114,17 @@ class CRUD:
         Update an existing document.
         """
         if many:
-            updated = await self.coll.update_many(
-                query, {"$set": document_data})
+            try:
+                updated = await self.coll.update_many(
+                    query, {"$set": document_data})
+            except Exception as ex:  # pylint: disable-msg=W0703
+                error_logger.register(ex)
         else:
-            updated = await self.coll.update_one(query, {"$set": document_data})
+            try:
+                updated = await self.coll.update_one(
+                    query, {"$set": document_data})
+            except Exception as ex:  # pylint: disable-msg=W0703
+                error_logger.register(ex)
         return int(updated.modified_count)
 
     async def add_to_set(self, query: dict, array_name: str, data: any) -> int:
@@ -117,7 +132,10 @@ class CRUD:
         Add a new item to a list within a document.
         """
         operation = {"$addToSet": {f"{array_name}": data}}
-        updated = await self.coll.update_one(query, operation)
+        try:
+            updated = await self.coll.update_one(query, operation)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
         return int(updated.modified_count)
 
     async def push_nested(self, query: dict, path: str, data: any) -> int:
@@ -125,7 +143,10 @@ class CRUD:
         Insert a new document in nested element.
         """
         operation = {"$push":  {f"{path}": data}}
-        updated = await self.coll.update_one(query, operation)
+        try:
+            updated = await self.coll.update_one(query, operation)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
         return int(updated.modified_count)
 
     async def pull_array(
@@ -136,23 +157,35 @@ class CRUD:
         """
         operation = {"$pull": {f"{array_name}": condition}}
         if many:
-            updated = await self.coll.update_many(query, operation)
+            try:
+                updated = await self.coll.update_many(query, operation)
+            except Exception as ex:  # pylint: disable-msg=W0703
+                error_logger.register(ex)
         else:
-            updated = await self.coll.update_one(query, operation)
+            try:
+                updated = await self.coll.update_one(query, operation)
+            except Exception as ex:  # pylint: disable-msg=W0703
+                error_logger.register(ex)
         return int(updated.modified_count)
 
     async def delete(self, query: dict) -> int:
         """
         Delete a existing document.
         """
-        deleted = await self.coll.delete_one(query)
+        try:
+            deleted = await self.coll.delete_one(query)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
         return int(deleted.deleted_count)
 
     async def delete_many(self, query: dict) -> None:
         """
         Delete many documents.
         """
-        await self.coll.delete_many(query)
+        try:
+            await self.coll.delete_many(query)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
 
     async def find(
             self, query: dict,
@@ -172,14 +205,20 @@ class CRUD:
 
         # For find a single document
         if only_one:
-            document = await self.coll.find_one(query, query_filter)
+            try:
+                document = await self.coll.find_one(query, query_filter)
+            except Exception as ex:  # pylint: disable-msg=W0703
+                error_logger.register(ex)
             return jsonify(document)
 
         # For find multiple documents
-        cursor = self.coll.find(query, query_filter)
-        items = []
-        for document in await cursor.to_list(length=100):
-            items.append(document)
+        try:
+            cursor = self.coll.find(query, query_filter)
+            items = []
+            for document in await cursor.to_list(length=100):
+                items.append(document)
+        except Exception as ex:  # pylint: disable-msg=W0703
+            error_logger.register(ex)
 
         return items
 

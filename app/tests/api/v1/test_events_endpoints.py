@@ -15,7 +15,7 @@ def test_create_events(client, test_event, get_token, dummy_user):
     body = {
         "name": dummy_user["email"],
         "template": test_event["template"],
-        "url": test_event["url"],
+        "url": str(uuid4()),
         "startDate": test_event["startDate"],
         "organizationName": test_event["organizationName"]
     }

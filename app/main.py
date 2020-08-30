@@ -9,6 +9,10 @@ from api.v1 import api_router
 from auth.routes import auth_router
 from config import settings  # pylint: disable-msg=E0611
 
+###########################################
+##                Metadata               ##
+###########################################
+
 tags_metadata = [
     {
         "name": "Auth",

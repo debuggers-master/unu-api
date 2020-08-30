@@ -209,7 +209,6 @@ class OrganizationController:
         if org.get("userOwner") != user_id:
             return 403
 
-        
         events_org = org["events"]
 
         # Remove organization
@@ -230,7 +229,7 @@ class OrganizationController:
             condition={"organizationName": org["organizationName"]},
             many=True)
 
-        #Remove all  my_events Related in users own docs
+        # Remove all  my_events Related in users own docs
         for event in events_org:
             print("Deleted Event")
             await self.users.pull_array(
@@ -238,9 +237,8 @@ class OrganizationController:
                 array_name="myEvents",
                 condition={"eventId": event["eventId"]}
             )
-        
-        # Delete collaborations related events Related in user docs
 
+        # Delete collaborations related events Related in user docs
 
     def create_url(self, organization_name: str):
         """

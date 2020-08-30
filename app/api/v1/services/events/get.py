@@ -95,7 +95,8 @@ class GetEvent:
         # now = datetime.now()
         # today = date(now.year, now.month, now.day)
         query = {"publicationStatus": True}
-        filters = ["eventId", "name", "startDate", "organizationName", "publicationStatus"]
+        filters = ["eventId", "name", "startDate",
+                   "organizationName", "publicationStatus"]
         events = await self.crud.find(query, only_one=False, filters=filters)
         return events
 

@@ -105,7 +105,7 @@ class CRUD:
         try:
             created = await self.coll.insert_one(document_data)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
         return str(created.inserted_id)
 
     async def update(
@@ -118,13 +118,13 @@ class CRUD:
                 updated = await self.coll.update_many(
                     query, {"$set": document_data})
             except Exception as ex:  # pylint: disable-msg=W0703
-                error_logger.register(ex)
+                await error_logger.register(ex)
         else:
             try:
                 updated = await self.coll.update_one(
                     query, {"$set": document_data})
             except Exception as ex:  # pylint: disable-msg=W0703
-                error_logger.register(ex)
+                await error_logger.register(ex)
         return int(updated.modified_count)
 
     async def add_to_set(self, query: dict, array_name: str, data: any) -> int:
@@ -135,7 +135,7 @@ class CRUD:
         try:
             updated = await self.coll.update_one(query, operation)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
         return int(updated.modified_count)
 
     async def push_nested(self, query: dict, path: str, data: any) -> int:
@@ -146,7 +146,7 @@ class CRUD:
         try:
             updated = await self.coll.update_one(query, operation)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
         return int(updated.modified_count)
 
     async def pull_array(
@@ -160,12 +160,12 @@ class CRUD:
             try:
                 updated = await self.coll.update_many(query, operation)
             except Exception as ex:  # pylint: disable-msg=W0703
-                error_logger.register(ex)
+                await error_logger.register(ex)
         else:
             try:
                 updated = await self.coll.update_one(query, operation)
             except Exception as ex:  # pylint: disable-msg=W0703
-                error_logger.register(ex)
+                await error_logger.register(ex)
         return int(updated.modified_count)
 
     async def delete(self, query: dict) -> int:
@@ -175,7 +175,7 @@ class CRUD:
         try:
             deleted = await self.coll.delete_one(query)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
         return int(deleted.deleted_count)
 
     async def delete_many(self, query: dict) -> None:
@@ -185,7 +185,7 @@ class CRUD:
         try:
             await self.coll.delete_many(query)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
 
     async def find(
             self, query: dict,
@@ -208,7 +208,7 @@ class CRUD:
             try:
                 document = await self.coll.find_one(query, query_filter)
             except Exception as ex:  # pylint: disable-msg=W0703
-                error_logger.register(ex)
+                await error_logger.register(ex)
             return jsonify(document)
 
         # For find multiple documents
@@ -218,7 +218,7 @@ class CRUD:
             for document in await cursor.to_list(length=100):
                 items.append(document)
         except Exception as ex:  # pylint: disable-msg=W0703
-            error_logger.register(ex)
+            await error_logger.register(ex)
 
         return items
 

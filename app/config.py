@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     CORS_ORIGIN: List[str]
     HOST: str = " http://35.239.16.11"
+    EMAIL_ADMIN: str = "debuggers.master@gmail.com"
 
     # --- AUTH --- #
     SECRET_JWT: str = token_urlsafe(32)

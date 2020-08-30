@@ -87,6 +87,7 @@ class EmailSender:
         ------
         email_to_send: Mail - The sendgrid email object to send.
         """
+
         self.sendgrid.send(email_to_send)
 
     def get_unix_time(self, date_time: datetime) -> int:

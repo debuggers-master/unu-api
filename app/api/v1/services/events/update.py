@@ -50,6 +50,15 @@ class UpdateEvent:
         if not event:
             return self.check_modified(False)
 
+        #Check url exits
+        query_url = {"organizationName": event_data.get("organizationName"),
+            "url":event_data.get("url")}
+        same_url_in_org = await self.crud.find(query_url)
+
+        if same_url_in_org:
+            return 409
+            
+
         # Update image only if are new files
         image_header = await self.update_image(new_data["imageHeader"])
         image_event = await self.update_image(new_data["imageEvent"])
@@ -204,22 +213,22 @@ class UpdateEvent:
 
         Return: bool
         """
-
-
-        
         # Check authorization
         user = await self.users.find({"email": email})
         user_events = user["myEvents"]
 
-        for event in user_events:
-            if event_id == event["eventId"]:
-                # Update the status only if the owner call this edpoint.
-                query = _make_query(event_id)
-                status = not actual_status
-                await self.crud.update(query, {"publicationStatus": status})
-                return {"actualStatus": status}
-        return 403
+        is_user_admin = list(
+            filter(lambda ev: ev.get("eventId") == event_id, user_events))
+        is_user_admin = bool(len(is_user_admin))
 
+        if not is_user_admin:
+            return 403
+
+        # Update the status only if the owner call this edpoint.
+        query = _make_query(event_id)
+        status = not actual_status
+        await self.crud.update(query, {"publicationStatus": status})
+        return {"actualStatus": status}
 
 
     def check_modified(self, modified_count: int) -> dict:

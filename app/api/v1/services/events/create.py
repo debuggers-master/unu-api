@@ -48,6 +48,15 @@ class CreateEvent:
         ------
         event_id: dict - The event uuid created.
         """
+        
+        #Check url exits
+        query_url = {"organizationName": event_data.get("organizationName"),
+                 "url":event_data.get("url")}
+        same_url_in_org = await self.crud.find(query_url)
+
+        if same_url_in_org:
+            return 409
+
         event_id = _uuid()
 
         # Create the correct organization url

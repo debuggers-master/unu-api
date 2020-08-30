@@ -124,6 +124,10 @@ async def create_event(
     event_id = await CreateMethods.create_event(
         new_event.dict(), curret_user.email)
 
+    if event_id == 409:
+        raise HTTPException(status_code=409,
+                            detail="url event is already used")
+
     if not event_id:
         raise server_error
     return event_id

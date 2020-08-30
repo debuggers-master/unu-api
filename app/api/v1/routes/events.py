@@ -160,8 +160,11 @@ async def get_event_from_url(
     """
     Get a event using eventId
     """
+
+    organization_url = organizationName.lower()
+
     event_info = await ReadMethods.get_event_from_url(
-        organizationName, url,
+        organization_url, url,
         filters=filters, excludes=excludes)
 
     if not event_info:

@@ -248,7 +248,9 @@ headers: {Authorization: `Bearer {acces_token}`}
       "name": str,
       "startDate": str,
       "shortDescription": str
-      "organization": str,
+      "organizationName": str,
+      "publicationStatus": str,
+      "imageEvent": str,
     },
     ...
   ]

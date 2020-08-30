@@ -185,7 +185,6 @@ async def get_published_events():
     Retrieve a list with all published events.
     """
     event_list = await ReadMethods.get_published_events()
-    print(event_list)
     return event_list
 
 

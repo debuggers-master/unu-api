@@ -119,3 +119,5 @@ class EventPublishOut(BaseModel):
     startDate: str = Field(..., description="The event start date")
     organizationName: str = Field(..., description="The organization name")
     publicationStatus: Optional[bool]
+    shortDescription: Optional[str]
+    imageEvent: Optional[str]

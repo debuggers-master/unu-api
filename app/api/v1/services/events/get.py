@@ -95,9 +95,7 @@ class GetEvent:
         # now = datetime.now()
         # today = date(now.year, now.month, now.day)
         query = {"publicationStatus": True}
-        filters = ["eventId", "name", "startDate",
-                   "organizationName", "publicationStatus"]
-        events = await self.crud.find(query, only_one=False, filters=filters)
+        events = await self.crud.find(query, only_one=False)
         return events
 
     async def get_count_particpants(self, event_id: str) -> int:

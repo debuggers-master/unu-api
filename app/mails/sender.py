@@ -14,7 +14,6 @@ from sendgrid.helpers.mail import (
     FileName, FileType, Disposition
 )
 
-from logger.main import error_logger
 from config import settings  # pylint: disable-msg=E0611
 
 
@@ -88,10 +87,8 @@ class EmailSender:
         ------
         email_to_send: Mail - The sendgrid email object to send.
         """
-        try:
-            self.sendgrid.send(email_to_send)
-        except Exception as ex:
-            error_logger.register(ex)
+
+        self.sendgrid.send(email_to_send)
 
     def get_unix_time(self, date_time: datetime) -> int:
         """

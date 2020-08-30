@@ -16,14 +16,14 @@ from config import settings  # pylint: disable-msg=E0611
 ###########################################
 
 
-class ErroLogger:
+class ErrorLogger:
     """
     Error logger implementation
     """
 
     def __init__(self):
         self.sender = EmailSender()
-        self.collection = get_collection("error")
+        self.collection = get_collection("errors")
         self.crud = CRUD(self.collection)
 
     async def register(self, _exception):
@@ -63,7 +63,7 @@ class ErroLogger:
             subject="UNU API ERROR",
             html_content=message)
 
-        self.sender.send.send_email(email)
+        self.sender.send_email(email)
 
     def exception_to_string(self, excp):
         """
@@ -88,4 +88,4 @@ class ErroLogger:
         """
 
 
-error_logger = ErroLogger()
+error_logger = ErrorLogger()

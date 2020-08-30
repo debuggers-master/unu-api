@@ -108,3 +108,14 @@ class EventIn(BaseModel):
     """
     eventId: str = Field(..., description="The event id")
     eventData: EventBasicInfo = Field(...)
+
+
+class EventPublishOut(BaseModel):
+    """
+    Base model of return events publish info
+    """
+    eventId: str = Field(..., description=" uuid of the event")
+    name: Optional[str] = Field(description="The event name")
+    startDate: str = Field(..., description="The event start date")
+    organizationName: str = Field(..., description="The organization name")
+    publicationStatus: Optional[bool]

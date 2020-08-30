@@ -91,7 +91,7 @@ class UserOut(UserId, UserBase):
     """
     organizations: Optional[List[OrganizationOut]] = []
     myEvents: Optional[List[EventUserBaseDB]] = []
-    collaborations: Optional[List[EventInUSer]] = []
+    collaborations: Optional[List[CollaborationsDB]] = []
 
 
 class UserUpdate(UserId):

@@ -62,7 +62,8 @@ source scripts/dev.sh
 > OpenApi: https://unu-api.tk/redoc
 
 ### Url
-**base_path**: http://35.239.16.11.com/api/v1
+**base_path**: `https://unu-api.tk/api/v1`
+* auth routes use the base root `/`
 
 ### Authorization
 All routes excpet `auth/login` & `auth/signup` require the Authorization header.

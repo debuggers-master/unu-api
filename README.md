@@ -57,9 +57,9 @@ source scripts/dev.sh
 
 #### Complete documentation
 
-> Swagger: http://35.239.16.11/docs
+> Swagger: https://unu-api.tk/docs
 
-> OpenApi: http://35.239.16.11/redoc
+> OpenApi: https://unu-api.tk/redoc
 
 ### Url
 **base_path**: http://35.239.16.11.com/api/v1

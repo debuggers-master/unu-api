@@ -21,7 +21,7 @@ async def get_storage_bucket():
         client = storage.Client()
     except DefaultCredentialsError:
         client = storage.Client(settings.GOOGLE_APPLICATION_CREDENTIALS)
-    except Exception as ex:  # pylint: disable-msg=W0703
+    except Exception:  # pylint: disable-msg=W0703
         return False
     bucket = client.bucket(buckent_name)
     return bucket
